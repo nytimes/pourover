@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>Basic PourOver example</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page">
+            
+              
+              <a class="source" href="advanced_filters.html">
+                advanced_filters.js
+              </a>
+            
+              
+              <a class="source" href="advanced_views.html">
+                advanced_views.js
+              </a>
+            
+              
+              <a class="source" href="basic_pourover_ing.html">
+                basic_pourover_ing.js
+              </a>
+            
+              
+              <a class="source" href="buffering.html">
+                buffering.js
+              </a>
+            
+          </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              <h1 id="basic-pourover-example">Basic PourOver example</h1>
+<p>This will cover the creation of a collection and the basic use of filters, views, and sorts</p>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <h3 id="data">Data</h3>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>Let’s start with a nice array of data. All PourOver collections <em>must</em> be instantiated on
+arrays of hashes like the following, each item a hash of attributes.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> monsters = [{name: <span class="hljs-string">"sphinx"</span>, mythology: <span class="hljs-string">"greek"</span>, eyes: <span class="hljs-number">2</span>, sex: <span class="hljs-string">"f"</span>, hobbies: [<span class="hljs-string">"riddles"</span>,<span class="hljs-string">"sitting"</span>,<span class="hljs-string">"being a wonder"</span>]},
+                {name: <span class="hljs-string">"hydra"</span>, mythology: <span class="hljs-string">"greek"</span>, eyes: <span class="hljs-number">18</span>, sex: <span class="hljs-string">"m"</span>, hobbies: [<span class="hljs-string">"coiling"</span>,<span class="hljs-string">"terrorizing"</span>,<span class="hljs-string">"growing"</span>]},
+                {name: <span class="hljs-string">"huldra"</span>, mythology: <span class="hljs-string">"norse"</span>, eyes: <span class="hljs-number">2</span>, sex: <span class="hljs-string">"f"</span>, hobbies: [<span class="hljs-string">"luring"</span>,<span class="hljs-string">"terrorizing"</span>]},
+                {name: <span class="hljs-string">"cyclops"</span>, mythology: <span class="hljs-string">"greek"</span>, eyes: <span class="hljs-number">1</span>, sex: <span class="hljs-string">"m"</span>, hobbies: [<span class="hljs-string">"staring"</span>,<span class="hljs-string">"terrorizing"</span>]},
+                {name: <span class="hljs-string">"fenrir"</span>, mythology: <span class="hljs-string">"norse"</span>, eyes: <span class="hljs-number">2</span>, sex: <span class="hljs-string">"m"</span>, hobbies: [<span class="hljs-string">"growing"</span>,<span class="hljs-string">"god-killing"</span>]},
+                {name: <span class="hljs-string">"medusa"</span>,  mythology: <span class="hljs-string">"greek"</span>, eyes: <span class="hljs-number">2</span>, sex: <span class="hljs-string">"f"</span>, hobbies: [<span class="hljs-string">"coiling"</span>,<span class="hljs-string">"staring"</span>]}];</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <h3 id="collection-creation">Collection creation</h3>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p>We create a new PourOver collection by passing the data array into the <code>PourOver.Collection</code> constructor.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> collection = <span class="hljs-keyword">new</span> PourOver.Collection(monsters);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <h3 id="filter-creation">Filter creation</h3>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p>To do anything interesting with collections, we — almost always — need to add some filters. 
+The most common filter is the exactFilter, a filter that describes an attribute that is satisfied by exactly
+one choice of several possibilities. For example, in the above example, the “mythology” attribute has two possibilities:
+“greek” or “norse”. Every item has the value “greek” or “norse” for its mythology.
+<em>NOTE: <code>exactFilter</code>s’ names must be identical to the item attribute that they index</em></p>
+<p>For the most common filter types, such as “exactFilter”, PourOver ships with convenience constructors.
+<em>NOTE: Constructors for preset filters and sorts — like the ones below — are not initialized with “new”.
+They are simply passed a name and the set of possibilities.</em></p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> mythology_filter = PourOver.makeExactFilter(<span class="hljs-string">"mythology"</span>, [<span class="hljs-string">"greek"</span>,<span class="hljs-string">"norse"</span>]);
+<span class="hljs-keyword">var</span> gender_filter = PourOver.makeExactFilter(<span class="hljs-string">"sex"</span>, [<span class="hljs-string">"m"</span>,<span class="hljs-string">"f"</span>]);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              <p>Now, we will construct the other most-common filter, the <code>inclusionFilter</code>. The <code>inclusionFilter</code> is similar to the <code>exactFilter</code>.
+However, rather than items have a single choice, <code>inclusionFilter</code>s describe attributes that can have multiple choices per item.
+<em>NOTE: <code>inclusionFilter</code>s’ names must be identical to the item attribute that they index</em></p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> hobbies_filter = PourOver.makeInclusionFilter(<span class="hljs-string">"hobbies"</span>,[<span class="hljs-string">"riddles"</span>,
+                                                             <span class="hljs-string">"sitting"</span>,
+                                                             <span class="hljs-string">"being a wonder"</span>,
+                                                             <span class="hljs-string">"coiling"</span>,
+                                                             <span class="hljs-string">"terrorizing"</span>,
+                                                             <span class="hljs-string">"growing"</span>,
+                                                             <span class="hljs-string">"luring"</span>,
+                                                             <span class="hljs-string">"staring"</span>,
+                                                             <span class="hljs-string">"god-killing"</span>]);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
+              <h3 id="adding-filters">Adding filters</h3>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-10">&#182;</a>
+              </div>
+              <p>After constructing our filters, we have to add them to the collection. This will causes the filters to index
+the collection, pre-computing which collection elements satisfy each possibility’s predicate. For exact filters, the
+predicate is equality; a collection item satisfies a possibility if it’s value is equal to the value of the possibility.</p>
+<p>Adding a filter to a collection will also tell the filter to smartly reconstruct itself when items are added to, removed from, or
+updated in the collection.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>collection.addFilters([mythology_filter, gender_filter, hobbies_filter]);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-11">&#182;</a>
+              </div>
+              <h3 id="non-stateful-pure-querying-of-filters">Non-stateful (pure) querying of filters</h3>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-12">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-12">&#182;</a>
+              </div>
+              <p>Now that we have a nice set of filters, we would like to do something interesting: query them and combine the queries into more
+complex queries. PourOver supports both pure and stateful queries. We will cover the former first.</p>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-13">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-13">&#182;</a>
+              </div>
+              <p>Here we see that we query <code>exactFilter</code>s and <code>inclusionFilter</code>s the same way, by passing in the value for which we would like to search.
+<em>NOTE: Always access the filter through the <code>collection.filters</code> object. Do not use the “foo_filter” that you initialized earlier. When 
+you add filters to a collection, the filter gets cloned first. Querying the original filters, the pre-added filters, will not work.</em> </p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> greek_monsters = collection.filters.mythology.getFn(<span class="hljs-string">"greek"</span>);
+<span class="hljs-keyword">var</span> terror_monsters = collection.filters.hobbies.getFn(<span class="hljs-string">"terrorizing"</span>);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-14">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-14">&#182;</a>
+              </div>
+              <p>Querying filters returns a <code>MatchSet</code>, an objects that wraps a result and can be combined — AND, OR, NOT — with other <code>MatchSets</code>.
+The boolean combinations will also return <code>MatchSet</code>s and can, in turn, be further combined.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> greek_terrors = greek_monsters.and(terror_monsters);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-15">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-15">&#182;</a>
+              </div>
+              <p>To get the value of a MatchSet, simply access its <code>cids</code> — read “collection ids” — property. These cids can be passed to a collection’s <code>get</code>
+function to transform the cids into the actual objects they represent.
+The value of my_monsters will be:</p>
+<pre><code>[{<span class="hljs-string">"name"</span>:<span class="hljs-string">"hydra"</span>,<span class="hljs-string">"mythology"</span>:<span class="hljs-string">"greek"</span>,<span class="hljs-string">"eyes"</span>:<span class="hljs-number">18</span>,<span class="hljs-string">"sex"</span>:<span class="hljs-string">"m"</span>,<span class="hljs-string">"hobbies"</span>:[<span class="hljs-string">"coiling"</span>,<span class="hljs-string">"terrorizing"</span>,<span class="hljs-string">"growing"</span>],<span class="hljs-string">"cid"</span>:<span class="hljs-number">1</span>},
+ {<span class="hljs-string">"name"</span>:<span class="hljs-string">"cyclops"</span>,<span class="hljs-string">"mythology"</span>:<span class="hljs-string">"greek"</span>,<span class="hljs-string">"eyes"</span>:<span class="hljs-number">1</span>,<span class="hljs-string">"sex"</span>:<span class="hljs-string">"m"</span>,<span class="hljs-string">"hobbies"</span>:[<span class="hljs-string">"staring"</span>,<span class="hljs-string">"terrorizing"</span>],<span class="hljs-string">"cid"</span>:<span class="hljs-number">3</span>}]
+</code></pre>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> my_monsters = collection.get(greek_terrors.cids);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-16">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-16">&#182;</a>
+              </div>
+              <h3 id="stateful-querying">Stateful querying</h3>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-17">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-17">&#182;</a>
+              </div>
+              <p>Pure queries are always nice but they don’t map nicely to the core use case for PourOver: 
+modelling UI’s in which users query a collection by clicking, sliding, scrubbing and editing
+controls. You will want to remember what their current query is. Otherwise, you’d lose their work!</p>
+<p>Stateful queries are very similar to pure queries. You just use the <code>query</code> method of a filter instead of the <code>getFn</code> method.
+This will store the result of the query  on the <code>current_query</code> attribute of the filter.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>collection.filters.mythology.query(<span class="hljs-string">"greek"</span>);
+collection.filters.hobbies.query(<span class="hljs-string">"terrorizing"</span>);
+<span class="hljs-keyword">var</span> getCurrentMonsters = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span>{</span>
+    <span class="hljs-keyword">var</span> myth_set = collection.filters.mythology.current_query,
+        hobby_set = collection.filters.hobbies.current_query,
+        output_set = myth_set.and(hobby_set);
+
+    <span class="hljs-keyword">return</span> collection.get(output_set.cids);
+}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-18">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-18">&#182;</a>
+              </div>
+              <p>Now, whenever a user queries a filter (through some currently undefined UI action), we can just call <code>getCurrentMonsters()</code>
+and get the current set of monsters, filtered by mythology and hobbies. By default, an unqueried filter or empty query 
+returns a match set representing the entire collection. This means that intersections and unions will work regardless of 
+whether or not a query has been made.</p>
+<p>But something is missing. We don’t want to have to write <code>getCurrentMonsters</code> everytime we make an app. 
+Also, it would be nice if we could cache the <em>result</em> of getCurrentMonsters to speed up subsequent renders.
+Moreover, we don’t have any way (yet) to page through results or sort them.</p>
+<p>Enter views … </p>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-19">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-19">&#182;</a>
+              </div>
+              <h3 id="views">Views</h3>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-20">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-20">&#182;</a>
+              </div>
+              <p>In PourOver, a View is used to cache the combination of many queries, paging through and sorting the results.</p>
+<p>To construct a View, we pass a name and a collection into the constructor.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> view = <span class="hljs-keyword">new</span> PourOver.View(<span class="hljs-string">"default_view"</span>, collection);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-21">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-21">&#182;</a>
+              </div>
+              <p>Whenever a stateful query occurs, the View will update its cached <code>MatchSet</code> with the result of its <code>selectionFn</code>. This 
+describes how a View should combine the filters on a collection. The default View selectionFn simply intersects all the
+collection’s filters together. This should cover the standard use case of a UI in which each control maps to a filter.
+If a user selects “greek” for “mythology” and “terrorizing” for “hobbies”, she expects the result to be all monsters which are
+Greek AND terrorize, the intersection of all the filters. (Sex will also be intersected but, since it hasn’t been queried in 
+our example, it will not affect the result of the intersection)</p>
+<p>To get this cached result of a <code>View</code>, call the <code>getCurrentItems</code> method;</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> current_monsters = view.getCurrentItems();</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-22">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-22">&#182;</a>
+              </div>
+              <h3 id="paging-views">Paging Views</h3>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-23">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-23">&#182;</a>
+              </div>
+              <p>Views nicely abstract over the paging pattern. By default, Views have an infinite page size. To set a smaller page size, either:</p>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-24">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-24">&#182;</a>
+              </div>
+              <p>-1. pass in a <code>page_size</code>: [int] option to the constructor</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> paged_view_1 = <span class="hljs-keyword">new</span> PourOver.View(<span class="hljs-string">"paged_view"</span>, collection, {page_size: <span class="hljs-number">1</span>});</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-25">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-25">&#182;</a>
+              </div>
+              <p>-2. extend <code>PourOver.View</code>, override the <code>page_size</code> attribute and instantiate your new View type</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> PagedView = PourOver.View.extend({
+    page_size: <span class="hljs-number">1</span>
+});
+<span class="hljs-keyword">var</span> paged_view_2 = <span class="hljs-keyword">new</span> PagedView(<span class="hljs-string">"paged_view_2"</span>, collection);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-26">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-26">&#182;</a>
+              </div>
+              <p>Once instantiated with a page_size attribute, we can call <code>page</code> and <code>pageTo</code> methods to move around in the <code>View</code>. 
+<code>getCurrentItems</code> will automatically respect the current page. 
+<code>page(n)</code> moves the current_page n pages forward. (Negative n pages backwards)
+<code>pageTo(cid)</code> finds which page a cid is on and changes the page to that page</p>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-27">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-27">&#182;</a>
+              </div>
+              <p>Page one to the right</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>paged_view_1.page(<span class="hljs-number">1</span>);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-28">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-28">&#182;</a>
+              </div>
+              <p>Page to the third item in the collection (cid #2)</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>paged_view_1.pageTo(<span class="hljs-number">2</span>);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-29">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-29">&#182;</a>
+              </div>
+              <h3 id="events">Events</h3>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-30">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-30">&#182;</a>
+              </div>
+              <p>All changes, queries, etc. trigger PourOver events. Most of the time, you only need to care about the View event “update”.
+This gets fired whenever something happens that would require a re-render (queries, addition, removals, etc.)
+<em>NOTE: “render” is nothing special in PourOver. A common pattern is just to define render function for your view.</em></p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>
+paged_view_1.on(<span class="hljs-string">"update"</span>,<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span>{</span>
+   paged_view_1.render(); 
+})</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-31">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-31">&#182;</a>
+              </div>
+              <h3 id="conclusion">Conclusion</h3>
+<p>This example should cover 90% of use cases for PourOver. For more complicated behavior.</p>
+<ul>
+<li>the “advanced_views” example will demonstrate sorting, the creation of custom selectionFns, and other arcana</li>
+<li>the “advanced_filters” example will explain the default filters and demonstrate how to create a new filter type</li>
+<li>the “buffering” example will demonstate how to use BufferedCollection and BufferedViews to lazily load non-categorical data</li>
+<li>the “events” example will demonstrate how to plug into the overly complex event system and uses silent updating to optimize queries</li>
+<li>the “ui” example will demonstrate how to use the PourOver.UI module to simplify the making of UIs</li>
+</ul>
+
+            </div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>

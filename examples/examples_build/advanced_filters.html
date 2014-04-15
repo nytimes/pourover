@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>Advanced filters</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page">
+            
+              
+              <a class="source" href="advanced_filters.html">
+                advanced_filters.js
+              </a>
+            
+              
+              <a class="source" href="advanced_views.html">
+                advanced_views.js
+              </a>
+            
+              
+              <a class="source" href="basic_pourover_ing.html">
+                basic_pourover_ing.js
+              </a>
+            
+              
+              <a class="source" href="buffering.html">
+                buffering.js
+              </a>
+            
+          </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              <h1 id="advanced-filters">Advanced filters</h1>
+<p>This example will cover the preset filter types and demonstrate how to create custom filter types.</p>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>First, let’s use our set up from the <a href="/pourover/examples/examples_build/basic_pourover_ing.html">basic example</a></p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>
+<span class="hljs-keyword">var</span> monsters = [{name: <span class="hljs-string">"sphinx"</span>, mythology: <span class="hljs-string">"greek"</span>, eyes: <span class="hljs-number">2</span>, sex: <span class="hljs-string">"f"</span>, hobbies: [<span class="hljs-string">"riddles"</span>,<span class="hljs-string">"sitting"</span>,<span class="hljs-string">"being a wonder"</span>]},
+                {name: <span class="hljs-string">"hydra"</span>, mythology: <span class="hljs-string">"greek"</span>, eyes: <span class="hljs-number">18</span>, sex: <span class="hljs-string">"m"</span>, hobbies: [<span class="hljs-string">"coiling"</span>,<span class="hljs-string">"terrorizing"</span>,<span class="hljs-string">"growing"</span>]},
+                {name: <span class="hljs-string">"huldra"</span>, mythology: <span class="hljs-string">"norse"</span>, eyes: <span class="hljs-number">2</span>, sex: <span class="hljs-string">"f"</span>, hobbies: [<span class="hljs-string">"luring"</span>,<span class="hljs-string">"terrorizing"</span>]},
+                {name: <span class="hljs-string">"cyclops"</span>, mythology: <span class="hljs-string">"greek"</span>, eyes: <span class="hljs-number">1</span>, sex: <span class="hljs-string">"m"</span>, hobbies: [<span class="hljs-string">"staring"</span>,<span class="hljs-string">"terrorizing"</span>]},
+                {name: <span class="hljs-string">"fenrir"</span>, mythology: <span class="hljs-string">"norse"</span>, eyes: <span class="hljs-number">2</span>, sex: <span class="hljs-string">"m"</span>, hobbies: [<span class="hljs-string">"growing"</span>,<span class="hljs-string">"god-killing"</span>]},
+                {name: <span class="hljs-string">"medusa"</span>,  mythology: <span class="hljs-string">"greek"</span>, eyes: <span class="hljs-number">2</span>, sex: <span class="hljs-string">"f"</span>, hobbies: [<span class="hljs-string">"coiling"</span>,<span class="hljs-string">"staring"</span>]}];
+
+<span class="hljs-keyword">var</span> collection = <span class="hljs-keyword">new</span> PourOver.Collection(monsters);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <h3 id="preset-filters">Preset Filters</h3>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p>We have already seen <code>exactFilter</code> and <code>inclusionFilter</code> in the <a href="/pourover/examples/examples_build/basic_pourover_ing.html">basic example</a>.
+<em>NOTE: <code>exactFilter</code>s’ and <code>inclusionFilter</code>s’ names must be identical to the item attribute that they index</em>
+We have seen <code>manualFilter</code> in the <a href="/pourover/examples/examples_build/advanced_views.html">advanced views example</a></p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> mythology_filter = PourOver.makeExactFilter(<span class="hljs-string">"mythology"</span>, [<span class="hljs-string">"greek"</span>,<span class="hljs-string">"norse"</span>]);
+<span class="hljs-keyword">var</span> gender_filter = PourOver.makeExactFilter(<span class="hljs-string">"sex"</span>, [<span class="hljs-string">"m"</span>,<span class="hljs-string">"f"</span>]);
+<span class="hljs-keyword">var</span> hobbies_filter = PourOver.makeInclusionFilter(<span class="hljs-string">"hobbies"</span>,[<span class="hljs-string">"riddles"</span>,
+                                                             <span class="hljs-string">"sitting"</span>,
+                                                             <span class="hljs-string">"being a wonder"</span>,
+                                                             <span class="hljs-string">"coiling"</span>,
+                                                             <span class="hljs-string">"terrorizing"</span>,
+                                                             <span class="hljs-string">"growing"</span>,
+                                                             <span class="hljs-string">"luring"</span>,
+                                                             <span class="hljs-string">"staring"</span>,
+                                                             <span class="hljs-string">"god-killing"</span>]);
+<span class="hljs-keyword">var</span> favorites_filter = PourOver.makeManualFilter(<span class="hljs-string">"favorites"</span>);
+collection.addFilters([mythology_filter, gender_filter, hobbies_filter, favorites_filter]);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p>There are two more preset filters which are related to each other:</p>
+<ul>
+<li><code>rangeFilter</code> : Possibilities are inclusive, numerical ranges ([[1,5],[6,10]]), queries can only be one of these exact ranges 
+and they return all items, whose relevant attribute falls between the extents of the range</li>
+<li><code>dvrangeFilter</code> : Possibilities are an ordered set of values ([1,2,3,4,5,6,7,8,9,10]), queries are any lower and upper bound for the
+sorted set of possibilites and they return all items, whose relevant attribute falls between the extents of the range</li>
+</ul>
+<p>Range filters are more efficient than dvrangeFilters for wide domains ([[1,10000],[10001,100000]]). They trade efficiency for flexibility; you can only query by the
+preset ranges</p>
+<p><em>NOTE: Range filters must be numeric. DvrangeFilters can be any sorted set, it determines a range based on index.</em></p>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p>Here we create two eyes filters. One for each of the range filter types.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> eyes_range_filter = PourOver.makeRangeFilter(<span class="hljs-string">"eyes_range"</span>,[[<span class="hljs-number">1</span>,<span class="hljs-number">1</span>],[<span class="hljs-number">2</span>,<span class="hljs-number">10</span>],[<span class="hljs-number">11</span>,<span class="hljs-number">20</span>]],{attr: <span class="hljs-string">"eyes"</span>})
+<span class="hljs-keyword">var</span> eyes_dvrange_filter = PourOver.makeDVrangeFilter(<span class="hljs-string">"eyes_dvrange"</span>,[<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">4</span>,<span class="hljs-number">5</span>,<span class="hljs-number">6</span>,<span class="hljs-number">7</span>,<span class="hljs-number">8</span>,<span class="hljs-number">9</span>,<span class="hljs-number">10</span>,<span class="hljs-number">11</span>,<span class="hljs-number">12</span>,<span class="hljs-number">13</span>,<span class="hljs-number">14</span>,<span class="hljs-number">15</span>,<span class="hljs-number">16</span>,<span class="hljs-number">17</span>,<span class="hljs-number">18</span>,<span class="hljs-number">19</span>,<span class="hljs-number">20</span>],{attr: <span class="hljs-string">"eyes"</span>})
+collection.addFilters([eyes_range_filter,eyes_dvrange_filter])</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p>To get all 2-10 eyed monsters</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> some_eyed_monster_cids = collection.filters.eyes_range.getFn([<span class="hljs-number">2</span>,<span class="hljs-number">10</span>]).cids
+<span class="hljs-keyword">var</span> some_eyed_monsters = collection.get(some_eyed_monster_cids)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              <p>To get 1-2 eyed monsters</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> lte_two_eyed_monster_cids = collection.filters.eyes_dvrange.getFn([<span class="hljs-number">1</span>,<span class="hljs-number">2</span>]).cids
+<span class="hljs-keyword">var</span> lte_two_eyed_monsters = collection.get(lte_two_eyed_monster_cids)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
+              <p>While we could get, say, all the 1-10 eyed monsters by <code>or</code> combining the 1-1 range and the 2-10 range,
+there would be no way to get 1-2 eyed monsters out of the <code>eyes_range_filter</code>. Here we see the flexibility of
+dvrangeFilters</p>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-10">&#182;</a>
+              </div>
+              <h3 id="making-new-filter-types">Making new filter types</h3>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-11">&#182;</a>
+              </div>
+              <p>One of the virtues of PourOver is how easy it is to construct new filter types for either convenience or optimization.
+PourOver’s default filtering is fast but not optimized for huge numerical domains, like Crossfilter. You could, if you wanted to,
+make a custom filter type to integrate Crossfilters continunous numerical filtering power with the patterns and abstractions of 
+PourOver.</p>
+<p>Here we will create a new, toy filter type, caseInsensitiveFilter. It will work similarly to the exactFilter. However, it will
+match queries regardless of their case</p>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-12">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-12">&#182;</a>
+              </div>
+              <p>To create a new filter type we have to extend <code>PourOver.Filter</code> with a <code>cacheResults</code>,<code>addCacheResults</code> and <code>getFn</code></p>
+<ul>
+<li><code>cacheResults</code> specifies how to take set of items and assign them to possibilities</li>
+<li><code>addCacheResults</code> specifies how to append a set of items to extant possibility caches (This can be the same thing as cacheResults and
+only needs to be different for optimization purposes.</li>
+<li><code>getFn</code> specifies how to translate a query into some combination of possibility caches</li>
+</ul>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> CaseInsensitiveFilter = PourOver.Filter.extend({
+    cacheResults: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(items)</span>{</span>
+      <span class="hljs-keyword">var</span> possibilities = <span class="hljs-keyword">this</span>.possibilities,
+          attribute = <span class="hljs-keyword">this</span>.attr; 
+      _(items).each(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(i)</span>{</span>
+        <span class="hljs-keyword">var</span> value = i[attribute].toLowerCase();
+        _(possibilities).each(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(p)</span>{</span>
+            <span class="hljs-keyword">if</span> (p.value.toLowerCase() === value) {
+              p.matching_cids = PourOver.insert_sorted(p.matching_cids,i.cid)
+            }
+        })
+      });
+    },
+    addCacheResults: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(new_items)</span>{</span>
+        <span class="hljs-keyword">this</span>.cacheResults.call(<span class="hljs-keyword">this</span>,new_items); 
+    },
+    getFn: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(query)</span>{</span>
+        <span class="hljs-keyword">var</span> query_lc = query.toLowerCase(),
+            matching_possibility = _(<span class="hljs-keyword">this</span>.possibilities).find(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(p)</span>{</span>
+                <span class="hljs-keyword">var</span> value_lc = p.value.toLowerCase();
+                <span class="hljs-keyword">return</span> value_lc === query_lc;
+            });</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-13">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-13">&#182;</a>
+              </div>
+              <p><code>getFn</code> must return a <code>MatchSet</code>
+<code>makeQueryMatchSet</code> is a convenience function for making match sets.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.makeQueryMatchSet(matching_possibility.matching_cids,query)
+    }
+});</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-14">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-14">&#182;</a>
+              </div>
+              <p>Generally, we have to create convenience functions, mapping over input values to create the value objects that the Filter 
+constructor expects.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> makeCaseInsensitiveFilter = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(name,values,attr)</span>{</span>
+    <span class="hljs-keyword">var</span> values = _(values).map(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(i)</span>{</span><span class="hljs-keyword">return</span> {value:i}}),
+        opts = {associated_attrs: [attr], attr: attr},
+        filter = <span class="hljs-keyword">new</span> CaseInsensitiveFilter(name,values,opts);
+    <span class="hljs-keyword">return</span> filter;
+}
+<span class="hljs-keyword">var</span> case_insensitive_name_filter = makeCaseInsensitiveFilter(<span class="hljs-string">"ci_name_filter"</span>,[<span class="hljs-string">"sphinx"</span>,<span class="hljs-string">"hydra"</span>,<span class="hljs-string">"huldra"</span>,<span class="hljs-string">"cyclops"</span>,<span class="hljs-string">"medusa"</span>,<span class="hljs-string">"fenrir"</span>],<span class="hljs-string">"name"</span>)
+collection.addFilters([case_insensitive_name_filter])
+<span class="hljs-keyword">var</span> ci_cyclops_match_set = collection.filters.ci_name_filter.getFn(<span class="hljs-string">"CyClOps"</span>)
+<span class="hljs-keyword">var</span> ci_cyclops = collection.get(ci_cyclops_match_set.cids)</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>

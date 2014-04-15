@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>Buffering example</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page">
+            
+              
+              <a class="source" href="advanced_filters.html">
+                advanced_filters.js
+              </a>
+            
+              
+              <a class="source" href="advanced_views.html">
+                advanced_views.js
+              </a>
+            
+              
+              <a class="source" href="basic_pourover_ing.html">
+                basic_pourover_ing.js
+              </a>
+            
+              
+              <a class="source" href="buffering.html">
+                buffering.js
+              </a>
+            
+          </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              <h1 id="buffering-example">Buffering example</h1>
+<p>This example will show how to use <code>BufferedCollections</code> and <code>BufferedViews</code>to lazily load full-text data, rather than mandating
+that every item in the collection has it’s entire set of attributes from the beginning. Of course, you cannot filter on buffered
+attributes. <code>BufferedCollections</code> and <code>BufferedViews</code> simply provide a mechanism for rending Views that depend on buffered data.</p>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p><code>BufferedCollections</code> are just like <code>Collections</code>, except for a few new methods and a few modifications. </p>
+<ul>
+<li><code>BufferedCollection</code> maintain a dictionary between guids and buffered values, this dictionary is used to
+provide the full attributes for some item</li>
+<li><code>get</code> and <code>getBy</code> are slightly altered so that they merge in the buffered attributes from the collection. However,
+these functions are used the same way as the vanilla <code>Collection</code> counterparts.</li>
+<li>When creating buffered collections you must supply a ‘getBufferUrl’ function that can transform an array of guids
+into a url that will return full data for that set of guids</li>
+<li><code>bufferGuids</code> takes a set of guids and returns a promise. This promise will return after the full attributes are available 
+for the specified guids</li>
+</ul>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>Say you had a server at example.com/data?guids=[guids]</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> monsters = [{name: <span class="hljs-string">"sphinx"</span>, mythology: <span class="hljs-string">"greek"</span>, eyes: <span class="hljs-number">2</span>, sex: <span class="hljs-string">"f"</span>, hobbies: [<span class="hljs-string">"riddles"</span>,<span class="hljs-string">"sitting"</span>,<span class="hljs-string">"being a wonder"</span>],guid:<span class="hljs-number">1</span>},
+                {name: <span class="hljs-string">"hydra"</span>, mythology: <span class="hljs-string">"greek"</span>, eyes: <span class="hljs-number">18</span>, sex: <span class="hljs-string">"m"</span>, hobbies: [<span class="hljs-string">"coiling"</span>,<span class="hljs-string">"terrorizing"</span>,<span class="hljs-string">"growing"</span>],guid:<span class="hljs-number">2</span>},
+                {name: <span class="hljs-string">"huldra"</span>, mythology: <span class="hljs-string">"norse"</span>, eyes: <span class="hljs-number">2</span>, sex: <span class="hljs-string">"f"</span>, hobbies: [<span class="hljs-string">"luring"</span>,<span class="hljs-string">"terrorizing"</span>],guid:<span class="hljs-number">3</span>},
+                {name: <span class="hljs-string">"cyclops"</span>, mythology: <span class="hljs-string">"greek"</span>, eyes: <span class="hljs-number">1</span>, sex: <span class="hljs-string">"m"</span>, hobbies: [<span class="hljs-string">"staring"</span>,<span class="hljs-string">"terrorizing"</span>],guid:<span class="hljs-number">4</span>},
+                {name: <span class="hljs-string">"fenrir"</span>, mythology: <span class="hljs-string">"norse"</span>, eyes: <span class="hljs-number">2</span>, sex: <span class="hljs-string">"m"</span>, hobbies: [<span class="hljs-string">"growing"</span>,<span class="hljs-string">"god-killing"</span>],guid:<span class="hljs-number">5</span>},
+                {name: <span class="hljs-string">"medusa"</span>,  mythology: <span class="hljs-string">"greek"</span>, eyes: <span class="hljs-number">2</span>, sex: <span class="hljs-string">"f"</span>, hobbies: [<span class="hljs-string">"coiling"</span>,<span class="hljs-string">"staring"</span>],guid:<span class="hljs-number">6</span>}];
+
+<span class="hljs-keyword">var</span> MyBufferedCollection = PourOver.BufferedCollection.extend({
+    getBufferUrl: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(guids)</span>{</span>
+        <span class="hljs-keyword">var</span> query = <span class="hljs-built_in">encodeURIComponent</span>(guids.join(<span class="hljs-string">","</span>));
+        <span class="hljs-keyword">return</span> <span class="hljs-string">"http://example.com/data?guids="</span>+query;
+    }
+})
+<span class="hljs-keyword">var</span> collection = <span class="hljs-keyword">new</span> MyBufferedCollection(monsters)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p><code>BufferedViews</code> can only be defined on <code>BufferedCollections</code>.
+Buffered views provide paging and rendering functions that buffer in the relevant items,
+those which are returned from <code>getCurrentItems()</code>, (using the collection’s <code>bufferGuids</code> function) 
+and then delegate back to the default <code>render</code> function of the view</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> MyBufferedView = PourOver.BufferedView.extend({
+    render: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span>{</span>
+       <span class="hljs-keyword">var</span> items = <span class="hljs-keyword">this</span>.getCurrentItems();
+       console.log(items);
+    }
+})
+<span class="hljs-keyword">var</span> my_buffered_view = <span class="hljs-keyword">new</span> MyBufferedView(<span class="hljs-string">"buffered_view"</span>,collection)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p>We call <code>bufferRender</code> instead of render, so that the collection buffers the data before
+relinquishing control back to the vanilla <code>render</code>.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>
+my_buffered_view.bufferRender();</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p>Of course, here nothing will happen because the example.com URL will never resolve</p>
+
+            </div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>

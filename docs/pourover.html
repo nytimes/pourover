@@ -1,0 +1,2810 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>pourover.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>pourover.js</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>PourOver = {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>Utility functions. Skip down to &quot;Collections&quot; for the real meat of PourOver.</p>
+<h1>The basic sorted set operations</h1>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  union_sorted: <span class="keyword">function</span>(a,b){</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>Make more efficient by just copying at Infinity</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="keyword">var</span> lowa = <span class="number">0</span>, lowb = <span class="number">0</span>, higha = a.length, highb = b.length, result=[], la, lb;
+    <span class="keyword">while</span> (higha &gt; lowa || highb &gt; lowb){
+      la = a[lowa];
+      lb = b[lowb];
+      <span class="keyword">if</span>(_.isUndefined(la)) la = <span class="literal">Infinity</span>;
+      <span class="keyword">if</span>(_.isUndefined(lb)) lb = <span class="literal">Infinity</span>;
+      <span class="keyword">if</span>(lowa == higha){
+        <span class="keyword">return</span> result.concat(b.slice(lowb,highb));
+      }
+      <span class="keyword">if</span>(lowb == highb){
+        <span class="keyword">return</span> result.concat(a.slice(lowa,higha));
+      }
+      <span class="keyword">if</span>(la == lb){
+        result.push(la);
+        lowa++;lowb++;
+      } <span class="keyword">else</span> <span class="keyword">if</span> (la &lt; lb){
+        result.push(la);
+        lowa++;
+      } <span class="keyword">else</span> {
+        result.push(lb);
+        lowb++;
+      }
+    }
+    <span class="keyword">return</span> result;
+  },
+  intersect_sorted: <span class="keyword">function</span>(a,b){
+    <span class="keyword">var</span> lowa = <span class="number">0</span>, lowb = <span class="number">0</span>, higha = a.length, highb = b.length, result=[], la, lb;
+    <span class="keyword">while</span> (higha &gt; lowa &amp;&amp; highb &gt; lowb){
+      la = a[lowa];
+      lb = b[lowb];
+
+
+      <span class="keyword">if</span>(la == lb){
+        result.push(la);
+        lowa++;lowb++;
+      } <span class="keyword">else</span> <span class="keyword">if</span> (la &lt; lb){
+        lowa++;
+      } <span class="keyword">else</span> {
+        lowb++;
+      }
+    }
+    <span class="keyword">return</span> result;
+  },
+  subtract_sorted: <span class="keyword">function</span>(a,b){
+    <span class="keyword">var</span> lowa = <span class="number">0</span>, lowb = <span class="number">0</span>, higha = a.length, highb = b.length, result=[], la, lb;
+    <span class="keyword">while</span> (higha &gt; lowa || highb &gt; lowb){
+      la = a[lowa];
+      lb = b[lowb];
+      <span class="keyword">if</span>(higha == lowa){
+        <span class="keyword">return</span> result;
+      }
+      <span class="keyword">if</span>(highb == lowb){
+        <span class="keyword">return</span> result.concat(a.slice(lowa,higha));
+      }
+      <span class="keyword">if</span>(la == lb){
+        lowa++;lowb++;
+      } <span class="keyword">else</span> <span class="keyword">if</span> (la &lt; lb){
+        result.push(la);
+        lowa++;
+      } <span class="keyword">else</span> {
+        lowb++;
+      }
+    }
+    <span class="keyword">return</span> result;
+  },
+  insert_sorted: <span class="keyword">function</span>(set,element){
+    <span class="keyword">var</span> length = set.length,
+      i = <span class="number">0</span>,
+      last_elem = set[length - <span class="number">1</span>];
+    <span class="keyword">if</span>(element &gt; last_elem){
+      set.push(element);
+      <span class="keyword">return</span> set;
+    }
+    <span class="keyword">while</span>(i &lt; length){
+      <span class="keyword">if</span>(element &lt; set[i]){
+        <span class="keyword">return</span> set.slice(<span class="number">0</span>,i).concat([element]).concat(set.slice(i,length));
+      } <span class="keyword">else</span> {
+        i++;
+      }
+    }
+    set.push(element);
+    <span class="keyword">return</span> set;
+  },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap for-h1">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <h1>Sort support</h1>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p>Sort the set according to some function and then store an array of the translations
+of the indicies. So if the first item went to index 2 after being sorted, put 2 in 
+the first spot of the permutation array.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  build_permutation_array: <span class="keyword">function</span>(set,sort){
+    <span class="keyword">var</span> sorted_set = _(set).clone(),perm=[];
+    <span class="keyword">if</span>(<span class="keyword">typeof</span>(sort) === <span class="string">"function"</span>){
+      sorted_set.sort(sort);
+    } <span class="keyword">else</span> {
+      sorted_set.sort(<span class="keyword">function</span>(a,b){<span class="keyword">return</span> sort.fn.call(sort,a,b)});
+    }
+    _(sorted_set).each(<span class="keyword">function</span>(m,i){perm[m.cid] = i;});
+    <span class="keyword">return</span> perm;
+  },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p>Use a permutation array to resort a subset of a collection.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  permute_from_array: <span class="keyword">function</span>(collection,perm){
+    <span class="keyword">var</span> output = [];
+    <span class="keyword">if</span>(<span class="keyword">typeof</span>(collection[<span class="number">0</span>]) === <span class="string">"number"</span>){
+      _(collection).each(<span class="keyword">function</span>(i){ output[perm[i]] = i });
+    } <span class="keyword">else</span> {
+      _(collection).each(<span class="keyword">function</span>(i){ output[perm[i.cid]] = i });
+    }
+    <span class="keyword">return</span> _(output).without(<span class="literal">undefined</span>);
+  },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p>Remove an element from a sorted set.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  remove_sorted: <span class="keyword">function</span>(set,element){
+    <span class="keyword">var</span> length = set.length,
+        i = <span class="number">0</span>;
+    <span class="keyword">while</span>(i &lt; length){
+      <span class="keyword">if</span>(element == set[i]){
+        <span class="keyword">return</span> set.slice(<span class="number">0</span>,i).concat(set.slice(i+<span class="number">1</span>,length));
+      } <span class="keyword">else</span> {
+        i++;
+      }
+    }
+    <span class="keyword">return</span> set;
+  },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap for-h1">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              <h1>Pre-defined cache methods</h1>
+<p>Caching is really the raison d&#39;etre of Pourover. Every filter has two cache methods: one for rebuilding the whole filter from scratch
+and one for adding new items. As Pourover grows it will gain more pre-defined cache methods that correlate with common UI and data patterns.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  cacheMethods: {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="pilwrap for-h3">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
+              <h3>Default: the dumb caches.</h3>
+<p>Just goes through each possible value for the filter and tests every item in the collection against it. As expensive as
+possibile, but simple.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    defaultCache: <span class="keyword">function</span>(items){
+      <span class="keyword">var</span> that = <span class="keyword">this</span>;
+      _(that.possibilities).each(<span class="keyword">function</span>(p){
+        <span class="keyword">var</span> matching_items = _(items).filter(<span class="keyword">function</span>(i){<span class="keyword">return</span> that.fn(p,i)}),
+            matching_cids = _(matching_items).map(<span class="keyword">function</span>(i){<span class="keyword">return</span> i.cid});
+        p.matching_cids = matching_cids;
+      });
+    },
+    defaultAddCache: <span class="keyword">function</span>(items){
+      <span class="keyword">var</span> that = <span class="keyword">this</span>;
+      _(that.possibilities).each(<span class="keyword">function</span>(p){
+        <span class="keyword">var</span> matching_items = _(items).filter(<span class="keyword">function</span>(i){<span class="keyword">return</span> that.fn(p,i)}),
+            matching_cids = _(matching_items).map(<span class="keyword">function</span>(i){<span class="keyword">return</span> i.cid});
+        p.matching_cids = PourOver.union_sorted(p.matching_cids,matching_cids)
+      });
+    },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="pilwrap for-h3">
+                <a class="pilcrow" href="#section-10">&#182;</a>
+              </div>
+              <h3>Exact: the fastest caches.</h3>
+<p>For filters that evaluate by strict equality (this property === this value). The name of the filter must
+match the name of the property for exact cache to work.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    exactCache: <span class="keyword">function</span>(items){
+      <span class="keyword">var</span> that = <span class="keyword">this</span>;
+      _(items).each(<span class="keyword">function</span>(i){
+        <span class="keyword">var</span> p = that.possibilities[i[that.name]];
+        <span class="keyword">if</span> (p) {
+          p.matching_cids = PourOver.insert_sorted(p.matching_cids,i.cid)
+        }
+      });
+    },
+    exactAddCache: <span class="keyword">function</span>(items){
+      <span class="keyword">var</span> that = <span class="keyword">this</span>;
+      _(items).each(<span class="keyword">function</span>(i){
+        <span class="keyword">var</span> p = that.possibilities[i[that.name]];
+        <span class="keyword">if</span> (p) {
+          p.matching_cids = PourOver.insert_sorted(p.matching_cids,i.cid)
+        }
+      });
+    }
+  }
+}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="pilwrap for-h1">
+                <a class="pilcrow" href="#section-11">&#182;</a>
+              </div>
+              <h1>Collections</h1>
+<p>The main kind of object in Pourover. A collection is basically a wrapper around an array of objects.
+It adds collection ids to its members and has support for various ways of retrieving all or a part of
+its members.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  PourOver.Collection = <span class="keyword">function</span>(items,opts){
+    <span class="keyword">if</span>(<span class="keyword">typeof</span>(items) == <span class="string">"undefined"</span>){items = [];}
+    <span class="keyword">this</span>.items = [];
+    <span class="keyword">this</span>.filters = {};
+    <span class="keyword">this</span>.sorts = {}
+    <span class="keyword">this</span>.addItems(items)  
+    <span class="keyword">this</span>.on(<span class="string">"change"</span>,<span class="keyword">function</span>(){
+      _(<span class="keyword">this</span>.filters).each(<span class="keyword">function</span>(f){ <span class="keyword">if</span>(f.current_query){f.current_query.refresh();} });
+    })
+    <span class="keyword">this</span>.initialize.apply(<span class="keyword">this</span>, arguments);
+  }
+  
+  _.extend(PourOver.Collection.prototype,Backbone.Events,{
+      initialize: <span class="keyword">function</span>(){},</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-12">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-12">&#182;</a>
+              </div>
+              <p>Force the filters and sorts of a collection to refresh. Generally most useful if you have batched
+up a bunch of silented actions and you want to refresh once at the end.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      refresh: <span class="keyword">function</span>(){
+        <span class="keyword">this</span>.trigger(<span class="string">"queryChange"</span>);
+      },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-13">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-13">&#182;</a>
+              </div>
+              <p>Retrive the objects associated with an array of cids. Like everything in Pourover, the cids must be sorted.
+This is not ususally an issue as you generally will not be calling <code>collection.get</code> with an array you
+manually create. You will probably be using the output of some function that keeps it sorted for you.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      get: <span class="keyword">function</span>(cids){
+        <span class="keyword">return</span> <span class="keyword">this</span>.getBy(<span class="string">"cid"</span>,cids)
+      },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-14">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-14">&#182;</a>
+              </div>
+              <p>Similar to get, except -- rather than getting items by cid -- you are getting them by [attr_name].
+Here vals is an array of [attr_names]s.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      getBy: <span class="keyword">function</span>(attr_name,vals){
+        <span class="keyword">if</span>(! _.isArray(vals)){ <span class="keyword">var</span> vals = [vals] }
+        <span class="keyword">var</span> low = <span class="number">0</span>, high = <span class="keyword">this</span>.items.length,lc = <span class="number">0</span>, hc = vals.length, output = [],items = <span class="keyword">this</span>.items,i;
+        <span class="keyword">while</span> (low &lt; high &amp;&amp; lc &lt; hc){
+          <span class="keyword">if</span> (vals[lc] == (i=items[low])[attr_name]){
+            output.push(i);
+            low++;
+            lc++;
+          } <span class="keyword">else</span> <span class="keyword">if</span> (vals[lc] &lt; i[attr_name]){
+            lc++;
+          } <span class="keyword">else</span>{
+            low++;
+          }
+        }
+        <span class="keyword">return</span> output;
+      },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-15">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-15">&#182;</a>
+              </div>
+              <p>Add items to the collection, triggering the appropriate events to keep all dependent sort and filter sets up-to-date.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      addItems: <span class="keyword">function</span>(i){
+        <span class="keyword">if</span>(! _.isArray(i)){ <span class="keyword">var</span> i = [i] }
+        <span class="keyword">var</span> last_id = <span class="keyword">this</span>.items.length &gt; <span class="number">0</span> ? _(<span class="keyword">this</span>.items).last().cid + <span class="number">1</span> : <span class="number">0</span>,new_items;
+        new_items = _(i).map(<span class="keyword">function</span>(c){<span class="keyword">var</span> n = PourOver.Item(c); n.cid = last_id++; <span class="keyword">return</span> n;});
+        <span class="keyword">this</span>.items = <span class="keyword">this</span>.items.concat(new_items);
+        <span class="keyword">this</span>.regenerateFilterSets(new_items);
+        <span class="keyword">this</span>.trigger(<span class="string">"change"</span>);
+      },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-16">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-16">&#182;</a>
+              </div>
+              <p>Remove items from the collection, triggering the appropriate events to keep all dependent sort and filter sets up-to-date.
+This functionality is only included begrudgingly. Pourover is best for collections that rarely remove members.
+TODO: Optimize</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      removeItems: <span class="keyword">function</span>(i,isSorted){
+        <span class="keyword">if</span>(<span class="keyword">typeof</span>(isSorted) === <span class="string">"undefined"</span>){<span class="keyword">var</span> isSorted = <span class="literal">false</span>}
+        <span class="keyword">if</span>(! _.isArray(i)){ <span class="keyword">var</span> i = [i] }
+        <span class="keyword">if</span>(isSorted){
+          i = i.sort(<span class="keyword">function</span>(a,b){<span class="keyword">return</span> a.cid - b.cid });
+          <span class="keyword">var</span> new_items = [],old_items = <span class="keyword">this</span>.items,new_length = i.length,old_length = <span class="keyword">this</span>.items.length,newi = <span class="number">0</span>, oldi = <span class="number">0</span>;
+          <span class="keyword">while</span>(oldi &lt; old_length){
+            <span class="keyword">if</span>(! newi &lt; new_length){
+              new_items = new_items.concat(old_items.slice(oldi))
+              <span class="keyword">break</span>;
+            } <span class="keyword">else</span> <span class="keyword">if</span>(old_items[oldi].cid === i[newi].cid){
+              newi++;
+              oldi++;
+            } <span class="keyword">else</span> {
+              new_items.push(old_items[oldi]);
+              oldi++;
+            }
+          }
+        } <span class="keyword">else</span> {
+          <span class="keyword">var</span> new_items = [], old_items = <span class="keyword">this</span>.items,old_length = <span class="keyword">this</span>.items.length, oldi = <span class="number">0</span>,delete_cids = _(i).pluck(<span class="string">"cid"</span>);
+          <span class="keyword">while</span>(oldi &lt; old_length &amp;&amp; delete_cids.length &gt; <span class="number">0</span>){
+            <span class="keyword">if</span>(_(delete_cids).include(old_items[oldi].cid)){
+              
+            } <span class="keyword">else</span> {
+              new_items.push(old_items[oldi]);
+            }
+            oldi++;
+          }
+        }
+        <span class="keyword">this</span>.items = new_items;
+        <span class="keyword">this</span>.regenerateFilterSets();
+        <span class="keyword">this</span>.trigger(<span class="string">"change"</span>);
+      },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-17">
+            <div class="annotation">
+              
+              <div class="pilwrap for-h1">
+                <a class="pilcrow" href="#section-17">&#182;</a>
+              </div>
+              <h1>Collection filter functions</h1>
+<p>All filters are associated to collections rather than views. This allows for multiple views to share the same filter.
+This is especially useful for modal situations in which you can set filters on a grid view that are reflected in the 
+one up view as well.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      addFilters: <span class="keyword">function</span>(f){
+        <span class="keyword">var</span> that = <span class="keyword">this</span>,new_filters;
+        <span class="keyword">if</span>(! _.isArray(f)){ <span class="keyword">var</span> f = [f] }
+        new_filters = _(f).reduce(<span class="keyword">function</span>(m,i){ m[i.name] = _.clone(i); m[i.name].collection = that; <span class="keyword">return</span> m; },{});
+        <span class="keyword">this</span>.filters = _(<span class="keyword">this</span>.filters).extend(new_filters);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-18">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-18">&#182;</a>
+              </div>
+              <p>Bubble all query change events up from the individual filters to the collection. This allows a developers to 
+specify events that should be triggered whenever any filter&#39;s query is changed.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        _(new_filters).each(<span class="keyword">function</span>(f){
+          f.on(<span class="string">"queryChange"</span>,<span class="keyword">function</span>(){
+            that.trigger(<span class="string">"queryChange"</span>);
+          })</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-19">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-19">&#182;</a>
+              </div>
+              <p>All filters precache the result of their filtering. This is the source of pourover&#39;s speed optimizations.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          f.cacheResults(that.items);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-20">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-20">&#182;</a>
+              </div>
+              <p>If a user passes in an <code>associated_attrs</code> property on a filter, that filter will re-cache its result whenever
+any object in the collection has an attribute changed. Setting <code>associated_attrs</code> is essential for admins or
+other uses in which filterable values can change.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          <span class="keyword">if</span>(f.associated_attrs){
+            _(f.associated_attrs).each(<span class="keyword">function</span>(a){
+              that.on(<span class="string">"change:"</span>+a,<span class="keyword">function</span>(objs){
+                f.removeFromCache(objs);
+                f.addCacheResults(objs);
+                <span class="keyword">if</span>(f.current_query){f.current_query.refresh();}
+              });
+            });
+          }
+        });
+      },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-21">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-21">&#182;</a>
+              </div>
+              <p>A shortcut to re-calculate the results of every filter. This is expensive if you do not pass in <code>new_items</code>, in which cases
+only the new_items will be cached and the filters updated.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      regenerateFilterSets: <span class="keyword">function</span>(new_items){
+        <span class="keyword">var</span> that = <span class="keyword">this</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-22">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-22">&#182;</a>
+              </div>
+              <p>If no new items are passed in, regenerate filters for all items in the collection</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="keyword">if</span>(<span class="keyword">typeof</span>(new_items) == <span class="string">"undefined"</span>){
+          _(<span class="keyword">this</span>.filters).each(<span class="keyword">function</span>(f){
+            f.cacheResults(that.items)
+          });
+        } <span class="keyword">else</span> {
+          _(<span class="keyword">this</span>.filters).each(<span class="keyword">function</span>(f){
+            f.addCacheResults(new_items)
+          });
+        }
+      },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-23">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-23">&#182;</a>
+              </div>
+              <p>A shortcut for returning a match object containing all the items in a collection. More on matches below.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      getAllItems: <span class="keyword">function</span>(){
+        <span class="keyword">var</span> cids = _(<span class="keyword">this</span>.items).map(<span class="keyword">function</span>(i){<span class="keyword">return</span> i.cid});
+        <span class="keyword">return</span> <span class="keyword">new</span> PourOver.MatchSet(cids,<span class="keyword">this</span>,[<span class="string">"all"</span>]);
+      },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-24">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-24">&#182;</a>
+              </div>
+              <p>Get the currently cached results for the last stateful query on a filter (the last time a <code>setQuery</code> was called on that filter.)
+If <code>empty_default</code> is set to true, the function will return no items if the filter does not have a current query set. Otherwise,
+the function will return all items in the collection. The former <code>empty_default</code> setting is useful when OR-ing filters together, when 
+you want an unset filter to represent an unselected dimension. The latter is useful when AND-ing filters together, when you
+want an unset filter to comprise all objects in the collection.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      getCurrentFilteredItems: <span class="keyword">function</span>(filter_name,empty_default){
+        <span class="keyword">if</span>(<span class="keyword">typeof</span>(empty_default) === <span class="string">"undefined"</span>){empty_default = <span class="literal">false</span>;}
+        <span class="keyword">if</span>(<span class="keyword">this</span>.filters[filter_name].current_query &amp;&amp; <span class="keyword">this</span>.filters[filter_name].current_query.stack.length &gt; <span class="number">0</span>){
+          <span class="keyword">return</span> <span class="keyword">this</span>.filters[filter_name].current_query;
+        } <span class="keyword">else</span> {
+          <span class="keyword">if</span>(empty_default){
+            <span class="keyword">return</span> <span class="keyword">new</span> PourOver.MatchSet([],<span class="keyword">this</span>,[]);
+          } <span class="keyword">else</span> {
+            <span class="keyword">return</span> <span class="keyword">this</span>.getAllItems();
+          }
+        }
+      },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-25">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-25">&#182;</a>
+              </div>
+              <p>The non-stateful way to query a filter. Simply returns the result of the query but does not store the query on the filter.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      getFilteredItems: <span class="keyword">function</span>(filter_name,query){
+        <span class="keyword">var</span> filter = <span class="keyword">this</span>.filters[filter_name],possibility;
+        <span class="keyword">if</span> (_.isUndefined(filter) ) <span class="keyword">throw</span> <span class="string">"The filter "</span> + filter_name + <span class="string">" does not exist."</span>
+        <span class="keyword">return</span> filter.getFn(query);
+      },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-26">
+            <div class="annotation">
+              
+              <div class="pilwrap for-h1">
+                <a class="pilcrow" href="#section-26">&#182;</a>
+              </div>
+              <h1>Sort functions</h1>
+<p>Sorts, like filters, are generally stored on collections for the same reason that filters are stored on the collection rather than the view.
+However, whereas filters keep track of their own state and this is shared between views, the state of which sort is enabled is stored on the view.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      
+      addSort: <span class="keyword">function</span>(sort){
+        <span class="keyword">var</span> that = <span class="keyword">this</span>;
+        <span class="keyword">this</span>.sorts[sort.name] = sort;
+        sort.collection = <span class="keyword">this</span>;
+        sort.rebuild_sort();
+        <span class="keyword">this</span>.on(<span class="string">"change"</span>,<span class="keyword">function</span>(){ sort.rebuild_sort(); });</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-27">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-27">&#182;</a>
+              </div>
+              <p>Like filters, if you set <code>associated_attrs</code> on a sort, they will rebuild themselves whenever any item in the collection undergoes a change
+on that attribute.
+TODO: Consider cloning on add. Also, bring in line with addFilter (events or not!?)</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="keyword">if</span>(sort.associated_attrs){
+          _(sort.associated_attrs).each(<span class="keyword">function</span>(a){
+            that.on(<span class="string">"change:"</span>+a,<span class="keyword">function</span>(objs){
+              sort.rebuild_sort();
+            });
+          });
+        }
+      },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-28">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-28">&#182;</a>
+              </div>
+              <p>Add multiple sorts.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      addSorts: <span class="keyword">function</span>(sorts){
+        <span class="keyword">if</span>(<span class="keyword">typeof</span>(opts) === <span class="string">"undefined"</span>){ opts = {};}
+        <span class="keyword">if</span>(! _(sorts).isArray()){sorts = [sorts]}
+        <span class="keyword">var</span> that = <span class="keyword">this</span>;
+        _(sorts).each(<span class="keyword">function</span>(s){ 
+          that.addSort(s);
+        });
+      },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-29">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-29">&#182;</a>
+              </div>
+              <p>The non-stateful way to retrieve all the items in the collection, sorted.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      getSortedItems: <span class="keyword">function</span>(sort_name){
+        <span class="keyword">var</span> s = <span class="keyword">this</span>.sorts[sort_name],that = <span class="keyword">this</span>,output;
+        <span class="keyword">return</span> s.sort(<span class="keyword">this</span>.items);
+      },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-30">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-30">&#182;</a>
+              </div>
+              <p>A silly shortcut, pass in a cid and an attribute, retrieve its value. Useful for template helpers.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      getItemValue: <span class="keyword">function</span>(cid,attribute){
+        <span class="keyword">var</span> item = _(<span class="keyword">this</span>.items).find(<span class="keyword">function</span>(i){<span class="keyword">return</span> i.cid === Number(cid);});
+        <span class="keyword">return</span> item[attribute];
+      },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-31">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-31">&#182;</a>
+              </div>
+              <p>Update the value of one attribute of one item in the collection.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      updateItem: <span class="keyword">function</span>(cid,attribute,value){
+        <span class="keyword">var</span> item = _(<span class="keyword">this</span>.items).find(<span class="keyword">function</span>(i){<span class="keyword">return</span> i.cid === Number(cid);});
+        item[attribute] = value;
+        <span class="keyword">this</span>.trigger(<span class="string">"incremental_change"</span>,[attribute]);
+        <span class="keyword">this</span>.trigger(<span class="string">"update"</span>,<span class="string">"updateItem"</span>);
+        <span class="keyword">this</span>.trigger(<span class="string">"change:"</span>+attribute,[item]);
+        <span class="keyword">return</span> item.guid;
+      },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-32">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-32">&#182;</a>
+              </div>
+              <p>Change the value of one attribute of many items to the same value.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      batchUpdateItems: <span class="keyword">function</span>(cids,attribute,value){
+        <span class="keyword">var</span> items = <span class="keyword">this</span>.get(cids,<span class="literal">true</span>);
+        _(items).each(<span class="keyword">function</span>(i){
+          i[attribute] = value;
+        });
+        <span class="keyword">this</span>.trigger(<span class="string">"update"</span>,<span class="string">"batchUpdate"</span>);
+        <span class="keyword">this</span>.trigger(<span class="string">"change:"</span>+attribute,items);
+        <span class="keyword">this</span>.trigger(<span class="string">"incremental_change"</span>,[attribute]);
+        <span class="keyword">return</span> _(items).pluck(<span class="string">"guid"</span>);
+      },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-33">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-33">&#182;</a>
+              </div>
+              <p>Change the value of several attributes of a single item in the collection.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      updateAttributes: <span class="keyword">function</span>(cid,updates){
+        <span class="keyword">var</span> item = _(<span class="keyword">this</span>.items).find(<span class="keyword">function</span>(i){<span class="keyword">return</span> i.cid === Number(cid);});
+        <span class="keyword">var</span> that = <span class="keyword">this</span>;
+        _(updates).each(<span class="keyword">function</span>(v,k){
+          item[k] = v;
+          that.trigger(<span class="string">"change:"</span>+k,[item]);
+        });
+        <span class="keyword">this</span>.trigger(<span class="string">"update"</span>,<span class="string">"updateAttribute"</span>);
+        <span class="keyword">this</span>.trigger(<span class="string">"incremental_change"</span>,_(updates).keys());
+        <span class="keyword">return</span> item.guid;
+      },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-34">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-34">&#182;</a>
+              </div>
+              <p>Change the value of several attributes of several items in the collection. Here &#39;updates&#39;
+is a hash of attributes -&gt; new values.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      batchUpdateAttributes: <span class="keyword">function</span>(cids,updates){
+        <span class="keyword">var</span> items = <span class="keyword">this</span>.get(cids,<span class="literal">true</span>) 
+        <span class="keyword">var</span> that = <span class="keyword">this</span>;
+        _(items).each(<span class="keyword">function</span>(item){
+          _(updates).each(<span class="keyword">function</span>(v,k){
+            item[k] = v;
+          });
+        })
+        _(updates).each(<span class="keyword">function</span>(v,k){
+          that.trigger(<span class="string">"change:"</span>+k,items);
+        });
+        <span class="keyword">this</span>.trigger(<span class="string">"update"</span>,<span class="string">"batchUpdateAttribute"</span>);
+        <span class="keyword">this</span>.trigger(<span class="string">"incremental_change"</span>,_(updates).keys());
+        <span class="keyword">return</span> _(items).pluck(<span class="string">"guid"</span>);
+      }
+  });</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-35">
+            <div class="annotation">
+              
+              <div class="pilwrap for-h1">
+                <a class="pilcrow" href="#section-35">&#182;</a>
+              </div>
+              <h1>Items</h1>
+<p>If we ever need to add properties to items in a collection, the code would go here.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  PourOver.Item = <span class="keyword">function</span>(i){
+    <span class="keyword">return</span> i;
+  },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-36">
+            <div class="annotation">
+              
+              <div class="pilwrap for-h1">
+                <a class="pilcrow" href="#section-36">&#182;</a>
+              </div>
+              <h1>Filters</h1>
+<p>A filter is basically a rule for mapping items of a collection into groups based on attribute
+values. It caches the results and can be queried either statefully or non-statefully, depending 
+on developer preference.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  PourOver.Filter = <span class="keyword">function</span>(name,values,opts){
+    <span class="keyword">if</span>(<span class="keyword">typeof</span>(opts) === <span class="string">"undefined"</span>){opts = {}}
+    <span class="keyword">this</span>.name = name;
+    <span class="keyword">this</span>.possibilities = <span class="keyword">this</span>.create_possibilities(values);
+    <span class="keyword">this</span>.values = _(values).map(<span class="keyword">function</span>(v){<span class="keyword">return</span> v.value});
+    _.extend(<span class="keyword">this</span>,opts);
+    <span class="keyword">this</span>.initialize.apply(<span class="keyword">this</span>, arguments);
+  }
+
+  _.extend(PourOver.Filter.prototype,Backbone.Events,{</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-37">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-37">&#182;</a>
+              </div>
+              <p>Initialize is a no-op by default.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    initialize: <span class="keyword">function</span>(){},</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-38">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-38">&#182;</a>
+              </div>
+              <p>Given an array of possible values, initializes the object that will store the cached results
+of querying for that possibilitiy.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    create_possibilities: <span class="keyword">function</span>(vs){
+      <span class="keyword">var</span> o = {};
+      _(vs).each(<span class="keyword">function</span>(v){  
+        <span class="keyword">var</span> name = v.name || String(v.value);
+        o[name] = v;
+        o[name].matching_cids = [];
+      })
+      <span class="keyword">return</span> o;
+     },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-39">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-39">&#182;</a>
+              </div>
+              <p>cacheResults and addCacheResults are generic methods that are must be overridden before instantiating a filter.
+The preset filters included below provide good examples of how these functions should be written. cacheResults
+should cache all the items in the collection, whereas addCacheResults incrementally adds new items to already
+cached, filtered results.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>     cacheResults: <span class="keyword">function</span>(items){
+       <span class="keyword">throw</span> <span class="string">"No cache function has been defined for this filter '"</span> + <span class="keyword">this</span>.name + <span class="string">"'."</span>
+     },
+     addCacheResults: <span class="keyword">function</span>(items){
+       <span class="keyword">throw</span> <span class="string">"No add cache function has been defined for this filter '"</span> + <span class="keyword">this</span>.name + <span class="string">"'."</span>
+     },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-40">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-40">&#182;</a>
+              </div>
+              <p>Generally only used when removing items from a collection or when an item changes value. This will remove the item from
+the cache so that it can either be recached with its new value or thrown away.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>     removeFromCache: <span class="keyword">function</span>(items){
+      <span class="keyword">var</span> cids = _(items).map(<span class="keyword">function</span>(i){<span class="keyword">return</span> i.cid}).sort(<span class="keyword">function</span>(a,b){<span class="keyword">return</span> a-b;});
+      _(<span class="keyword">this</span>.possibilities).each(<span class="keyword">function</span>(p){
+        p.matching_cids = PourOver.subtract_sorted(p.matching_cids,cids);
+      });
+     },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-41">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-41">&#182;</a>
+              </div>
+              <p>The stateful way to query a filter. Delegates the retrieval of a MatchSet to the filter&#39;s getFn and caches the results on the filter.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>     query: <span class="keyword">function</span>(q,silent){
+       <span class="keyword">if</span>(<span class="keyword">typeof</span>(silent) === <span class="string">"undefined"</span>){<span class="keyword">var</span> silent = <span class="literal">false</span>;}
+       <span class="keyword">var</span> match_set = <span class="keyword">this</span>.getFn(q);
+       <span class="keyword">this</span>.setQuery(match_set,silent);
+     },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-42">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-42">&#182;</a>
+              </div>
+              <p>Assigns a MatchSet to a filter (caches the result) and triggers the appropriate events.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>     setQuery: <span class="keyword">function</span>(q,silent){
+       <span class="keyword">if</span>(<span class="keyword">typeof</span>(silent) === <span class="string">"undefined"</span>){<span class="keyword">var</span> silent = <span class="literal">false</span>;}
+       <span class="keyword">this</span>.current_query = q;
+       <span class="keyword">if</span>(!silent){
+         <span class="keyword">this</span>.trigger(<span class="string">"queryChange"</span>);
+       }
+     },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-43">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-43">&#182;</a>
+              </div>
+              <p>Removes a cached result from a filter.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>     clearQuery: <span class="keyword">function</span>(silent){
+       <span class="keyword">if</span>(<span class="keyword">typeof</span>(silent) === <span class="string">"undefined"</span>){<span class="keyword">var</span> silent = <span class="literal">false</span>;}
+       <span class="keyword">this</span>.current_query = <span class="literal">false</span>;
+       <span class="keyword">if</span>(!silent){
+         <span class="keyword">this</span>.trigger(<span class="string">"queryChange"</span>);
+       }
+     },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-44">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-44">&#182;</a>
+              </div>
+              <p>Unions a cached result with another result (both being MatchSets) and produces a new MatchSet.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>     unionQuery: <span class="keyword">function</span>(q,silent){
+       <span class="keyword">if</span>(<span class="keyword">typeof</span>(silent) === <span class="string">"undefined"</span>){<span class="keyword">var</span> silent = <span class="literal">false</span>;}
+       <span class="keyword">if</span>(<span class="keyword">typeof</span>(q) === <span class="string">"string"</span> || <span class="keyword">typeof</span>(q) === <span class="string">"number"</span>){
+         <span class="keyword">var</span> q = <span class="keyword">this</span>.getFn(q);
+       }
+       <span class="keyword">if</span>(<span class="keyword">this</span>.current_query){
+         <span class="keyword">this</span>.current_query = <span class="keyword">this</span>.current_query.or(q);
+       } <span class="keyword">else</span> {
+         <span class="keyword">this</span>.current_query = q;
+       }
+       <span class="keyword">if</span>(!silent){
+         <span class="keyword">this</span>.trigger(<span class="string">"queryChange"</span>);
+       }
+     },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-45">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-45">&#182;</a>
+              </div>
+              <p>Intersects a cached result with another result (both being MatchSets) and produces a new MatchSet.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>     intersectQuery: <span class="keyword">function</span>(q,silent){
+       <span class="keyword">if</span>(<span class="keyword">typeof</span>(silent) === <span class="string">"undefined"</span>){<span class="keyword">var</span> silent = <span class="literal">false</span>;}
+       <span class="keyword">if</span>(<span class="keyword">typeof</span>(q) === <span class="string">"string"</span> || <span class="keyword">typeof</span>(q) === <span class="string">"number"</span>){
+         <span class="keyword">var</span> q = <span class="keyword">this</span>.getFn(q);
+       }
+       <span class="keyword">if</span>(<span class="keyword">this</span>.current_query){
+         <span class="keyword">this</span>.current_query = <span class="keyword">this</span>.current_query.and(q);
+       } <span class="keyword">else</span> {
+         <span class="keyword">this</span>.current_query = q;
+       }
+       <span class="keyword">if</span>(!silent){
+         <span class="keyword">this</span>.trigger(<span class="string">"queryChange"</span>);
+       }
+     },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-46">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-46">&#182;</a>
+              </div>
+              <p>Subtracts a cached result with another result (both being MatchSets) and produces a new MatchSet.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>     subtractQuery: <span class="keyword">function</span>(q,silent){
+       <span class="keyword">if</span>(<span class="keyword">typeof</span>(silent) === <span class="string">"undefined"</span>){<span class="keyword">var</span> silent = <span class="literal">false</span>;}
+       <span class="keyword">if</span>(<span class="keyword">typeof</span>(q) === <span class="string">"string"</span> || <span class="keyword">typeof</span>(q) === <span class="string">"number"</span> || _.isArray(q)){
+         <span class="keyword">var</span> q = <span class="keyword">this</span>.getFn(q);
+       }
+       <span class="keyword">if</span>(<span class="keyword">this</span>.current_query){
+         <span class="keyword">this</span>.current_query = <span class="keyword">this</span>.current_query.not(q);
+       } <span class="keyword">else</span> {
+         <span class="keyword">this</span>.current_query = q;
+       }
+       <span class="keyword">if</span>(!silent){
+         <span class="keyword">this</span>.trigger(<span class="string">"queryChange"</span>);
+       }
+     },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-47">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-47">&#182;</a>
+              </div>
+              <p>This is the inverse of the three functions above. Removes a query from a compound, cached MatchSet on a filter.
+This is useful when you have a UI in which subsequent selections union together. It is faster on a toggle to remove
+the deselected possibility rather than re-union the remaining selected ones.
+TODO: Test</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>     removeSingleQuery: <span class="keyword">function</span>(q,silent){
+       <span class="keyword">if</span>(! <span class="keyword">this</span>.current_query){<span class="keyword">return</span> <span class="literal">false</span>;}
+       <span class="keyword">if</span>(<span class="keyword">typeof</span>(silent) === <span class="string">"undefined"</span>){<span class="keyword">var</span> silent = <span class="literal">false</span>;}
+       <span class="keyword">if</span>(<span class="keyword">typeof</span>(q) === <span class="string">"string"</span> || <span class="keyword">typeof</span>(q) === <span class="string">"number"</span> || _.isArray(q)){
+         <span class="keyword">var</span> q = <span class="keyword">this</span>.getFn(q);
+       }
+       <span class="keyword">var</span> s = [],
+           stack = <span class="keyword">this</span>.current_query.stack,new_stack;
+        new_stack = _(stack).reduce(<span class="keyword">function</span>(m,i){
+          <span class="keyword">if</span>(i[<span class="number">1</span>] === q.stack[<span class="number">0</span>][<span class="number">1</span>]){
+            <span class="keyword">return</span> m;
+          } <span class="keyword">else</span> <span class="keyword">if</span>(i[<span class="number">0</span>] === <span class="string">"or"</span> &amp;&amp; i[<span class="number">1</span>][<span class="number">0</span>][<span class="number">1</span>] === q.stack[<span class="number">0</span>][<span class="number">1</span>]){
+            <span class="keyword">return</span> m;
+          } <span class="keyword">else</span> <span class="keyword">if</span>(i[<span class="number">0</span>] === <span class="string">"and"</span> &amp;&amp; i[<span class="number">1</span>][<span class="number">0</span>][<span class="number">1</span>] === q.stack[<span class="number">0</span>][<span class="number">1</span>]){
+            <span class="keyword">return</span> m;
+          } <span class="keyword">else</span> <span class="keyword">if</span>(i[<span class="number">0</span>] === <span class="string">"not"</span> &amp;&amp; i[<span class="number">1</span>][<span class="number">0</span>][<span class="number">1</span>] === q.stack[<span class="number">0</span>][<span class="number">1</span>]){
+            <span class="keyword">return</span> m;
+          } <span class="keyword">else</span> {m.push(i); <span class="keyword">return</span> m;}
+        },s);
+       <span class="keyword">this</span>.current_query.stack = new_stack;
+       <span class="keyword">this</span>.current_query.refresh();
+       <span class="keyword">if</span>(!silent){
+         <span class="keyword">this</span>.trigger(<span class="string">"queryChange"</span>);
+       }
+     },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-48">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-48">&#182;</a>
+              </div>
+              <p>Convenice method for getting the collection attached to a filter. 
+Just an aesthetic thing. I like the explicit &quot;getCollection&quot; calls in
+the rest of the code. </p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>     getCollection: <span class="keyword">function</span>(){
+       <span class="keyword">return</span> <span class="keyword">this</span>.collection;
+      }
+  });</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-49">
+            <div class="annotation">
+              
+              <div class="pilwrap for-h1">
+                <a class="pilcrow" href="#section-49">&#182;</a>
+              </div>
+              <h1>Sorts</h1>
+<p>Sorts cache different orderings of collection items and subsets thereof. Sorts generally belong to collections,
+but they can belong to views as well for optimization concerns.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  PourOver.Sort = <span class="keyword">function</span>(name,opts){
+    <span class="keyword">this</span>.name = name;
+    _.extend(<span class="keyword">this</span>,opts)
+    <span class="keyword">this</span>.initialize.apply(<span class="keyword">this</span>, arguments);
+  }
+
+  _.extend(PourOver.Sort.prototype,Backbone.Events,{
+    initialize: <span class="keyword">function</span>(){},</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-50">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-50">&#182;</a>
+              </div>
+              <p>By default, sorts are not view sorts. A view sort is attached to a specific view and only updates when that
+view undergoes a queryChange.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    view: <span class="literal">false</span>,</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-51">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-51">&#182;</a>
+              </div>
+              <p>Use a sort to order an array of cids</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    sort: <span class="keyword">function</span>(set){<span class="keyword">return</span> PourOver.permute_from_array(set,<span class="keyword">this</span>.permutation_array)},</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-52">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-52">&#182;</a>
+              </div>
+              <p>Recache the results of sorting the collection.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    rebuild_sort: <span class="keyword">function</span>(){
+      <span class="keyword">if</span>(<span class="keyword">this</span>.view){
+        <span class="keyword">var</span> items = <span class="keyword">this</span>.view.match_set.all();
+      } <span class="keyword">else</span> {
+        <span class="keyword">var</span> items = <span class="keyword">this</span>.collection.items;
+      }
+      <span class="keyword">this</span>.permutation_array = PourOver.build_permutation_array(items,<span class="keyword">this</span>); 
+      <span class="keyword">this</span>.trigger(<span class="string">"resort"</span>);
+    }
+  });</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-53">
+            <div class="annotation">
+              
+              <div class="pilwrap for-h1">
+                <a class="pilcrow" href="#section-53">&#182;</a>
+              </div>
+              <h1>Views</h1>
+<p>Views store a state of collection and are generally what should be rendered. There can be many views per collection. 
+Views can be paged. Moreover, a view has a selection function which tells the view how to compose its various filters to produce the current set.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  PourOver.View = <span class="keyword">function</span>(name,collection,opts){
+    <span class="keyword">var</span> that = <span class="keyword">this</span>;
+    <span class="keyword">this</span>.name = name;
+    <span class="keyword">if</span>(<span class="keyword">typeof</span>(opts) === <span class="string">"undefined"</span>){ opts = {};}
+    <span class="keyword">this</span>.collection = collection;
+    <span class="keyword">this</span>.match_set = <span class="keyword">new</span> PourOver.MatchSet(_(<span class="keyword">this</span>.collection.items).map(<span class="keyword">function</span>(i){<span class="keyword">return</span> i.cid}),<span class="keyword">this</span>.collection,[<span class="string">"all"</span>]);
+    <span class="keyword">if</span>(opts.template){<span class="keyword">this</span>.template = opts.template};</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-54">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-54">&#182;</a>
+              </div>
+              <p>Whenever the collection gains or loses members, recache the MatchSet saved on the view.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="keyword">this</span>.collection.on(<span class="string">"change"</span>,<span class="keyword">function</span>(){
+      that.match_set.refresh();
+      that.setNaturalSelection();
+    });</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-55">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-55">&#182;</a>
+              </div>
+              <p>Whenever an item in the collection is changed, recache the MatchSet saved on the view.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="keyword">this</span>.collection.on(<span class="string">"incremental_change"</span>,<span class="keyword">function</span>(attrs){
+      that.match_set.refresh();
+      that.setNaturalSelection(attrs);
+    });</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-56">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-56">&#182;</a>
+              </div>
+              <p>Bubble all collection update events through.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="keyword">this</span>.collection.on(<span class="string">"update"</span>,<span class="keyword">function</span>(f){
+      that.trigger(<span class="string">"update"</span>,f);
+    });</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-57">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-57">&#182;</a>
+              </div>
+              <p>Whenever any filter is queried statefully, reset the view&#39;s MatchSet; We don&#39;t have to refresh the match_set here. That is only necessary
+when it&#39;s possible that a filter has stale information as a result of a change in the underlying data.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="keyword">this</span>.collection.on(<span class="string">"queryChange"</span>,<span class="keyword">function</span>(){
+      that.setNaturalSelection(); 
+      that.trigger(<span class="string">"update"</span>,<span class="string">"query"</span>);
+    });</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-58">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-58">&#182;</a>
+              </div>
+              <p>Bubble up sortChange events as updates</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="keyword">this</span>.on(<span class="string">"sortChange"</span>,<span class="keyword">function</span>(){
+      <span class="keyword">this</span>.trigger(<span class="string">"update"</span>,<span class="string">"sort"</span>);
+    })</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-59">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-59">&#182;</a>
+              </div>
+              <p>Bubble up sortChange events as updates</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="keyword">this</span>.on(<span class="string">"pageChange"</span>,<span class="keyword">function</span>(){
+      <span class="keyword">this</span>.trigger(<span class="string">"update"</span>,<span class="string">"page"</span>);
+    })
+    _.extend(<span class="keyword">this</span>,opts);
+    <span class="keyword">this</span>.initialize.apply(<span class="keyword">this</span>, arguments);
+  }
+
+  _.extend(PourOver.View.prototype,Backbone.Events,{
+    initialize: <span class="keyword">function</span>(){},
+    current_page: <span class="number">0</span>,
+    view_sorts: [],</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-60">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-60">&#182;</a>
+              </div>
+              <p>By default, return all items in the view. </p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    page_size: <span class="literal">Infinity</span>,
+    current_sort: <span class="literal">false</span>,</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-61">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-61">&#182;</a>
+              </div>
+              <p>Changes a view from being sorted to no longer being sorted.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    removeSort: <span class="keyword">function</span>(){
+      <span class="keyword">if</span>(<span class="keyword">this</span>.current_sort.off){<span class="keyword">this</span>.current_sort.off(<span class="string">"resort"</span>);}
+      <span class="keyword">this</span>.current_sort = <span class="literal">false</span>;
+      <span class="keyword">this</span>.trigger(<span class="string">"sortChange"</span>);
+    },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-62">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-62">&#182;</a>
+              </div>
+              <p>Sets a sort on a view and fires all appropriate events.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    setSort: <span class="keyword">function</span>(sort_name,view_sort){
+      <span class="keyword">if</span>(<span class="keyword">typeof</span>(view_sort) === <span class="string">"undefined"</span>){view_sort = <span class="literal">false</span>}
+      <span class="keyword">var</span> that = <span class="keyword">this</span>;
+      <span class="keyword">if</span>(<span class="keyword">this</span>.current_sort.off){<span class="keyword">this</span>.current_sort.off(<span class="string">"resort"</span>);}
+      <span class="keyword">if</span>(sort_name &amp;&amp; view_sort){
+        <span class="keyword">this</span>.current_sort = <span class="keyword">this</span>.view_sorts[sort_name];
+        <span class="keyword">this</span>.current_sort.on(<span class="string">"resort"</span>,<span class="keyword">function</span>(){that.trigger(<span class="string">"sortChange"</span>)});
+      } <span class="keyword">else</span> <span class="keyword">if</span>(sort_name){
+        <span class="keyword">this</span>.current_sort = <span class="keyword">this</span>.collection.sorts[sort_name];
+        <span class="keyword">this</span>.current_sort.on(<span class="string">"resort"</span>,<span class="keyword">function</span>(){that.trigger(<span class="string">"sortChange"</span>)});
+      } <span class="keyword">else</span> { 
+        <span class="keyword">this</span>.current_sort = <span class="literal">false</span>; 
+
+      }
+      <span class="keyword">this</span>.trigger(<span class="string">"sortChange"</span>);
+    },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-63">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-63">&#182;</a>
+              </div>
+              <p>Return the name of the current sort of the view.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    getSort: <span class="keyword">function</span>(){
+      <span class="keyword">if</span> (!<span class="keyword">this</span>.current_sort){
+        <span class="keyword">return</span> <span class="literal">false</span>;
+      } <span class="keyword">else</span> {
+        <span class="keyword">return</span> <span class="keyword">this</span>.current_sort.name;
+      }
+    },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-64">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-64">&#182;</a>
+              </div>
+              <p>Add a sort to the view. The difference between this and a collection sort is that this sort will 
+only change if the view receives a selectionChange.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    addViewSorts: <span class="keyword">function</span>(sorts){
+        <span class="keyword">if</span>(<span class="keyword">typeof</span>(opts) === <span class="string">"undefined"</span>){ opts = {};}
+        <span class="keyword">if</span>(! _(sorts).isArray()){sorts = [sorts]}
+        <span class="keyword">var</span> that = <span class="keyword">this</span>;
+        _(sorts).each(<span class="keyword">function</span>(sort){ 
+          that.view_sorts[sort.name] = sort;
+          sort.collection = that.collection;
+          sort.view = that;
+          sort.rebuild_sort();
+          that.on(<span class="string">"selectionChange"</span>,<span class="keyword">function</span>(attrs){ 
+            <span class="keyword">if</span>(sort.associated_attrs == <span class="literal">undefined</span>){
+              sort.rebuild_sort(); 
+            }
+            <span class="keyword">if</span>(sort.associated_attrs &amp;&amp; _.intersection(sort.associated_attrs,attrs).length &gt; <span class="number">0</span>){
+              sort.rebuild_sort(); 
+            }
+          });
+        });
+    },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-65">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-65">&#182;</a>
+              </div>
+              <p>IMPORTANT: This determines how a view composes the filters on a collection to generate results. Here, by default,
+every filter on the collection is intersected. This is often the desired behavior. However, this must be overridden
+if you want your view to do fancier things such as union some filters, difference others, and intersect the rest.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    selectionFn: <span class="keyword">function</span>(){
+      <span class="keyword">var</span> collection = <span class="keyword">this</span>.collection; 
+      <span class="keyword">var</span> output = _(collection.filters).reduce(<span class="keyword">function</span>(m,i){
+        <span class="keyword">var</span> q = i.current_query;
+        <span class="keyword">if</span>(m &amp;&amp; (!q || _.isEmpty(q.stack))){ <span class="keyword">return</span> m;}
+        <span class="keyword">if</span>(!m &amp;&amp; !q){<span class="keyword">return</span> collection.getAllItems();}
+
+        <span class="keyword">if</span>(m){
+          <span class="keyword">return</span> m.and(q);
+        } <span class="keyword">else</span> {
+          <span class="keyword">return</span> q;
+        }
+      },<span class="literal">false</span>);
+      <span class="keyword">return</span> output;
+    },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-66">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-66">&#182;</a>
+              </div>
+              <p>Caches a MatchSet on the view as the current match_set;</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    setSelection: <span class="keyword">function</span>(match_set,attrs){
+      <span class="keyword">this</span>.match_set = match_set;
+      <span class="keyword">this</span>.trigger(<span class="string">"selectionChange"</span>,attrs);
+    },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-67">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-67">&#182;</a>
+              </div>
+              <p>Delegates to the views selectionFn to generate an array of valid cids given the current filters.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    setNaturalSelection: <span class="keyword">function</span>(attrs){
+      <span class="keyword">var</span> selection;
+      selection = <span class="keyword">this</span>.selectionFn();
+      <span class="keyword">this</span>.setSelection(selection,attrs);
+    },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-68">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-68">&#182;</a>
+              </div>
+              <p>Removes a MatchSet from a view and replaces it with the universe of possible items.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    clearSelection: <span class="keyword">function</span>(){<span class="keyword">this</span>.match_set = <span class="keyword">this</span>.collection.getAllItems();},</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-69">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-69">&#182;</a>
+              </div>
+              <p>IMPORTANT: This is the function you will call most often on views. This returns the cached, filtered items and 
+then sorts them and pages them as appropriate.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    getCurrentItems: <span class="keyword">function</span>(page){
+      <span class="keyword">if</span>(! <span class="keyword">this</span>.match_set){<span class="keyword">return</span> []}
+      <span class="keyword">if</span>(<span class="keyword">typeof</span>(page) === <span class="string">"undefined"</span>){
+        <span class="keyword">var</span> page = <span class="keyword">this</span>.current_page;
+      }
+      <span class="keyword">if</span>(<span class="keyword">this</span>.page_size == <span class="literal">Infinity</span>){
+        <span class="keyword">if</span>(<span class="keyword">this</span>.current_sort){
+          <span class="keyword">var</span> items = <span class="keyword">this</span>.match_set.all_sorted(<span class="keyword">this</span>.current_sort);
+        } <span class="keyword">else</span> {
+          <span class="keyword">var</span> items = <span class="keyword">this</span>.match_set.all();
+        }
+      } <span class="keyword">else</span> {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-70">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-70">&#182;</a>
+              </div>
+              <p>TODO: Slice cids before reassociating</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="keyword">if</span>(<span class="keyword">this</span>.current_sort){
+          <span class="keyword">var</span> items = <span class="keyword">this</span>.match_set.all_sorted_cids(<span class="keyword">this</span>.current_sort);
+          items = items.slice(<span class="keyword">this</span>.page_size * page,<span class="keyword">this</span>.page_size * (page + <span class="number">1</span>));
+          <span class="keyword">var</span> ordered_cids = _(items).clone().sort(<span class="keyword">function</span>(a,b){<span class="keyword">return</span> a-b});
+          <span class="keyword">var</span> unsorted_items = <span class="keyword">this</span>.collection.get(ordered_cids);
+          items = _(items).map(<span class="keyword">function</span>(i){<span class="keyword">return</span> _(unsorted_items).find(<span class="keyword">function</span>(o){<span class="keyword">return</span> o.cid === i}) });
+        } <span class="keyword">else</span> {
+          <span class="keyword">var</span> items = <span class="keyword">this</span>.match_set.cids;
+          items = items.slice(<span class="keyword">this</span>.page_size * page,<span class="keyword">this</span>.page_size * (page + <span class="number">1</span>));
+          items = <span class="keyword">this</span>.collection.get(items);
+        }
+      }
+      <span class="keyword">return</span> items;
+    },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-71">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-71">&#182;</a>
+              </div>
+              <p>Change the page of the view by [dir] pages. Negative values to page back.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    page: <span class="keyword">function</span>(dir){
+      <span class="keyword">var</span> new_dir = dir + <span class="keyword">this</span>.current_page;
+      <span class="keyword">if</span>(new_dir &lt; <span class="number">0</span>) new_dir = <span class="number">0</span>;
+      <span class="keyword">if</span>(new_dir &gt; Math.ceil(<span class="keyword">this</span>.match_set.length()/<span class="keyword">this</span>.page_size - <span class="number">1</span>)) new_dir = Math.ceil(<span class="keyword">this</span>.match_set.length()/<span class="keyword">this</span>.page_size - <span class="number">1</span>);
+      <span class="keyword">this</span>.current_page = new_dir;
+      <span class="keyword">this</span>.trigger(<span class="string">"pageChange"</span>);
+    },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-72">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-72">&#182;</a>
+              </div>
+              <p>Page to a specific cid. This IS NOT to page to a specific page.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    pageTo: <span class="keyword">function</span>(cid){
+      <span class="keyword">if</span>(<span class="keyword">this</span>.current_sort){
+        <span class="keyword">var</span> index = _(<span class="keyword">this</span>.match_set.all_sorted_cids(<span class="keyword">this</span>.current_sort)).indexOf(cid),
+            len = <span class="keyword">this</span>.match_set.cids.length,
+            page = Math.ceil(index/<span class="keyword">this</span>.page_size);
+      } <span class="keyword">else</span> {
+        <span class="keyword">var</span> index = _(<span class="keyword">this</span>.match_set.cids).indexOf(cid),
+            len = <span class="keyword">this</span>.match_set.cids.length,
+            page = Math.ceil(index/<span class="keyword">this</span>.page_size);
+      }
+      <span class="keyword">this</span>.current_page = page;
+      <span class="keyword">this</span>.trigger(<span class="string">"pageChange"</span>);
+    },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-73">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-73">&#182;</a>
+              </div>
+              <p>Set the page size.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    setPageSize: <span class="keyword">function</span>(size){
+      <span class="keyword">this</span>.page_size = size;
+      <span class="keyword">this</span>.trigger(<span class="string">"pageChange"</span>);
+    },
+    render: <span class="keyword">function</span>(){}
+  })</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-74">
+            <div class="annotation">
+              
+              <div class="pilwrap for-h1">
+                <a class="pilcrow" href="#section-74">&#182;</a>
+              </div>
+              <h1>MatchSets</h1>
+<p>These are what are returned from queries on filters. They can be chained together with ands, or, &amp; nots. 
+They also keep a &quot;stack&quot; to remember how they were created (after chaining) so that they can refresh themselves.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  PourOver.MatchSet = <span class="keyword">function</span>(cids,collection,stack){
+    <span class="keyword">this</span>.cids = cids;
+    <span class="keyword">this</span>.collection = collection
+    <span class="keyword">this</span>.stack = stack;
+    <span class="keyword">this</span>.initialize.apply(<span class="keyword">this</span>, arguments);
+  }
+  _.extend(PourOver.MatchSet.prototype,Backbone.Events,{
+    initialize: <span class="keyword">function</span>(){},</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-75">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-75">&#182;</a>
+              </div>
+              <p>When the underlying data has changed re-evaluate which items are included in this possibily compound result.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    refresh: <span class="keyword">function</span>(s,match_set){
+     <span class="keyword">if</span>(<span class="keyword">typeof</span>(s) === <span class="string">"undefined"</span>){<span class="keyword">var</span> s = <span class="keyword">this</span>.stack || []}
+     <span class="keyword">if</span>(s.length &lt; <span class="number">1</span> &amp;&amp; match_set){
+       <span class="keyword">this</span>.cids = match_set.cids;
+       <span class="keyword">return</span> <span class="keyword">this</span>;
+     } <span class="keyword">else</span> <span class="keyword">if</span> (s.length &lt; <span class="number">1</span>){
+       <span class="keyword">this</span>.cids = <span class="literal">false</span>;
+       <span class="keyword">return</span> <span class="keyword">this</span>;
+     }
+
+     <span class="keyword">var</span> step = s[<span class="number">0</span>],
+         operation = step[<span class="number">0</span>];
+     <span class="keyword">if</span>(<span class="keyword">typeof</span>(operation) === <span class="string">"object"</span>){
+       <span class="keyword">var</span> match_set = operation.getFn(step[<span class="number">1</span>]);
+       <span class="keyword">return</span> <span class="keyword">this</span>.refresh(_(s).rest(),match_set)
+     } <span class="keyword">else</span> <span class="keyword">if</span>(operation === <span class="string">"all"</span> || step === <span class="string">"all"</span>) {
+       <span class="keyword">var</span> cids = _(<span class="keyword">this</span>.collection.items).map(<span class="keyword">function</span>(i){<span class="keyword">return</span> i.cid});
+       <span class="keyword">var</span> match_set = <span class="keyword">new</span> PourOver.MatchSet(cids,<span class="keyword">this</span>,[<span class="string">"all"</span>]);
+       <span class="keyword">return</span> <span class="keyword">this</span>.refresh(_(s).rest(),match_set)
+     } <span class="keyword">else</span> <span class="keyword">if</span>(operation === <span class="string">"and"</span>) {
+       <span class="keyword">if</span>(match_set){
+         <span class="keyword">var</span> m = match_set.and(<span class="keyword">this</span>.refresh(step[<span class="number">1</span>]));
+       } <span class="keyword">else</span> {
+         <span class="keyword">var</span> m = <span class="keyword">this</span>.refresh(step[<span class="number">1</span>]);
+       }
+       <span class="keyword">return</span> <span class="keyword">this</span>.refresh(_(s).rest(),m)
+     } <span class="keyword">else</span> <span class="keyword">if</span>(operation === <span class="string">"or"</span>) {
+       <span class="keyword">if</span>(match_set){
+        <span class="keyword">var</span> m = match_set.or(<span class="keyword">this</span>.refresh(step[<span class="number">1</span>]));
+       } <span class="keyword">else</span> {
+        <span class="keyword">var</span> m = <span class="keyword">this</span>.refresh(step[<span class="number">1</span>]);
+       }
+       <span class="keyword">return</span> <span class="keyword">this</span>.refresh(_(s).rest(),m)
+    } <span class="keyword">else</span> <span class="keyword">if</span>(operation === <span class="string">"not"</span>) {
+       <span class="keyword">if</span>(match_set){
+        <span class="keyword">var</span> m = match_set.not(<span class="keyword">this</span>.refresh(step[<span class="number">1</span>]));
+       } <span class="keyword">else</span> {
+        <span class="keyword">var</span> m = <span class="keyword">this</span>.refresh(step[<span class="number">1</span>]);
+       }
+       <span class="keyword">return</span> <span class="keyword">this</span>.refresh(_(s).rest(),m)
+    }
+    },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-76">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-76">&#182;</a>
+              </div>
+              <p>Intersect this MatchSet with another MatchSet.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    and: <span class="keyword">function</span>(other_matches){ 
+      <span class="keyword">if</span>(<span class="keyword">this</span>.stack.length &lt; <span class="number">1</span> &amp;&amp; other_matches){
+        <span class="keyword">return</span> other_matches;
+      } <span class="keyword">else</span> <span class="keyword">if</span> (!other_matches){
+        <span class="keyword">return</span> <span class="keyword">this</span>;
+      } <span class="keyword">else</span> {
+        <span class="keyword">var</span> set = PourOver.intersect_sorted(<span class="keyword">this</span>.cids,other_matches.cids); 
+        <span class="keyword">return</span> <span class="keyword">new</span> PourOver.MatchSet(set,<span class="keyword">this</span>.collection,<span class="keyword">this</span>.stack.concat([[<span class="string">"and"</span>,other_matches.stack]])) 
+      }
+    },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-77">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-77">&#182;</a>
+              </div>
+              <p>Union this MatchSet with another MatchSet.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    or: <span class="keyword">function</span>(other_matches){ 
+      <span class="keyword">if</span>(<span class="keyword">this</span>.stack.length &lt; <span class="number">1</span> &amp;&amp; other_matches){
+        <span class="keyword">return</span> other_matches;
+      } <span class="keyword">else</span> <span class="keyword">if</span> (!other_matches){
+        <span class="keyword">return</span> <span class="keyword">this</span>;
+      } <span class="keyword">else</span> {
+        <span class="keyword">var</span> set = PourOver.union_sorted(<span class="keyword">this</span>.cids,other_matches.cids); 
+        <span class="keyword">return</span> <span class="keyword">new</span> PourOver.MatchSet(set,<span class="keyword">this</span>.collection,<span class="keyword">this</span>.stack.concat([[<span class="string">"or"</span>,other_matches.stack]])); 
+      }
+    },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-78">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-78">&#182;</a>
+              </div>
+              <p>Difference this MatchSet with another MatchSet.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    not: <span class="keyword">function</span>(other_matches){ 
+      <span class="keyword">if</span>(<span class="keyword">this</span>.stack.length &lt; <span class="number">1</span> || ! other_matches){
+        <span class="keyword">return</span> <span class="keyword">this</span>;
+      } <span class="keyword">else</span> {
+        <span class="keyword">var</span> set = PourOver.subtract_sorted(<span class="keyword">this</span>.cids,other_matches.cids); 
+        <span class="keyword">return</span> <span class="keyword">new</span> PourOver.MatchSet(set,<span class="keyword">this</span>.collection,<span class="keyword">this</span>.stack.concat([[<span class="string">"not"</span>,other_matches.stack]])); 
+      }
+    },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-79">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-79">&#182;</a>
+              </div>
+              <p>Return all the items corresponding to the cids cached on the MatchSet.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    all: <span class="keyword">function</span>(){ <span class="keyword">return</span> <span class="keyword">this</span>.collection.get(<span class="keyword">this</span>.cids);},</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-80">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-80">&#182;</a>
+              </div>
+              <p>Return a slice of the items corresponding to the cids cached on the MatchSet.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    slice: <span class="keyword">function</span>(s,e){ <span class="keyword">return</span> <span class="keyword">this</span>.collection.get(<span class="keyword">this</span>.cids.slice(s,e)) },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-81">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-81">&#182;</a>
+              </div>
+              <p>Return all the items corresponding to the cids cached on the MatchSet AND sorted by sort s.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    all_sorted: <span class="keyword">function</span>(s){ <span class="keyword">var</span> c = <span class="keyword">this</span>.all(); <span class="keyword">return</span> s.sort(c); },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-82">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-82">&#182;</a>
+              </div>
+              <p>Sort the cached cids.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    all_sorted_cids: <span class="keyword">function</span>(s){ <span class="keyword">var</span> c = <span class="keyword">this</span>.cids; <span class="keyword">return</span> s.sort(c); },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-83">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-83">&#182;</a>
+              </div>
+              <p>Return how many items comprise this MatchSet.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    length: <span class="keyword">function</span>(){<span class="keyword">return</span> <span class="keyword">this</span>.cids.length}
+  });</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-84">
+            <div class="annotation">
+              
+              <div class="pilwrap for-h1">
+                <a class="pilcrow" href="#section-84">&#182;</a>
+              </div>
+              <h1>PourOver.UI</h1>
+<p>PourOver.UI is a simple add-on for creating objects to be rendered as UI elements controlling the 
+state of filters and views.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>PourOver.UI = {}
+PourOver.UI.Element = <span class="keyword">function</span>(opts){
+    <span class="keyword">if</span>(<span class="keyword">typeof</span>(opts) === <span class="string">"undefined"</span>){<span class="keyword">var</span> opts = {}}
+    <span class="keyword">this</span>.initialize.apply(<span class="keyword">this</span>,arguments)
+}
+
+_.extend(PourOver.UI.Element.prototype,Backbone.Events,{
+  initialize: <span class="keyword">function</span>(){},
+  getMatchSet: <span class="keyword">function</span>(){
+    <span class="keyword">throw</span> <span class="string">"No get match set function specifiec"</span>
+  },
+  getFilterState: <span class="keyword">function</span>(){
+    <span class="keyword">throw</span> <span class="string">"No get filter state specified"</span>;
+  },
+  template: <span class="keyword">function</span>(){
+    <span class="keyword">throw</span> <span class="string">"No template specified"</span>
+  },
+  render: <span class="keyword">function</span>(){
+    <span class="keyword">var</span> filter_state = <span class="keyword">this</span>.getFilterState();
+        output = <span class="keyword">this</span>.template({state:filter_state});
+    <span class="keyword">return</span> output
+  },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-85">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-85">&#182;</a>
+              </div>
+              <p>Pass in a MatchSet that only has a single query of a chain of OR&#39;ed queried and receive
+an array of possibility names that have been selected.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  getSimpleSelectState: <span class="keyword">function</span>(match_set,s,output){
+      <span class="keyword">if</span>(<span class="keyword">typeof</span>(match_set) === <span class="string">"undefined"</span> || !match_set || !match_set.stack){<span class="keyword">return</span> <span class="literal">false</span>}
+      <span class="keyword">if</span>(<span class="keyword">typeof</span>(s) === <span class="string">"undefined"</span>){<span class="keyword">var</span> s = match_set.stack}
+      <span class="keyword">if</span>(<span class="keyword">typeof</span>(output) === <span class="string">"undefined"</span>){<span class="keyword">var</span> output = []}
+      <span class="keyword">if</span>(s.length &lt; <span class="number">1</span>){
+        <span class="keyword">return</span> output;
+      } <span class="keyword">else</span> <span class="keyword">if</span> (<span class="keyword">typeof</span>(s[<span class="number">0</span>][<span class="number">0</span>]) === <span class="string">"object"</span>){
+        output.push(s[<span class="number">0</span>][<span class="number">1</span>]);
+        <span class="keyword">return</span> <span class="keyword">this</span>.getSimpleSelectState(match_set,_(s).rest(),output);
+      } <span class="keyword">else</span> <span class="keyword">if</span> (s[<span class="number">0</span>][<span class="number">0</span>] === <span class="string">"or"</span>){
+        output = output.concat(<span class="keyword">this</span>.getSimpleSelectState(match_set,s[<span class="number">0</span>][<span class="number">1</span>]));
+        <span class="keyword">return</span> <span class="keyword">this</span>.getSimpleSelectState(match_set,_(s).rest(),output);
+      } <span class="keyword">else</span> {
+        <span class="keyword">throw</span> <span class="string">"This does not appear to be a valid, simple selectElement stack."</span>
+      }
+  },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-86">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-86">&#182;</a>
+              </div>
+              <p>Pass in a MatchSet that is the result of a single, non-compounded range and receive the
+value of that range.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  getSimpleRangeState: <span class="keyword">function</span>(match_set){
+    <span class="keyword">if</span>(<span class="keyword">typeof</span>(match_set) === <span class="string">"undefined"</span> || !match_set || !match_set.stack){<span class="keyword">return</span> <span class="literal">false</span>}
+    stack = match_set.stack;
+    <span class="keyword">if</span>(stack.length !== <span class="number">1</span> || stack[<span class="number">0</span>][<span class="number">1</span>].length !== <span class="number">2</span>){<span class="keyword">throw</span> <span class="string">"The filter specified does not appear to have a simple range stack."</span>}
+    <span class="keyword">return</span> stack[<span class="number">0</span>][<span class="number">1</span>];
+  }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-87">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-87">&#182;</a>
+              </div>
+              <p>TODO: Added more UI gets.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>});</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-88">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-88">&#182;</a>
+              </div>
+              <p>From Backbone
+Helper function to correctly set up the prototype chain, for subclasses.
+Similar to <code>goog.inherits</code>, but uses a hash of prototype properties and
+class properties to be extended.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  PourOver.extend = <span class="keyword">function</span>(protoProps, staticProps) {
+      <span class="keyword">var</span> parent = <span class="keyword">this</span>;
+      <span class="keyword">var</span> child;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-89">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-89">&#182;</a>
+              </div>
+              <p>The constructor function for the new subclass is either defined by you
+(the &quot;constructor&quot; property in your <code>extend</code> definition), or defaulted
+by us to simply call the parent&#39;s constructor.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="keyword">if</span> (protoProps &amp;&amp; _.has(protoProps, <span class="string">'constructor'</span>)) {
+        child = protoProps.constructor;
+      } <span class="keyword">else</span> {
+        child = <span class="keyword">function</span>() {
+          <span class="keyword">return</span> parent.apply(<span class="keyword">this</span>, arguments);
+        };
+      }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-90">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-90">&#182;</a>
+              </div>
+              <p>Add static properties to the constructor function, if supplied.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      _.extend(child, parent, staticProps);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-91">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-91">&#182;</a>
+              </div>
+              <p>Set the prototype chain to inherit from <code>parent</code>, without calling
+<code>parent</code>&#39;s constructor function.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="keyword">var</span> Surrogate = <span class="keyword">function</span>() {
+          <span class="keyword">this</span>.constructor = child;
+        };
+      Surrogate.prototype = parent.prototype;
+      child.prototype = <span class="keyword">new</span> Surrogate;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-92">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-92">&#182;</a>
+              </div>
+              <p>Add prototype properties (instance properties) to the subclass,
+if supplied.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="keyword">if</span> (protoProps) _.extend(child.prototype, protoProps);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-93">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-93">&#182;</a>
+              </div>
+              <p>Set a convenience property in case the parent&#39;s prototype is needed
+later.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      child.__super__ = parent.prototype;
+
+      <span class="keyword">return</span> child;
+    };
+  
+  PourOver.Collection.extend = PourOver.View.extend = PourOver.Filter.extend = PourOver.Sort.extend = PourOver.MatchSet.extend = PourOver.UI.Element.extend = PourOver.extend</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-94">
+            <div class="annotation">
+              
+              <div class="pilwrap for-h1">
+                <a class="pilcrow" href="#section-94">&#182;</a>
+              </div>
+              <h1>Presets</h1>
+<p>A PourOver buffered collection is one that stores some or all of its data as a promise. This is useful in conjunction with a
+large data set in which you don&#39;t want to load all the data at page open.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  PourOver.BufferedCollection = PourOver.Collection.extend({
+    buffered_items: {},
+    stripFutures: <span class="keyword">function</span>(item){
+      <span class="keyword">return</span> _(item).reduce(<span class="keyword">function</span>(m,v,k){<span class="keyword">if</span>(<span class="keyword">typeof</span>(v) != <span class="string">"undefined"</span>){m[k] = v} <span class="keyword">return</span> m},{});
+    },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-95">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-95">&#182;</a>
+              </div>
+              <p>Overrides the base get function with one that buffers in whole values from the server</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    get: <span class="keyword">function</span>(cids,raw){
+      <span class="keyword">if</span>(<span class="keyword">typeof</span>(raw) === <span class="string">"undefined"</span>){<span class="keyword">var</span> raw = <span class="literal">false</span>} 
+      <span class="keyword">var</span> items = PourOver.Collection.prototype.get.call(<span class="keyword">this</span>,cids),
+          that = <span class="keyword">this</span>;
+      <span class="keyword">if</span>(raw){<span class="keyword">return</span> items;}
+      <span class="keyword">return</span> _(items).map(<span class="keyword">function</span>(i){
+        <span class="keyword">var</span> guid = i.guid, new_item;
+        <span class="keyword">if</span>(that.buffered_items.hasOwnProperty(guid)){
+          <span class="keyword">return</span> _(that.buffered_items[guid]).extend(that.stripFutures(i));
+        } <span class="keyword">else</span> {
+          <span class="keyword">return</span> i;
+        }
+      }); 
+    },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-96">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-96">&#182;</a>
+              </div>
+              <p>Retreive a specific attr of a specific item from the buffer.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    getBufferedValue: <span class="keyword">function</span>(guid,attr){
+      <span class="keyword">if</span>(<span class="keyword">this</span>.buffered_items.hasOwnProperty(guid)){
+        <span class="keyword">return</span> <span class="keyword">this</span>.buffered_items[guid][attr] || <span class="literal">false</span>;
+      } <span class="keyword">else</span> {
+        <span class="keyword">return</span> <span class="literal">false</span>;
+      }
+    },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-97">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-97">&#182;</a>
+              </div>
+              <p>Delete all buffered values for items in the collection.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    clearBufferedItems: <span class="function"><span class="keyword">function</span> <span class="params">()</span>{</span>
+      <span class="keyword">var</span> buffered_items = <span class="keyword">this</span>.buffered_items;
+      <span class="keyword">for</span> (<span class="keyword">var</span> p <span class="keyword">in</span> buffered_items){
+        <span class="keyword">if</span> (buffered_items.hasOwnProperty(p)){
+            <span class="keyword">delete</span> buffered_items[p];
+        }
+      }
+    },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-98">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-98">&#182;</a>
+              </div>
+              <p>When instantiating a buffered collection you must provide this method. This is how a buffered collection
+knows what URL to fetch new data from.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    getBufferUrl: <span class="keyword">function</span>(guids){
+      <span class="keyword">throw</span> <span class="string">"You must override getBufferUrl;"</span>
+    },
+    preprocessItem: <span class="keyword">function</span>(item){
+      <span class="keyword">return</span> [item[<span class="string">"guid"</span>],item]
+    },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-99">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-99">&#182;</a>
+              </div>
+              <p>Pull down new data for an array of guids from the server at the URL returned by getBufferUrl. When the request returns,
+push the new values into the buffer. The deferred object is returned from this method so you can chain additional callbacks
+onto the resolution such as a render action.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    bufferGuids: <span class="keyword">function</span>(guids){
+      <span class="keyword">var</span> that = <span class="keyword">this</span>,
+          guids = _(guids).select(<span class="keyword">function</span>(g){ <span class="keyword">return</span> g &amp;&amp;  ! that.buffered_items.hasOwnProperty(g);}), 
+          buffurl = <span class="keyword">this</span>.getBufferUrl(guids),
+          url = buffurl[<span class="number">0</span>],
+          jsonpCallback = buffurl[<span class="number">1</span>];
+      <span class="keyword">if</span>(guids.length &gt; <span class="number">0</span>){
+        <span class="keyword">return</span> $.ajax({
+          url: url,
+          dataType:<span class="string">'jsonp'</span>,
+          cache: <span class="literal">true</span>
+        }).always(<span class="keyword">function</span>(d){
+          <span class="keyword">if</span>(_.isArray(d)){
+            items = _(d).map(_.bind(that.preprocessItem,that));
+            _(items).each(<span class="keyword">function</span>(i){
+              that.buffered_items[i[<span class="number">0</span>]] = i[<span class="number">1</span>];
+            });
+          }
+        });
+      } <span class="keyword">else</span> {
+        <span class="keyword">return</span> $.Deferred().resolve(<span class="literal">false</span>);
+      }
+    }
+  });</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-100">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-100">&#182;</a>
+              </div>
+              <p>A buffered view is the pair to a buffered collection. It calls the appropriate buffering methods of the buffered collection
+so that you automatically get the benefits of buffering as you are paging through the view. If you use a buffered view with a buffered collection
+you shouldn&#39;t need to call the buffering methods of the collection explicitly.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  PourOver.BufferedView = PourOver.View.extend({
+    buffer_pages: <span class="number">1</span>,
+    bufferAroundCurrentPage: <span class="keyword">function</span>(){
+      <span class="keyword">var</span> current_page = <span class="keyword">this</span>.current_page,
+          low_bound = current_page - <span class="keyword">this</span>.buffer_pages &gt; <span class="number">0</span> ? current_page - <span class="keyword">this</span>.buffer_pages : <span class="number">0</span>,
+          high_bound = current_page + <span class="keyword">this</span>.buffer_pages,
+          range = _.range(low_bound,high_bound + <span class="number">1</span>),
+          that = <span class="keyword">this</span>;
+      range = _(range).map(<span class="keyword">function</span>(page){
+        <span class="keyword">return</span> _(that.getCurrentItems(page)).pluck(<span class="string">"guid"</span>);
+      });
+      <span class="keyword">var</span> guids = _.flatten(range);
+      buffer_deferred = <span class="keyword">this</span>.collection.bufferGuids(guids);
+      buffer_deferred.done(<span class="keyword">function</span>(d){
+          <span class="keyword">if</span>(d){
+            that.render();
+          }
+      })
+    },
+    page: <span class="keyword">function</span>(dir){
+      PourOver.View.prototype.page.call(<span class="keyword">this</span>,dir);
+      <span class="keyword">this</span>.bufferAroundCurrentPage();
+    },
+    pageTo: <span class="keyword">function</span>(cid){
+      PourOver.View.prototype.pageTo.call(<span class="keyword">this</span>,cid);
+      <span class="keyword">this</span>.bufferAroundCurrentPage();
+    }
+  })</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-101">
+            <div class="annotation">
+              
+              <div class="pilwrap for-h2">
+                <a class="pilcrow" href="#section-101">&#182;</a>
+              </div>
+              <h2>Filter defaults</h2>
+<p>A strange filter that selects items based on an explicit list of cids. This is useful when you want to use PourOver in association
+with, say, an editorially composed list of items or any mechanic in which you can &quot;select&quot; items to be included in a filter independent of 
+any attribute.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  PourOver.manualFilter = PourOver.Filter.extend({
+    cacheResults: <span class="keyword">function</span>(){<span class="keyword">return</span> <span class="literal">false</span>},
+    addCacheResults: <span class="keyword">function</span>(){<span class="keyword">return</span> <span class="literal">false</span>},
+    getFn: <span class="keyword">function</span>(query){
+      <span class="keyword">if</span>(_(query).isArray()){
+        query = query.sort(<span class="keyword">function</span>(a,b){<span class="keyword">return</span> a - b})
+        <span class="keyword">return</span> <span class="keyword">new</span> PourOver.MatchSet(query,<span class="keyword">this</span>.getCollection(),[[<span class="keyword">this</span>,query]]);
+      } <span class="keyword">else</span> <span class="keyword">if</span> (<span class="keyword">typeof</span>(query) === <span class="string">"number"</span>) {
+        <span class="keyword">return</span> <span class="keyword">new</span> PourOver.MatchSet([query],<span class="keyword">this</span>.getCollection(),[[<span class="keyword">this</span>,query]]);
+      } <span class="keyword">else</span> {
+        <span class="keyword">throw</span> <span class="string">"Manual filters only support querying by one or more cids"</span>
+      }
+    },
+    addItems: <span class="keyword">function</span>(cids){
+      <span class="keyword">if</span>(! _(cids).isArray()){cids = [cids]}
+      cids = cids.sort(<span class="keyword">function</span>(a,b){<span class="keyword">return</span> a - b});
+      <span class="keyword">if</span>(<span class="keyword">this</span>.current_query){
+        <span class="keyword">var</span> current_query = <span class="keyword">this</span>.current_query.cids,
+            new_query = PourOver.union_sorted(current_query,cids);
+      } <span class="keyword">else</span> {
+        <span class="keyword">var</span> new_query = cids;
+      }
+      <span class="keyword">this</span>.query(new_query);
+    },
+    removeItems: <span class="keyword">function</span>(cids){
+      <span class="keyword">if</span>(! _(cids).isArray()){cids = [cids]}
+      cids = cids.sort(<span class="keyword">function</span>(a,b){<span class="keyword">return</span> a - b});
+      <span class="keyword">var</span> current_query = <span class="keyword">this</span>.current_query.cids,
+          new_query = PourOver.subtract_sorted(current_query,cids);
+      <span class="keyword">this</span>.query(new_query);
+    }
+  });</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-102">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-102">&#182;</a>
+              </div>
+              <p>The convenience constructor for manual filters.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  PourOver.makeManualFilter = <span class="keyword">function</span>(name){
+    <span class="keyword">var</span> filter = <span class="keyword">new</span> PourOver.manualFilter(name,[]);
+    <span class="keyword">return</span> filter;
+  }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-103">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-103">&#182;</a>
+              </div>
+              <p>An exact filter is the most commonly used filter. Given an attribute and a list of possibilities, an exact filter will bucket the items
+into those satisfying each of the possibilities. This also has the fastest peformance as far as creating and updating.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  PourOver.exactFilter = PourOver.Filter.extend({
+    cacheResults: PourOver.cacheMethods.exactCache,
+    addCacheResults: PourOver.cacheMethods.exactAddCache,
+    getFn: <span class="keyword">function</span>(query){
+      <span class="keyword">var</span> that = <span class="keyword">this</span>;
+      <span class="keyword">if</span>(_(query).isArray()){
+        <span class="keyword">var</span> match_set = _(query).reduce(<span class="keyword">function</span>(m,i){
+          <span class="keyword">if</span>(!m){
+            <span class="keyword">return</span> that.getFn(i);
+          } <span class="keyword">else</span> {
+            <span class="keyword">return</span> m.or(that.getFn(i));
+          }
+        },<span class="literal">false</span>);
+        <span class="keyword">return</span> match_set;
+      } <span class="keyword">else</span> {
+        <span class="keyword">var</span> possibility = <span class="keyword">this</span>.possibilities[query];
+        <span class="keyword">if</span> (_.isUndefined(possibility) ) <span class="keyword">throw</span> <span class="string">"The filter "</span> + <span class="keyword">this</span>.name + <span class="string">" does not have a match for the query '"</span> + query + <span class="string">"'."</span>;
+        <span class="keyword">return</span> <span class="keyword">new</span> PourOver.MatchSet(possibility.matching_cids,<span class="keyword">this</span>.getCollection(),[[<span class="keyword">this</span>,query]]);
+      }
+    }
+  });</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-104">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-104">&#182;</a>
+              </div>
+              <p>The convenience constructor for exact filters.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  PourOver.makeExactFilter = <span class="keyword">function</span>(name,values,opts){
+    <span class="keyword">if</span>(<span class="keyword">typeof</span>(opts) === <span class="string">"undefined"</span>){opts = {}}
+    <span class="keyword">var</span> values = _(values).map(<span class="keyword">function</span>(i){<span class="keyword">return</span> {value:i}}),
+        opts = _.extend({associated_attrs: [name]},opts),
+        filter = <span class="keyword">new</span> PourOver.exactFilter(name,values,opts);
+    <span class="keyword">return</span> filter;
+  }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-105">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-105">&#182;</a>
+              </div>
+              <p>A range filter is for dividing items into buckets of ranges based on a specific attribute. A good example is, say, each item as 0-1000 &quot;friends&quot;, then you can 
+supply a range filter with the possibilities: [[0,10],[11,100],[101,1000]] and it will create buckets for 0-10, 11-100, and 101 + friends.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  PourOver.rangeFilter = PourOver.Filter.extend({
+    cacheResults: PourOver.cacheMethods.defaultCache,
+    addCacheResults: PourOver.cacheMethods.defaultAddCache,
+    fn: <span class="keyword">function</span>(possibility,item){
+      <span class="keyword">return</span> possibility.low &lt;= item[<span class="keyword">this</span>.name] &amp;&amp; possibility.high &gt;= item[<span class="keyword">this</span>.name]
+    },
+    getFn: <span class="keyword">function</span>(query){
+      <span class="keyword">var</span> possibility = <span class="keyword">this</span>.possibilities[query.join(<span class="string">"-"</span>)];
+      <span class="keyword">if</span> (_.isUndefined(possibility) ) <span class="keyword">throw</span> <span class="string">"The filter "</span> + <span class="keyword">this</span>.name + <span class="string">" does not have a match for the query '"</span> + query + <span class="string">"'."</span>;
+      <span class="keyword">return</span> <span class="keyword">new</span> PourOver.MatchSet(possibility.matching_cids,<span class="keyword">this</span>.getCollection(),[[<span class="keyword">this</span>,query]]);
+    }
+  });</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-106">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-106">&#182;</a>
+              </div>
+              <p>The convenience constructor for range filters.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  PourOver.makeRangeFilter = <span class="keyword">function</span>(name,ranges,opts){
+    <span class="keyword">if</span>(<span class="keyword">typeof</span>(opts) === <span class="string">"undefined"</span>){opts = {}}
+    <span class="keyword">var</span> values = _(ranges).map(<span class="keyword">function</span>(r){<span class="keyword">return</span> {low: r[<span class="number">0</span>], high: r[<span class="number">1</span>], value: r.join(<span class="string">"-"</span>)}}),
+        newopts = _.extend({associated_attrs: [name]},opts),
+        filter = <span class="keyword">new</span> PourOver.rangeFilter(name,values,newopts);
+    <span class="keyword">return</span> filter;
+  }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-107">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-107">&#182;</a>
+              </div>
+              <p>The inverse of a range filter. Again each item has single value for a certain attribute, but the possibilities you provide are every value of that attribute.
+Then, you query by a range. So, if a person can have 1-10 hats, you would feed a dv range filter the possibilities [1,2,3,4,5,6,7,8,9,10] and then make 
+queries such as [2,5] for 2-5 hats. Do not use this for huge ranges like 1-100. Use crossfilter or write some optimized way of doing this. PourOver is not optimized
+for that kind of continuous query.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  PourOver.dvrangeFilter = PourOver.Filter.extend({
+    cacheResults:  PourOver.cacheMethods.exactCache,
+    addCacheResults: PourOver.cacheMethods.exactAddCache,
+    getFn: <span class="keyword">function</span>(query){
+      <span class="keyword">if</span>(! query[<span class="number">0</span>] || ! query[<span class="number">1</span>]){
+        <span class="keyword">return</span> <span class="keyword">new</span> PourOver.MatchSet([],<span class="keyword">this</span>.getCollection(),[[<span class="keyword">this</span>,query]]);
+      }
+      <span class="keyword">var</span> li,hi,that,possibilities,cids;
+      li = _(<span class="keyword">this</span>.values).indexOf(query[<span class="number">0</span>]);
+      hi = _(<span class="keyword">this</span>.values).indexOf(query[<span class="number">1</span>]);
+      that = <span class="keyword">this</span>;
+      possibilities = _(<span class="keyword">this</span>.values.slice(li,hi+<span class="number">1</span>)).map(<span class="keyword">function</span>(p){<span class="keyword">return</span> that.possibilities[p]});
+      cids = _(possibilities).reduce(<span class="keyword">function</span>(m,i){ <span class="keyword">return</span> PourOver.union_sorted(m,i.matching_cids) },[]);
+      <span class="keyword">return</span> <span class="keyword">new</span> PourOver.MatchSet(cids,<span class="keyword">this</span>.getCollection(),[[<span class="keyword">this</span>,query]]);
+    }
+  });</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-108">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-108">&#182;</a>
+              </div>
+              <p>The convenience constructor for dv range filters.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  PourOver.makeDVrangeFilter = <span class="keyword">function</span>(name,v,opts){
+    <span class="keyword">if</span>(<span class="keyword">typeof</span>(opts) === <span class="string">"undefined"</span>){opts = {}}
+    <span class="keyword">var</span> values = _(v).map(<span class="keyword">function</span>(i){<span class="keyword">return</span> {value:i}}),
+        newopts = _.extend({associated_attrs: [name]},opts),
+        filter = <span class="keyword">new</span> PourOver.dvrangeFilter(name,values,newopts);
+    <span class="keyword">return</span> filter
+  }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-109">
+            <div class="annotation">
+              
+              <div class="pilwrap for-h2">
+                <a class="pilcrow" href="#section-109">&#182;</a>
+              </div>
+              <h2>Preset sorts</h2>
+<p>Sorts items based on an explicit ordering of values. This would be useful for, say, a slideshow in which
+the order of items has nothing to do with any of their filterable attributes. Comes with methods to reorganize
+the items in the sort.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  PourOver.explicitSort = PourOver.Sort.extend({
+    fn: <span class="keyword">function</span>(a,b){
+      <span class="keyword">var</span> a_index = _(<span class="keyword">this</span>.order).indexOf(a[<span class="keyword">this</span>.attr]),
+          b_index = _(<span class="keyword">this</span>.order).indexOf(b[<span class="keyword">this</span>.attr]);
+      <span class="keyword">if</span>(a_index === -<span class="number">1</span>) {a_index = <span class="number">1</span>/<span class="number">0</span>}
+      <span class="keyword">if</span>(b_index === -<span class="number">1</span>) {b_index = <span class="number">1</span>/<span class="number">0</span>}
+      <span class="keyword">return</span> a_index - b_index;
+    },
+    reset: <span class="keyword">function</span>(items){
+      <span class="keyword">this</span>.order = _(items).pluck(<span class="keyword">this</span>.attr);
+      <span class="keyword">this</span>.rebuild_sort();
+    },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-110">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-110">&#182;</a>
+              </div>
+              <p>Insert an item into the sort.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    insert: <span class="keyword">function</span>(items,index){
+      <span class="keyword">if</span>(<span class="keyword">typeof</span>(index) === <span class="string">"undefined"</span>){<span class="keyword">var</span> index = <span class="keyword">this</span>.order.length}
+      <span class="keyword">if</span>(! _(items).isArray()){items = [items]}
+      <span class="keyword">var</span> new_order = _(items).pluck(<span class="keyword">this</span>.attr),
+          args = [index,<span class="number">0</span>].concat(new_order);
+      <span class="keyword">this</span>.order.splice.apply(<span class="keyword">this</span>.order,args);
+      <span class="keyword">this</span>.rebuild_sort();
+    },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-111">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-111">&#182;</a>
+              </div>
+              <p>Remove an item from the sort.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    remove: <span class="keyword">function</span>(items){
+      <span class="keyword">if</span>(! _(items).isArray()){items = [items]}
+      <span class="keyword">var</span> attrs = _(items).pluck(<span class="keyword">this</span>.attr);
+      <span class="keyword">this</span>.order = _(<span class="keyword">this</span>.order).difference(attrs);
+      <span class="keyword">this</span>.rebuild_sort();
+    },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-112">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-112">&#182;</a>
+              </div>
+              <p>Move an item from one place to another in the sort.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    move: <span class="keyword">function</span>(items,index){
+      <span class="keyword">if</span>(! _(items).isArray()){items = [items]}
+      <span class="keyword">var</span> attrs = _(items).pluck(<span class="keyword">this</span>.attr);
+      <span class="keyword">this</span>.order = _(<span class="keyword">this</span>.order).map(<span class="keyword">function</span>(o){ <span class="keyword">return</span> _(attrs).include(o) ? <span class="literal">null</span> : o });
+      <span class="keyword">this</span>.insert(items,index);
+      <span class="keyword">this</span>.order = _(<span class="keyword">this</span>.order).compact();
+    }
+  });</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-113">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-113">&#182;</a>
+              </div>
+              <p>The convenience constructor for an explicit sort.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  PourOver.makeExplicitSort = <span class="keyword">function</span>(name,collection,attr,order,opts){
+    <span class="keyword">var</span> sort = <span class="keyword">new</span> PourOver.explicitSort(name,opts);
+    sort.attr = attr;
+    sort.order = order;
+    <span class="keyword">return</span> sort;
+  }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-114">
+            <div class="annotation">
+              
+              <div class="pilwrap for-h2">
+                <a class="pilcrow" href="#section-114">&#182;</a>
+              </div>
+              <h2>Preset UI elements</h2>
+<p>A simple select element is roughly equavalent to elements such as a checklist or a radio list.
+Items can only be unioned together. One or more selected.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  PourOver.UI.SimpleSelectElement = PourOver.UI.Element.extend({
+    initialize: <span class="keyword">function</span>(opts){
+      <span class="keyword">if</span>(!opts.filter){<span class="keyword">throw</span> <span class="string">"A simple select element must have a filter specified"</span>}
+      <span class="keyword">this</span>.filter = opts.filter;
+    },
+    getMatchSet: <span class="keyword">function</span>(){
+      <span class="keyword">return</span> <span class="keyword">this</span>.filter.current_query;  
+    },
+    getFilterState: <span class="keyword">function</span>(){
+      <span class="keyword">var</span> match_set = <span class="keyword">this</span>.getMatchSet();
+      <span class="keyword">return</span> <span class="keyword">this</span>.getSimpleSelectState(match_set)
+    }
+  });</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-115">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-115">&#182;</a>
+              </div>
+              <p>A dv range element can be used for a slider in which you set the low and high and the query
+corresponds to everything in between.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  PourOver.UI.SimpleDVRangeElement = PourOver.UI.Element.extend({
+    initialize: <span class="keyword">function</span>(opts){
+      <span class="keyword">if</span>(!opts.filter){<span class="keyword">throw</span> <span class="string">"A simple dv range element must have a filter specified"</span>}
+      <span class="keyword">this</span>.filter = opts.filter;
+    },
+    getMatchSet: <span class="keyword">function</span>(){
+      <span class="keyword">return</span> <span class="keyword">this</span>.filter.current_query;  
+    },
+    getFilterState: <span class="keyword">function</span>(){
+      <span class="keyword">var</span> match_set = <span class="keyword">this</span>.getMatchSet();
+      <span class="keyword">return</span> <span class="keyword">this</span>.getSimpleRangeState(match_set)
+    }
+  });</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>
