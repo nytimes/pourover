@@ -1,0 +1,8 @@
+baseurl: /pourover
+markdown: kramdown
+title: PourOver
+description: PourOver is a library for fast filtering and sorting of large collections&mdash;think 100,000s of items&mdash;in the browser.
+exclude: 
+    - build.sh
+github:
+  repo: http://github.com/newsdev/pourover

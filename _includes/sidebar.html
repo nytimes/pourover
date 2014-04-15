@@ -1,0 +1,33 @@
+<div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <div><img style="margin:0 auto;" style="margin-left:auto;margin-right:auto;" src="{{site.baseurl}}/public/pourover.png" width="200"/></div>
+
+      <h1>{{ site.title }}</h1>
+      <p class="lead" style="line-height:1.7rem; font-size:1.1rem; margin-bottom: 40px;">{{ site.description }}</p>
+    </div>
+
+    <ul class="sidebar-nav">
+      {% comment %}
+        The code below dynamically generates a sidebar nav of pages with
+        `layout: page` in the front-matter. See readme for usage.
+      {% endcomment %}
+
+      {% assign pages_list = site.pages %}
+      {% for node in pages_list %}
+        {% if node.title != null %}
+          {% if node.layout == "page" %}
+            <li class="sidebar-nav-item{% if page.url == node.url %} active{% endif %}">
+              <a href="{{ node.url }}">{{ node.title }}</a>
+            </li>
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+
+      <li class="sidebar-nav-item"><a href="{{ site.github.repo }}">Code on GitHub</a></li>
+    </ul>
+
+    <p style="font-size:15px;">See also: <a href="http://newsdev.github.io/tamper" style="color: rgba(255, 255, 255, 0.498039);"><img src="{{site.baseurl}}/public/tamper-logo.png" style="width:25px; display: inline; margin: 0 4px; position: relative; top: 6px;">tamper</a>.</p>
+
+  </div>
+</div>
