@@ -1,1 +1,1 @@
-Visit [the PourOver homepage](http://newsdev.github.io/pourover) for more info.
+Visit [the PourOver homepage](http://nytimes.github.io/pourover) for more info.
