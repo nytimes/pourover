@@ -88,21 +88,21 @@
 
 <p>So, what&#8217;s it all for? Why do I need PourOver?</p>
 
-<p>Let me describe for you how faceted search generally works,  alternatively, how apps work that allow you to filter, sort, select, etc. from some interface: The user performs some action, indicates some slice of the data that they want. Your app takes this request, sends it to a server, the server (that is processing these request for all your other users too) slices the data and returns the result. The app subs this data in and re-renders its view.</p>
+<p>Let me describe for you how faceted search generally works, how apps work that allow you to filter, sort, select: The user performs an action, indicates some slice of the data that they want. Your app takes this request, sends it to a server. That server (that is processing these request for all your other users too) slices the data and returns the result. The app processes this data, changes its model and re-renders its view.</p>
 
 <p>There are some pathological issues here. You are making the shared resource (the server) do all the work while the clients, more or less, sit idly by and just procress and create requests. You add a network roundtrip to every interaction with the page. That&#8217;s <a href="http://www.igvita.com/2012/07/19/latency-the-new-web-performance-bottleneck/">on average</a> adding 28-44 ms of latency to every action. </p>
 
 <p>What does this mean for the user? It means the difference between an app feeling like it&#8217;s responsive to input and an app feeling like it&#8217;s churning through a search, waiting to fetch data. </p>
 
-<p>What does this mean for the developer? It means that the faster a user changes filters, the harder they use your app the higher the load on your server. It means that paging through large, filtered sets of data is over-complicated. In fact, this was part of the reason PourOver was created. In 2012, for the Olympics we wrote an app, Imago, for moderating half a million wire photos of athletes. Despite frequent optimization &#8211; and hand-coding a custom index selector &#8211; the bottleneck always came when trying to page through a filtered subset of a changing database. Offset is a performance killer (at least with my meagre MySQL chops). </p>
+<p>What does this mean for the developer? It means that the faster a user changes filters &#8211; the harder they use your app &#8211; the higher the load on your server. It means that paging through large, filtered sets of data is over-complicated. You have to use magic to get OFFSET and ORDER BY to respect indices. In fact, this was part of the reason PourOver was created. In 2012, for the Olympics, we wrote an app, Imago. It was used for moderating half a million wire photos of athletes and events. Despite frequent optimization &#8211; and hand-coding a custom index selector &#8211; a bottleneck crept up when trying to page through a filtered subset of a changing database. Offset is a performance killer (at least with my meagre MySQL chops) especially with respect to data that might be queried on multiple, composed dimensions. </p>
 
 <p>See, with the filter -&gt; query -&gt; response pattern you are starting from scratch each time. Sure, your database has indices to speed things up. But, often, you&#8217;ve already done more work. Imagine you query for all the friends that are female. Your database looks around, returns 1000 friends. The app renders a list. Then, the user selects &#8220;under 25 years old&#8221;. Now, the database looks again for all female friends and intersects that with all friends under 25. Return. Render. But you already know your female friends! The least amount of work would be just return the under 25 friends and intersect client-side. Paging adds an even greater level of complexity. </p>
 
 <p>PourOver is meant to make all this simpler, at least for our target use cases: large sets that are filterable and sortable by several attributes over small, finite domains. As described above, PourOver creates a cache for every possibility and then uses simple set algebra to make composite queries on the client. It&#8217;s basically a client-side index. This means that when I query for all friends that are girls and under 25, the work that has to be done is just an intersection between the girl index and the under 25 index (called MatchSets in PourOver).</p>
 
-<p>Furthermore, PourOver makes development simpler. You simply pull down all the data and then use boolean logic to compose queries that are automatically cached. You don&#8217;t have to worry about optimizing database queries. You don&#8217;t have to cripple user actions because they could possibly hose the database.</p>
+<p>Furthermore, PourOver makes development simpler. You simply pull down all the data and then use boolean logic to compose queries that are automatically cached. You don&#8217;t have to worry about optimizing database queries. You don&#8217;t have to cripple user actions because they could possibly hose the database. You don&#8217;t have to rate-limit requests.</p>
 
-<p>The challenge becomes: how do you get the large data set from server to client. At least the data that affects the filters (all the other information &#8211; full text, descriptions, etc. &#8211; can be buffered in). Arguably, this is a simpler, more one-dimensional problem. Data sets over small finite domains can be packed into tight, binary represenations: if there are 8 possibilities for each item, say, you can represent the value with 3 bits. Mixing in bit maps and, then, file compression, we have seen sets of 100k items pack into &lt;100k.</p>
+<p>The challenge becomes: how do you get the large data set from server to client. At least the data that affects the filters (all the other information &#8211; full text, descriptions, etc. &#8211; can be buffered in). Arguably, this is a simpler, more one-dimensional problem. Data sets over small finite domains can be packed into tight, binary represenations: if there are 8 possibilities for each item, say, you can represent the value with 3 bits. Mixing in bit maps and, then, file compression, we have seen sets of 100k items pack into &lt;100k. For more information on this compression format, see PourOver&#8217;s sister project <a href="http://nytimes.github.io/tamper/">Tamper</a>.</p>
 
 <h4 id="basic-concepts">Basic Concepts</h4>
 <p><strong>Collections</strong>
@@ -144,7 +144,7 @@ collection = new PourOver.Collection(data);
 <pre><code>collection.updateItem(1,"name","margot");
 </code></pre>
 
-<p>Here, 1 is the cid. Currently, all collection operations are keyed off the item&#8217;s cid. Like addItems, updateItem will regenerate all filters and rebuild all sorts.</p>
+<p>Here, 1 is the cid. Currently, all collection operations are keyed off the item&#8217;s cid. Like addItems, updateItem will regenerate all relevant filters and rebuild all relevant sorts.</p>
 
 <p>Note: It is always more efficient to create a collection and then add all your items rather than to create a collection of empty items and then call <code>updateItem</code> many times in succession.</p>
 
@@ -159,7 +159,7 @@ collection = new PourOver.Collection(data);
 </code></pre>
 
 <p><strong>Adding filters</strong>
-Now, let&#8217;s do something interesting with our collection. First, we need to make a filter. PourOver ships with a handful of filter defaults that should comprise most of the filtering you will be doing. More defaults will be added later. (We will cover how to create your own filter from scratch in the Advanced Usage section).</p>
+Now, let&#8217;s do something interesting with our collection. First, we need to make a filter. PourOver ships with a handful of filter defaults that should comprise most of the filtering you will be using. More defaults will be added later. (We will cover how to create your own filter from scratch in the Advanced Usage section).</p>
 
 <p>Say we want to make a filter for number of eyes, from our example above. The most common PourOver filter is the <code>exactFilter</code> which takes an array of possibilities, of which any object in the collection can satisfy only one. The filter defaults ship with constructor methods to simplify things even further</p>
 
@@ -168,7 +168,7 @@ Now, let&#8217;s do something interesting with our collection. First, we need to
 
 <p>This says: &#8220;create a new exact filter for the attribute &#8216;eyes&#8217;. An item may have 0, 1, or 2 as possible values for its <code>eyes</code> attribute.&#8221; An item may have a value that is not included in the possibilities and this will not cause an error. It will simply not be findable on that attribute as it will not be added to any filter&#8217;s <code>MatchSet</code>.</p>
 
-<p><strong>NOTE: You must name your exact filter (the first argument) the same thing as the attribute that it is indexing, in this case &#8220;eyes&#8221;</strong></p>
+<p><strong>NOTE: You must name your exact filter (the first argument) the same thing as the attribute that it is indexing, in this case &#8220;eyes&#8221;. If you want your filter name to be different than the attribute it indexes, you must pass an <code>attr</code> option to the filter constructor.</strong></p>
 
 <p>Now, we have to add this filter to our collection</p>
 
@@ -177,9 +177,9 @@ Now, let&#8217;s do something interesting with our collection. First, we need to
 
 <p>Again, <code>addFilters</code> takes either a single filter or an array of filters. </p>
 
-<p><strong>NOTE: <code>addFilters</code> will clone the filter before adding it. Thus, you must refer to the new filter located at <code>collection.filters.eye</code> when using the filter in subsequent references.</strong></p>
+<p><strong>NOTE: <code>addFilters</code> will clone the filter before adding it. Thus, you must refer to the new filter located at <code>collection.filters.eyes</code> when using the filter in subsequent references.</strong></p>
 
-<p>Now, let&#8217;s use this filter to do some queries. Earlier, I mentioned that there are stateful and non-stateful ways to query filters. The former is useful if you have a UI that is tied to a filter, say a color selector. Then it&#8217;s nice to be able to save the current query on the filter and any subsequent renders will get the right information. However, you might want to query a filter non-statefully  to, say, get the number of items satisfying a query. </p>
+<p>Now, let&#8217;s use this filter to do some queries. Earlier, I mentioned that there are stateful and non-stateful ways to query filters. The former is useful if you have a UI that is tied to a filter, say a color selector. In that case, it&#8217;s nice to be able to save the current query on the filter. Any subsequent renders will get the right information. However, you might want to query a filter non-statefully, say, to get the number of items satisfying a query. </p>
 
 <p>Statefully:</p>
 
@@ -266,7 +266,7 @@ view = new MyView("default_view",collection)
 
 <p>Now, let&#8217;s look at this bit of code in depth. If you have used Backbone before, you will recognize this style of creating new Views. However, these are not Backbone views. They are simply written in the same style.</p>
 
-<p>First, we call <code>extend</code> on PourOver.View which simply just creates a new constructor object based on PourOver.View with some overridden and added methods in the prototype.</p>
+<p>First, we call <code>extend</code> on <code>PourOver.View</code> which simply creates a new constructor object based on <code>PourOver.View</code> with some overridden and added methods in the prototype.</p>
 
 <p>We specify a template to be used in rendering and then a render function. Generally, your view render function should call <code>this.getCurrentItems()</code> and use these items are the set to be rendered. As in most render functions, this one ends by replacing some HTML on our page <code>$("#container").html(output);</code></p>
 
@@ -291,7 +291,7 @@ view = new MyView("default_view",collection)
 
 <ul>
   <li>&#8220;change&#8221;: Fired whenever items are added or removed in the collection.</li>
-  <li>&#8220;change*:[attr]&#8221; : Fired whenever an item&#8217;s [attr] is modified.</li>
+  <li>&#8220;change:[attr]&#8221; : Fired whenever an item&#8217;s [attr] is modified.</li>
   <li>&#8220;incrememental_change&#8221;: Fired whenever an item is modified.</li>
   <li>&#8220;queryChange&#8221;: Fired on a filter whenever a stateful query is made on a filter. Bubbles up to collectons.</li>
   <li>&#8220;selectionChange&#8221;: Fired on a view whenever the view&#8217;s match set is updated. This generally happens automatically when one of the filters are queried or the collection is changed.</li>
@@ -299,6 +299,8 @@ view = new MyView("default_view",collection)
   <li>&#8220;pageChange&#8221;: Fired whenever a view&#8217;s page changes.</li>
   <li>&#8220;update&#8221;: Fired on a view whenever any change,queryChange,selectionChange, pageChange or sortChange happens on the view or its collection. This is likely the event you want to listen for to trigger a re-render</li>
 </ul>
+
+<p>There are also events for collection <code>will_change</code> and <code>will_incremental_change</code> that get fired before a collection changes. </p>
 
 <p>Whenever an item changes a specific attribute, &#8220;change:[attribute]&#8221; is fired (as well as a generic &#8220;change&#8221; event.) This event is what filters and sorts hook onto for optimized, incremental updating. This is done through &#8220;associated_attrs&#8221;.</p>
 
@@ -314,7 +316,7 @@ view = new MyView("default_view",collection)
 
 <h4 id="chp-3---pourover-ui">Chp 3 - PourOver UI</h4>
 
-<p>PourOver comes bundled with a convenience interface for creating UIs for controlling the states of filters, think of a color picker or a list of possible options. This is called PourOver.UI. The main purpose of PourOver.UI is to translate between a filter&#8217;s MatchSet and an easier to work with representation of the filter&#8217;s current state.</p>
+<p>PourOver comes bundled with a convenience interface for creating UIs that control the states of filters. Think of a color picker or a list of possible options. This is called PourOver.UI. The main purpose of PourOver.UI is to translate between a filter&#8217;s MatchSet and an easier to work with representation of the filter&#8217;s current state.</p>
 
 <p>For example, say you were working with an exact filter, the most common filter in PourOver. After a series of unionQuery calls you now have a pretty complicated stack object &#8211; the stored state of your filter &#8211; and it would be complicated or at least inconvenient to recurse through the stack to extract which filter possibilities had been selected. This would be useful if you wanted to render an element on the page that show the possibilities as either selected or deselected as for a UI control.</p>
 
@@ -335,6 +337,8 @@ var range_select = PourOver.UI.SimpleDVRangeElement({filter: collection.filters.
 <p>Even if you&#8217;re not using one of these built-in classes, it&#8217;s useful to organize your filter display around PourOver.UI.Element&#8217;s abstract interface for easy debugging.</p>
 
 <h4 id="chp-4---advanced-usage">Chp 4 - Advanced Usage</h4>
+
+<p>See the examples above.</p>
 
 <h4 id="chp-5---faqs">Chp 5 - FAQs</h4>
 
@@ -392,7 +396,9 @@ var range_select = PourOver.UI.SimpleDVRangeElement({filter: collection.filters.
 
 <p>Here we create an explicit ordering on the guid attribute. Specifically, we are saying that this sort should put items in the order (based on guid) 9,1,2. All other items will sort to the end in insertion order. NOTE: It is important to specify associated_attrs as an empty array to prevent the sort from re-sorting when items are added or removed from the collection. Since, the sort is explicit, adding and removing items can&#8217;t change the order.</p>
 
-<h4 id="epilogue---the-philosophy-of-pourover">Epilogue - The Philosophy of PourOver</h4>
+<ul>
+  <li>reverseCidSort: This is the opposite of the default. It displays items in reverse order, with respect to when they were added to the collection.</li>
+</ul>
 
 <hr />
 
@@ -400,7 +406,7 @@ var range_select = PourOver.UI.SimpleDVRangeElement({filter: collection.filters.
 <p>PourOver is very much indebted to <a href="http://backbone.js.org">Backbone</a>. In fact, it copies the Extend and Events modules from Backbone.
 Furthermore, it is written in Backbone-ese and, indeed uses the Backbone.extend method to create its prototypes and Backbone.Events for its events. However, items in a PourOver collection are simple hashes/objects, not Backbone models. </p>
 
-<p>PourOver&#8217;s other obvious inspration is <a href="http://square.github.com/crossfilter/">Crossfilter</a>. Whereas Crossfilter is much more sophisticated for numerical querying, PourOver is aimed at dynamic collection, aribitrary, chainable boolean filter composition, and the creation of Views for UI elements.</p>
+<p>PourOver&#8217;s other obvious inspration is <a href="http://square.github.com/crossfilter/">Crossfilter</a>. Whereas Crossfilter is much more sophisticated for numerical querying, PourOver is aimed at dynamic collection, aribitrary, chainable boolean filter composition, and the creation of Views for UI elements. I hope that someone will create a Crossfilter-powered filter type for PourOver. I will gladly merge that in.</p>
 
 <p>Pourover is distributed under the <a href="https://github.com/NYTimes/pourover/blob/master/LICENSE.txt">Apache 2.0 License</a></p>
 
