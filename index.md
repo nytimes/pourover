@@ -4,7 +4,7 @@ title: The PourOver Book
 ---
 
 #### Preface 1 - What is PourOver
-PourOver is a library for fast filtering and sorting of large collections -- think 100,000s of items -- in the browser. It provides simple patterns for the client-side querying of data and, then, composing this queries with others. You can union, intersect, and difference queries, all without having recalculate the results of these queries. You also get some useful features like collections that buffer their information in periodically, views that page and cache, fast sorting, and much, much more. If you just want to get started using PourOver, I would skip to "Preface - The Best Way to Learn PourOver". There you will find extensive examples. If you are curious about why we made PourOver or what it might offer to you, I encourage you to skip down to "Chp 1. - The Philosophy of PourOver".
+PourOver is a library for fast filtering and sorting of large collections -- think 100,000s of items -- in the browser. It provides simple patterns for the client-side querying of data and, then, composing these queries with others. You can union, intersect, and difference queries, all without having recalculate their results. You also get some useful features like collections that buffer their information in periodically, views that page and cache, fast sorting, and much, much more. If you just want to get started using PourOver, I would skip to "Preface - The Best Way to Learn PourOver". There you will find extensive examples. If you are curious about why we made PourOver or what it might offer to you, I encourage you to skip down to "Chp 1. - The Philosophy of PourOver".
 
 #### Prologue - Dependencies
 [Underscore.js](http://underscorejs.org/)
