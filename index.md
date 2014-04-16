@@ -306,7 +306,7 @@ Furthermore, it is written in Backbone-ese and, indeed uses the Backbone.extend 
 
 PourOver's other obvious inspration is [Crossfilter](http://square.github.com/crossfilter/). Whereas Crossfilter is much more sophisticated for numerical querying, PourOver is aimed at dynamic collection, aribitrary, chainable boolean filter composition, and the creation of Views for UI elements.
 
-PourOver is distributed under the Apache 2.0 License.
+Pourover is distributed under the [Apache 2.0 License](https://github.com/NYTimes/pourover/blob/master/LICENSE.txt)
 
 <img src="{{site.baseurl}}/public/opennews-logo.png" alt="OpenNews logo" width="120" style="margin: 0" />
 <a href="http://opennews.org/code.html" style="font-size:14px;">Released for OpenNews Code Convening, April 2014</a>
