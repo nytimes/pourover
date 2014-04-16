@@ -132,8 +132,8 @@ var PourOver = (function(){
         return set;
       },
       // # Pre-defined cache methods
-      // Caching is really the raison d'etre of Pourover. Every filter has two cache methods: one for rebuilding the whole filter from scratch
-      // and one for adding new items. As Pourover grows it will gain more pre-defined cache methods that correlate with common UI and data patterns.
+      // Caching is really the raison d'etre of PourOver. Every filter has two cache methods: one for rebuilding the whole filter from scratch
+      // and one for adding new items. As PourOver grows it will gain more pre-defined cache methods that correlate with common UI and data patterns.
       cacheMethods: {
         // ### Default: the dumb caches.
         // Just goes through each possible value for the filter and tests every item in the collection against it. As expensive as
@@ -349,7 +349,7 @@ var PourOver = (function(){
       // want global "pubsub" in a convenient place.
       _.extend(PourOver, Events);
       // #Collections
-      //The main kind of object in Pourover. A collection is basically a wrapper around an array of objects.
+      //The main kind of object in PourOver. A collection is basically a wrapper around an array of objects.
       //It adds collection ids to its members and has support for various ways of retrieving all or a part of
       //its members.
 
@@ -373,7 +373,7 @@ var PourOver = (function(){
             this.trigger("queryChange");
           },
 
-          // Retrive the objects associated with an array of cids. Like everything in Pourover, the cids must be sorted.
+          // Retrive the objects associated with an array of cids. Like everything in PourOver, the cids must be sorted.
           // This is not ususally an issue as you generally will not be calling `collection.get` with an array you
           // manually create. You will probably be using the output of some function that keeps it sorted for you.
           get: function(cids){
@@ -437,7 +437,7 @@ var PourOver = (function(){
           },
 
           // Remove items from the collection, triggering the appropriate events to keep all dependent sort and filter sets up-to-date.
-          // This functionality is only included begrudgingly. Pourover is best for collections that rarely remove members.
+          // This functionality is only included begrudgingly. PourOver is best for collections that rarely remove members.
           // TODO: Optimize
           removeItems: function(i,isSorted){
             this.trigger("will_change");
@@ -489,7 +489,7 @@ var PourOver = (function(){
               f.on("queryChange",function(){
                 that.trigger("queryChange");
               })
-              // All filters precache the result of their filtering. This is the source of pourover's speed optimizations.
+              // All filters precache the result of their filtering. This is the source of PourOver's speed optimizations.
               f.cacheResults(that.items);
               // If a user passes in an `associated_attrs` property on a filter, that filter will re-cache its result whenever
               // any object in the collection has an attribute changed. Setting `associated_attrs` is essential for admins or
