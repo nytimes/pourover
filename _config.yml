@@ -5,4 +5,4 @@ description: PourOver is a library for fast filtering and sorting of large colle
 exclude: 
     - build.sh
 github:
-  repo: http://github.com/newsdev/pourover
+  repo: http://github.com/NYTimes/pourover
