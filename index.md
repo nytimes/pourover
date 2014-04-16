@@ -3,17 +3,14 @@ layout: post
 title: The PourOver Book
 ---
 
+#### Preface 1 - What is PourOver
+PourOver is a library for fast filtering and sorting of large collections -- think 100,000s of items -- in the browser. It provides simple patterns for the client-side querying of data and, then, composing this queries with others. You can union, intersect, and difference queries, all without having recalculate the results of these queries. You also get some useful features like collections that buffer their information in periodically, views that page and cache, fast sorting, and much, much more. If you just want to get started using PourOver, I would skip to "Preface - The Best Way to Learn PourOver". There you will find extensive examples. If you are curious about why we made PourOver or what it might offer to you, I encourage you to skip down to "Chp 1. - The Philosophy of PourOver".
+
 #### Prologue - Dependencies
 [Underscore.js](http://underscorejs.org/)
 
-#### Prologue 2 - Special Thanks
-PourOver is very much indebted to [Backbone](http://backbone.js.org). In fact, it copies the Extend and Events modules from Backbone.
-Furthermore, it is written in Backbone-ese and, indeed uses the Backbone.extend method to create its prototypes and Backbone.Events for its events. However, items in a PourOver collection are simple hashes/objects, not Backbone models. 
 
-#### Preface 1 - What is PourOver
-PourOver is a library for fast filtering and sorting of large collections -- think 100,000s of items -- in the browser. It's similar to [Crossfilter](http://square.github.com/crossfilter/) but supports aribitrary, chainable boolean combination of filters. It provides a simple interface for specifying queries such as: "Give me all the red or blue or green dresses that were not strapless and appeared in the 90s." You also get some cool features like collections that buffer their information in periodically, views that page and cache, fast sorting, and much, much more. I encourage you to skip down to "Chp 1. - The Philosophy of PourOver" to get more insight into the uses and rationale for PourOver.
-
-#### Preface 2 - The Best Way to Learn PourOver
+#### Preface - The Best Way to Learn PourOver
 The best way to learn PourOver is by example:
 
 - [Basic PourOver example]({{ site.baseurl }}/examples/examples_build/basic_pourover_ing.html)
@@ -303,7 +300,13 @@ Here we create an explicit ordering on the guid attribute. Specifically, we are 
 
 ----
 
-Pourover is distributed under the Apache 2.0 License.
+#### Afterward - Special Thanks
+PourOver is very much indebted to [Backbone](http://backbone.js.org). In fact, it copies the Extend and Events modules from Backbone.
+Furthermore, it is written in Backbone-ese and, indeed uses the Backbone.extend method to create its prototypes and Backbone.Events for its events. However, items in a PourOver collection are simple hashes/objects, not Backbone models. 
+
+PourOver's other obvious inspration is [Crossfilter](http://square.github.com/crossfilter/). Whereas Crossfilter is much more sophisticated for numerical querying, PourOver is aimed at dynamic collection, aribitrary, chainable boolean filter composition, and the creation of Views for UI elements.
+
+PourOver is distributed under the Apache 2.0 License.
 
 <img src="{{site.baseurl}}/public/opennews-logo.png" alt="OpenNews logo" width="120" style="margin: 0" />
 <a href="http://opennews.org/code.html" style="font-size:14px;">Released for OpenNews Code Convening, April 2014</a>
