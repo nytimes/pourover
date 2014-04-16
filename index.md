@@ -3,8 +3,12 @@ layout: post
 title: The PourOver Book
 ---
 
-#### Preface 1 - What is PourOver
-PourOver is a library for fast filtering and sorting of large collections -- think 100,000s of items -- in the browser. It provides simple patterns for the client-side querying of data and, then, composing these queries with others. You can union, intersect, and difference queries, all without having recalculate their results. You also get some useful features like collections that buffer their information in periodically, views that page and cache, fast sorting, and much, much more. If you just want to get started using PourOver, I would skip to "Preface - The Best Way to Learn PourOver". There you will find extensive examples. If you are curious about why we made PourOver or what it might offer to you, I encourage you to skip down to "Chp 1. - The Philosophy of PourOver".
+#### Front Matter - What is PourOver
+PourOver is a library for simple, fast filtering and sorting of large collections -- think 100,000s of items -- in the browser. It allows you to build data-exploration apps and archives that run at 60fps, that don't have to to wait for a database call to render query results. 
+
+PourOver is built around the ideal of simple queries that can be arbitrarily composed with each other, without having to recalculate their results. You can union, intersect, and difference queries. PourOver will remember how your queries were constructed and can smartly update them when items are added or modified. You also get useful features like collections that buffer their information periodically, views that page and cache, fast sorting, and much, much more. 
+
+If you just want to get started using PourOver, I would skip to "Preface - The Best Way to Learn PourOver". There you will find extensive examples. If you are curious about why we made PourOver or what it might offer to you, I encourage you to skip down to "Chp 1. - The Philosophy of PourOver".
 
 #### Prologue - Dependencies
 [Underscore.js](http://underscorejs.org/)
@@ -41,7 +45,7 @@ Furthermore, PourOver makes development simpler. You simply pull down all the da
 The challenge becomes: how do you get the large data set from server to client. At least the data that affects the filters (all the other information -- full text, descriptions, etc. -- can be buffered in). Arguably, this is a simpler, more one-dimensional problem. Data sets over small finite domains can be packed into tight, binary represenations: if there are 8 possibilities for each item, say, you can represent the value with 3 bits. Mixing in bit maps and, then, file compression, we have seen sets of 100k items pack into <100k.
 
 
-######## Basic Concepts
+#### Basic Concepts
 **Collections**
 A PourOver `Collection` is an array of items, indexed by collection ids (cids). Collections are accompanied by a set of filters and sorts that can be applied to retrieve sorted subsets of the collection. Collections know nothing about the state of these filters and sorts. The collection is merely responsible for adding, updating and removing items, filters, and sorts and for returning subsets of its items. The general pattern is that a filter will return a set of cids (from a cache) and then the collection will take those cids and return the corresponding items.
 
@@ -57,7 +61,7 @@ A `View` stores a composite state of a collection, often what is meant to be ren
 **Sort** 
 A `Sort` is pretty much what is sounds like. However, it doesn't cache the cids of the collection in order. Rather, it caches a *function* that can arrange any subset of the collection's cids in the sort order. Sorts, like filters, generally belong to collections. However, sorts can belong to views as well. The reason for this has to do with optimization but we will discuss this later.
 
-#### Chp. 2 - Basic Usage
+#### Basic Usage
 
 **Creating a collection**
 Generally, the first thing you will want to do with PourOver is create a collection. 
