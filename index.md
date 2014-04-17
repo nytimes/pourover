@@ -10,8 +10,11 @@ PourOver is built around the ideal of simple queries that can be arbitrarily com
 
 If you just want to get started using PourOver, I would skip to "Preface - The Best Way to Learn PourOver". There you will find extensive examples. If you are curious about why we made PourOver or what it might offer to you, I encourage you to skip down to "Chp 1. - The Philosophy of PourOver".
 
-#### Prologue - Dependencies
-[Underscore.js](http://underscorejs.org/)
+#### Prologue - Dependencies and Browser Compatibility
+[Underscore.js](http://underscorejs.org/) is the only dependency.
+
+PourOver should work in any browser that underscore works in.
+It has been tested in: IE7+, Firefox 4+, Safari 5+, Opera 9+, Chrome 1+
 
 
 #### Preface - The Best Way to Learn PourOver
