@@ -310,7 +310,7 @@ Here we create an explicit ordering on the guid attribute. Specifically, we are 
 PourOver is very much indebted to [Backbone](http://backbone.js.org). In fact, it copies the Extend and Events modules from Backbone.
 Furthermore, it is written in Backbone-ese and, indeed uses the Backbone.extend method to create its prototypes and Backbone.Events for its events. However, items in a PourOver collection are simple hashes/objects, not Backbone models. 
 
-PourOver's other obvious inspration is [Crossfilter](http://square.github.com/crossfilter/). Whereas Crossfilter is much more sophisticated for numerical querying, PourOver is aimed at dynamic collection, aribitrary, chainable boolean filter composition, and the creation of Views for UI elements. I hope that someone will create a Crossfilter-powered filter type for PourOver. I will gladly merge that in.
+PourOver's other obvious inspiration is [Crossfilter](http://square.github.com/crossfilter/). Whereas Crossfilter is much more sophisticated for numerical querying, PourOver is aimed at dynamic collection, aribitrary, chainable boolean filter composition, and the creation of Views for UI elements. I hope that someone will create a Crossfilter-powered filter type for PourOver. I will gladly merge that in.
 
 Pourover is distributed under the [Apache 2.0 License](https://github.com/NYTimes/pourover/blob/master/LICENSE.txt)
 
