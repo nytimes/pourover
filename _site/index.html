@@ -87,17 +87,17 @@ It has been tested in: IE7+, Firefox 4+, Safari 5+, Opera 9+, Chrome 1+</p>
   <li>Events (Coming soon)</li>
 </ul>
 
-<h4 id="chp-1---the-philosophy-of-pourover">Chp. 1 - The Philosophy of PourOver</h4>
+<h2 id="chp-1---the-philosophy-of-pourover">Chp. 1 - The Philosophy of PourOver</h2>
 
 <p>So, what’s it all for? Why do I need PourOver?</p>
 
 <p>Let me describe for you how faceted search generally works, how apps work that allow you to filter, sort, select: The user performs an action, indicates some slice of the data that they want. Your app takes this request, sends it to a server. That server (that is processing these request for all your other users too) slices the data and returns the result. The app processes this data, changes its model and re-renders its view.</p>
 
-<p>There are some pathological issues here. You are making the shared resource (the server) do all the work while the clients, more or less, sit idly by and just procress and create requests. You add a network roundtrip to every interaction with the page. That’s <a href="http://www.igvita.com/2012/07/19/latency-the-new-web-performance-bottleneck/">on average</a> adding 28-44 ms of latency to every action. </p>
+<p>There are some pathological issues here. You are making the shared resource (the server) do all the work while the clients, more or less, sit idly by and just process and create requests. You add a network roundtrip to every interaction with the page. That’s <a href="http://www.igvita.com/2012/07/19/latency-the-new-web-performance-bottleneck/">on average</a> adding 28-44 ms of latency to every action. </p>
 
 <p>What does this mean for the user? It means the difference between an app feeling like it’s responsive to input and an app feeling like it’s churning through a search, waiting to fetch data. </p>
 
-<p>What does this mean for the developer? It means that the faster a user changes filters – the harder they use your app – the higher the load on your server. It means that paging through large, filtered sets of data is over-complicated. You have to use magic to get OFFSET and ORDER BY to respect indices. In fact, this was part of the reason PourOver was created. In 2012, for the Olympics, we wrote an app, Imago. It was used for moderating half a million wire photos of athletes and events. Despite frequent optimization – and hand-coding a custom index selector – a bottleneck crept up when trying to page through a filtered subset of a changing database. Offset is a performance killer (at least with my meagre MySQL chops) especially with respect to data that might be queried on multiple, composed dimensions. </p>
+<p>What does this mean for the developer? It means that the faster a user changes filters – the harder they use your app – the higher the load on your server. It means that paging through large, filtered sets of data is over-complicated. You have to use magic to get OFFSET and ORDER BY to respect indices. In fact, this was part of the reason PourOver was created. In 2012, for the Olympics, we wrote an app, Imago. It was used for moderating half a million wire photos of athletes and events. Despite frequent optimization – and hand-coding a custom index selector – a bottleneck crept up when trying to page through a filtered subset of a changing database. Offset is a performance killer (at least with my meager MySQL chops) especially with respect to data that might be queried on multiple, composed dimensions. </p>
 
 <p>See, with the filter -&gt; query -&gt; response pattern you are starting from scratch each time. Sure, your database has indices to speed things up. But, often, you’ve already done more work. Imagine you query for all the friends that are female. Your database looks around, returns 1000 friends. The app renders a list. Then, the user selects “under 25 years old”. Now, the database looks again for all female friends and intersects that with all friends under 25. Return. Render. But you already know your female friends! The least amount of work would be just return the under 25 friends and intersect client-side. Paging adds an even greater level of complexity. </p>
 
@@ -105,7 +105,7 @@ It has been tested in: IE7+, Firefox 4+, Safari 5+, Opera 9+, Chrome 1+</p>
 
 <p>Furthermore, PourOver makes development simpler. You simply pull down all the data and then use boolean logic to compose queries that are automatically cached. You don’t have to worry about optimizing database queries. You don’t have to cripple user actions because they could possibly hose the database. You don’t have to rate-limit requests.</p>
 
-<p>The challenge becomes: how do you get the large data set from server to client. At least the data that affects the filters (all the other information – full text, descriptions, etc. – can be buffered in). Arguably, this is a simpler, more one-dimensional problem. Data sets over small finite domains can be packed into tight, binary represenations: if there are 8 possibilities for each item, say, you can represent the value with 3 bits. Mixing in bit maps and, then, file compression, we have seen sets of 100k items pack into &lt;100k. For more information on this compression format, see PourOver’s sister project <a href="http://nytimes.github.io/tamper/">Tamper</a>.</p>
+<p>The challenge becomes: how do you get the large data set from server to client? At least the data that affects the filters (all the other information – full text, descriptions, etc. – can be buffered in). Arguably, this is a simpler, more one-dimensional problem. Data sets over small finite domains can be packed into tight, binary representations: if there are 8 possibilities for each item, say, you can represent the value with 3 bits. Mixing in bit maps and, then, file compression, we have seen sets of 100k items pack into &lt;100k. For more information on this compression format, see PourOver’s sister project <a href="http://nytimes.github.io/tamper/">Tamper</a>.</p>
 
 <h4 id="basic-concepts">Basic Concepts</h4>
 <p><strong>Collections</strong>
@@ -115,7 +115,7 @@ A PourOver <code>Collection</code> is an array of items, indexed by collection i
 A PourOver <code>Filter</code> belongs to a collection and is associated with some way in which that collection may be filtered: an attribute, a function, etc. The filter caches which items correspond to its possibilities. Every filter has a hash of possibilities, each possibility has a list of <code>cids</code>. Filters can either be used statefully or non-statefully (we will show examples of this below in the filter section). </p>
 
 <p><strong>MatchSet</strong>
-The result of a query on a filter is a <code>MatchSet</code>. A MatchSet is like an array of cids but it remembers how it was created. Since a <code>MatchSet</code> may be the result of aribtrary unions, intersections, and differences, it is necessary to remember how it was composed so that individual operations may be undone or updated. For example: say you queried for red OR blue OR green dresses. The state of the color filter is now set to red OR blue OR green. But then, a new blue dress is added to the collection. The <code>MatchSet</code>’s memory – called its <code>stack</code> – knows automatically how to update itself based on the new dress addition. Without the user having to do anything, the color filter’s current matchset state now contains the new dress.</p>
+The result of a query on a filter is a <code>MatchSet</code>. A MatchSet is like an array of cids but it remembers how it was created. Since a <code>MatchSet</code> may be the result of arbitrary unions, intersections, and differences, it is necessary to remember how it was composed so that individual operations may be undone or updated. For example: say you queried for red OR blue OR green dresses. The state of the color filter is now set to red OR blue OR green. But then, a new blue dress is added to the collection. The <code>MatchSet</code>’s memory – called its <code>stack</code> – knows automatically how to update itself based on the new dress addition. Without the user having to do anything, the color filter’s current matchset state now contains the new dress.</p>
 
 <p><strong>View</strong>
 A <code>View</code> stores a composite state of a collection, often what is meant to be rendered. There can be many views per collection. Views can be paged. Moreover, a view has a selection function which tells the view how to compose its various filters to produce the current set. For example, say you picked red OR blue OR green dresses that are strapless and from 1996. The view would have a selection function that intersects the color filter’s <code>MatchSet</code> with that of the style filter and the year filter. However, the view could, alternatively, be told to union its filters together. Views also cache the items currently filtered/sorted by its state for fast re-renders.</p>
@@ -138,7 +138,7 @@ collection = new PourOver.Collection(data);
 <pre><code>collection.addItems({name: "amy", eyes: 1, sex:"f"});
 </code></pre>
 
-<p>Excellent. Were there any filters or sort on this collection they would automatically be regenerated to accomodate this new item. However, there are no filters or sorts. </p>
+<p>Excellent. Were there any filters or sort on this collection they would automatically be regenerated to accommodate this new item. However, there are no filters or sorts. </p>
 
 <p><code>addItems</code> can take a single item or an array of items.</p>
 
@@ -259,7 +259,7 @@ Collections are interesting, but they aren’t terribly well-suited for renderin
 	},
 	selectionFn: function(){
 		var collection = this.collection,
-			eyes_dimension = collection.getCurrrentFilteredItems("eyes"),
+			eyes_dimension = collection.getCurrentFilteredItems("eyes"),
 			sex_dimension = collection.getCurrentFilteredItems("sex");
 		return eyes_dimension.and(sex_dimension);
 	}
@@ -277,7 +277,7 @@ view = new MyView("default_view",collection)
 
 <p><strong>NOTE: <code>selectionFn</code> must return a <code>MatchSet</code> not an array of items. Remember, MatchSets are returned from <code>getCurrentFilteredItems</code> calls as well non-stateful queries over filters as well as from <code>and</code>, <code>or</code>, and <code>not</code> functions, chained off other MatchSets.</strong></p>
 
-<p>The <code>selectionFn</code> is used as follows: All views have a method <code>setNaturalSelection</code>. This method calls <code>selectionFn</code> and then saves the result as <code>this.match_set</code>. Then, whenever <code>getCurrentItems</code> is called, it does not have to revaluate the filters. It simply pulls the <code>this.match_set</code> off the view and then applies any sorts or paging. This allows for fast switching of sorts and pages without filters having to be reassessed. <code>setNaturalSelection</code> is automatically called on a View whenever an item changes or a filter’s query changes. However, you can call <code>setNaturalSelection</code> yourself if you need to force a refresh or a recache.</p>
+<p>The <code>selectionFn</code> is used as follows: All views have a method <code>setNaturalSelection</code>. This method calls <code>selectionFn</code> and then saves the result as <code>this.match_set</code>. Then, whenever <code>getCurrentItems</code> is called, it does not have to re-evaluate the filters. It simply pulls the <code>this.match_set</code> off the view and then applies any sorts or paging. This allows for fast switching of sorts and pages without filters having to be reassessed. <code>setNaturalSelection</code> is automatically called on a View whenever an item changes or a filter’s query changes. However, you can call <code>setNaturalSelection</code> yourself if you need to force a refresh or a recache.</p>
 
 <p>Other common attributes/methods to extend the default PourOver view with are:</p>
 
@@ -285,10 +285,10 @@ view = new MyView("default_view",collection)
   <li>page_size: This sets a page size of the view. By default it is set to Infinite and returns the entire filtered and sorted set.</li>
   <li>current_sort: By default there is no sort on the view. However, if you want your view to start out sorted, here is where you specify that.</li>
   <li>current_page: The page to start the view on. By default, 0.</li>
-  <li>initialze: The function to call after the view has been created. This function will be passed all the arguments passed into <code>new View(arguments)</code> and the <code>this</code> context will be the new view. This is a noop by default.</li>
+  <li>initialize: The function to call after the view has been created. This function will be passed all the arguments passed into <code>new View(arguments)</code> and the <code>this</code> context will be the new view. This is a noop by default.</li>
 </ul>
 
-<h1 id="chp-25---the-event-cycle">Chp 2.5 - The Event Cycle</h1>
+<h2 id="chp-2---the-event-cycle">Chp. 2 - The Event Cycle</h2>
 
 <p>There are several basic types of events fired by PourOver objects:</p>
 
@@ -296,7 +296,7 @@ view = new MyView("default_view",collection)
   <li>“change”: Fired whenever items are added or removed in the collection.</li>
   <li>“change:[attr]” : Fired whenever an item’s [attr] is modified.</li>
   <li>“incrememental_change”: Fired whenever an item is modified.</li>
-  <li>“queryChange”: Fired on a filter whenever a stateful query is made on a filter. Bubbles up to collectons.</li>
+  <li>“queryChange”: Fired on a filter whenever a stateful query is made on a filter. Bubbles up to collections.</li>
   <li>“selectionChange”: Fired on a view whenever the view’s match set is updated. This generally happens automatically when one of the filters are queried or the collection is changed.</li>
   <li>“sortChange”: Fired on a view whenever the view’s sort changes or is removed.</li>
   <li>“pageChange”: Fired whenever a view’s page changes.</li>
@@ -317,7 +317,7 @@ view = new MyView("default_view",collection)
 
 <p>This will create a sort that will rebuild itself whenever the eyes attribute is updated. You must specify this when creating a sort on collection with attributes that may change while in a sorted state.</p>
 
-<h4 id="chp-3---pourover-ui">Chp 3 - PourOver UI</h4>
+<h2 id="chp-3---pourover-ui">Chp. 3 - PourOver UI</h2>
 
 <p>PourOver comes bundled with a convenience interface for creating UIs that control the states of filters. Think of a color picker or a list of possible options. This is called PourOver.UI. The main purpose of PourOver.UI is to translate between a filter’s MatchSet and an easier to work with representation of the filter’s current state.</p>
 
@@ -339,11 +339,11 @@ var range_select = PourOver.UI.SimpleDVRangeElement({filter: collection.filters.
 
 <p>Even if you’re not using one of these built-in classes, it’s useful to organize your filter display around PourOver.UI.Element’s abstract interface for easy debugging.</p>
 
-<h4 id="chp-4---advanced-usage">Chp 4 - Advanced Usage</h4>
+<h2 id="chp-4---advanced-usage">Chp. 4 - Advanced Usage</h2>
 
 <p>See the examples above.</p>
 
-<h4 id="chp-5---faqs">Chp 5 - FAQs</h4>
+<h2 id="chp-5---faqs">Chp. 5 - FAQs</h2>
 
 <h6 id="what-are-the-different-filter-types-included-with-pourover">## 1. What are the different filter types included with PourOver</h6>
 
@@ -374,7 +374,7 @@ var range_select = PourOver.UI.SimpleDVRangeElement({filter: collection.filters.
     <p><strong>Range and DVRange filters must always be named the same string as the attribute that they track</strong> Also, like exactFilters, range and dvrange filers will be associated to the attrs after which they are named.</p>
   </li>
   <li>
-    <p>manualFilter: This filter, surpisingly, is a filter for manual queries. That is to say, rather than querying a manual filter with a desired value for some attribute, you pass <code>manualFilter</code> an array of cids and the matchset will be set to exactly those cids. This is useful when representing user-created slices of collections or editor-curated slices of collections. Say a user can move pictures into their personal collection. It is recommended that you do this by creating a manual filter to store the state of this collection, rather than creating some tag attribute.</p>
+    <p>manualFilter: This filter, surprisingly, is a filter for manual queries. That is to say, rather than querying a manual filter with a desired value for some attribute, you pass <code>manualFilter</code> an array of cids and the matchset will be set to exactly those cids. This is useful when representing user-created slices of collections or editor-curated slices of collections. Say a user can move pictures into their personal collection. It is recommended that you do this by creating a manual filter to store the state of this collection, rather than creating some tag attribute.</p>
 
     <pre><code>  var edpicks = PourOver.makeManualFilter("edpicks")
   edpicks.query([3,7,19,25])
