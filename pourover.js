@@ -1230,7 +1230,7 @@ var PourOver = (function(){
         throw "No template specified"
       },
       render: function(){
-        var filter_state = this.getFilterState();
+        var filter_state = this.getFilterState(),
             output = this.template({state:filter_state});
         return output
       },
