@@ -682,7 +682,7 @@ var PourOver = (function(){
         initialize: function(){},
 
         // Given an array of possible values, initializes the object that will store the cached results
-        // of querying for that possibilitiy.
+        // of querying for that possibility.
         create_possibilities: function(vs){
           var o = {};
           _(vs).each(function(v){
@@ -1221,7 +1221,7 @@ var PourOver = (function(){
     _.extend(PourOver.UI.Element.prototype,PourOver.Events,{
       initialize: function(){},
       getMatchSet: function(){
-        throw "No get match set function specifiec"
+        throw "No get match set function specified"
       },
       getFilterState: function(){
         throw "No get filter state specified";
@@ -1366,7 +1366,7 @@ var PourOver = (function(){
           });
         },
 
-        // Retreive a specific attr of a specific item from the buffer.
+        // Retrieve a specific attr of a specific item from the buffer.
         getBufferedValue: function(guid,attr){
           if(this.buffered_items.hasOwnProperty(guid)){
             return this.buffered_items[guid][attr] || false;
