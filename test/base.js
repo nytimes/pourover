@@ -216,6 +216,27 @@ test("Views can be paged",function(){
   var items = view.getCurrentItems();
   deepEqual([4],_(items).pluck("cid"),"View stops at end")
 })
+test("Views can be paged to a specific page",function(){
+  var collection = new PourOver.Collection([{gender: "boy", name: "Erik", age: 26, color: "red"},{gender: "boy", name:"Bart", age: 100, color: "dead"},{name: "Cindy", age: 10, color: "blue", gender: "girl"},{gender: "girl", name:"Sandra", age: 70, color: "purple"}, {gender: "boy", name:"Cargo", age: 10, color: "gold"} ]),
+      filter = PourOver.makeExactFilter("gender",["boy","girl"]),
+      age_sort = PourOver.Sort.extend({fn: function(a,b){return a.age - b.age}}),
+      sort = new age_sort("age");
+  collection.addFilters([filter]);
+  collection.addSort(sort);
+  var view = new PourOver.View("default",collection);
+  view.setPageSize(2);
+  var items = view.getCurrentItems();
+  deepEqual([0,1],_(items).pluck("cid"),"Page size is correct")
+  view.setPage(0);
+  var items = view.getCurrentItems();
+  deepEqual([0,1],_(items).pluck("cid"),"View can be paged to a specific page")
+  view.setPage(1);
+  var items = view.getCurrentItems();
+  deepEqual([2,3],_(items).pluck("cid"),"View can be paged to a specific page")
+  view.setPage(2);
+  var items = view.getCurrentItems();
+  deepEqual([4],_(items).pluck("cid"),"View can be paged to a specific page")
+})
 test("Views can be sorted",function(){
   var collection = new PourOver.Collection([{gender: "boy", name: "Erik", age: 26, color: "red"},{gender: "boy", name:"Bart", age: 100, color: "dead"},{name: "Cindy", age: 10, color: "blue", gender: "girl"},{gender: "girl", name:"Sandra", age: 70, color: "purple"}, {gender: "boy", name:"Cargo", age: 10, color: "gold"} ]),
       filter = PourOver.makeExactFilter("gender",["boy","girl"]),
