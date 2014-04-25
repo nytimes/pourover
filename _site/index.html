@@ -293,14 +293,14 @@ view = new MyView("default_view",collection)
 <p>There are several basic types of events fired by PourOver objects:</p>
 
 <ul>
-  <li>&#8220;change&#8221;: Fired whenever items are added or removed in the collection.</li>
+  <li>&#8220;change&#8221;: Fired whenever items are added or removed in the collection. You will need to listen to this if you want to re-render in response to collection additions or deletions</li>
   <li>&#8220;change:[attr]&#8221; : Fired whenever an item&#8217;s [attr] is modified.</li>
   <li>&#8220;incrememental_change&#8221;: Fired whenever an item is modified.</li>
   <li>&#8220;queryChange&#8221;: Fired on a filter whenever a stateful query is made on a filter. Bubbles up to collections.</li>
   <li>&#8220;selectionChange&#8221;: Fired on a view whenever the view&#8217;s match set is updated. This generally happens automatically when one of the filters are queried or the collection is changed.</li>
   <li>&#8220;sortChange&#8221;: Fired on a view whenever the view&#8217;s sort changes or is removed.</li>
   <li>&#8220;pageChange&#8221;: Fired whenever a view&#8217;s page changes.</li>
-  <li>&#8220;update&#8221;: Fired on a view whenever any change,queryChange,selectionChange, pageChange or sortChange happens on the view or its collection. This is likely the event you want to listen for to trigger a re-render</li>
+  <li>&#8220;update&#8221;: Fired on a view whenever any change:attr, queryChange, selectionChange, pageChange or sortChange happens on the view or its collection. This is likely the event you want to listen for to trigger a re-render. Again, you will have to listen to &#8220;change&#8221; AS WELL AS &#8220;update&#8221; if you want to re-render on item addition as well as item modification.</li>
 </ul>
 
 <p>There are also events for collection <code>will_change</code> and <code>will_incremental_change</code> that get fired before a collection changes. </p>

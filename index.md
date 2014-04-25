@@ -218,14 +218,14 @@ Other common attributes/methods to extend the default PourOver view with are:
 	
 There are several basic types of events fired by PourOver objects:
 	
-- "change": Fired whenever items are added or removed in the collection.
+- "change": Fired whenever items are added or removed in the collection. You will need to listen to this if you want to re-render in response to collection additions or deletions
 - "change:[attr]" : Fired whenever an item's [attr] is modified.
 - "incrememental_change": Fired whenever an item is modified.
 - "queryChange": Fired on a filter whenever a stateful query is made on a filter. Bubbles up to collections.
 - "selectionChange": Fired on a view whenever the view's match set is updated. This generally happens automatically when one of the filters are queried or the collection is changed.
 - "sortChange": Fired on a view whenever the view's sort changes or is removed.
 - "pageChange": Fired whenever a view's page changes.
-- "update": Fired on a view whenever any change,queryChange,selectionChange, pageChange or sortChange happens on the view or its collection. This is likely the event you want to listen for to trigger a re-render
+- "update": Fired on a view whenever any change:attr, queryChange, selectionChange, pageChange or sortChange happens on the view or its collection. This is likely the event you want to listen for to trigger a re-render. Again, you will have to listen to "change" AS WELL AS "update" if you want to re-render on item addition as well as item modification.
 
 There are also events for collection `will_change` and `will_incremental_change` that get fired before a collection changes. 
 	
