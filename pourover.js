@@ -911,6 +911,7 @@ var PourOver = (function(){
         this.on("pageChange",function(){
           this.trigger("update","page");
         });
+        this.view_sorts = [];
         _.extend(this,opts);
         this.initialize.apply(this, arguments);
       };
@@ -918,7 +919,6 @@ var PourOver = (function(){
       _.extend(PourOver.View.prototype,PourOver.Events,{
         initialize: function(){},
         current_page: 0,
-        view_sorts: [],
 
         // By default, return all items in the view.
         page_size: Infinity,
