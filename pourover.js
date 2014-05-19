@@ -653,6 +653,31 @@ var PourOver = (function(){
             this.trigger("update");
             this.trigger("batchUpdateAttribute");
             return _(items).pluck("guid");
+          },
+
+          batchLoadItems: function(data){
+            this.trigger("will_incremental_change");
+
+            _(data).each(_.bind(function(d){
+                var item = this.getBy("guid",d.guid),
+                    last_id = this.items.length > 0 ? _(this.items).last().cid + 1 : 0,
+                    current_item;
+                if (item && item[0]){
+                    current_item = item[0];
+                  _(d).each(function(v,k){
+                    current_item[k] = v;
+                  });
+                } else {
+                    item = PourOver.Item(d); 
+                    item.cid = last_id++;
+                    this.items = this.items.concat([item]);
+                }
+            },this))
+
+            this.regenerateFilterSets();
+            this.trigger("incremental_change","*");
+            this.trigger("update");
+            this.trigger("batchLoadItems");
           }
       });
 
@@ -970,7 +995,7 @@ var PourOver = (function(){
               sort.view = that;
               sort.rebuild_sort();
               that.on("selectionChange",function(attrs){
-                if(sort.associated_attrs == undefined){
+                if(sort.associated_attrs == undefined || attrs === "*"){
                   sort.rebuild_sort();
                 }
                 if(sort.associated_attrs && _.intersection(sort.associated_attrs,attrs).length > 0){
