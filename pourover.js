@@ -676,6 +676,7 @@ var PourOver = (function(){
 
             this.regenerateFilterSets();
             this.trigger("incremental_change","*");
+            this.trigger("change");
             this.trigger("update");
             this.trigger("batchLoadItems");
           }
@@ -850,7 +851,12 @@ var PourOver = (function(){
          // the rest of the code.
          getCollection: function(){
            return this.collection;
-          }
+          },
+
+         getByPossibilityGroups: function(){
+           var collection = this.collection;
+           return _(this.possibilities).reduce(function(m,p,k){m[k] = collection.get(p.matching_cids); return m;},{});
+         }
       });
 
       // #Sorts
