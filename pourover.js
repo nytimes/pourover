@@ -608,6 +608,17 @@ var PourOver = (function(){
             return item.guid;
           },
 
+          // Delete an attribute of one item in the collection.
+          removeItemAttribute: function(cid,attribute,value){
+            this.trigger("will_incremental_change");
+            var item = _(this.items).find(function(i){return i.cid === Number(cid);});
+            delete item[attribute];
+            this.trigger("change:"+attribute,[item]);
+            this.trigger("incremental_change",[attribute]);
+            this.trigger("update","updateItem");
+            return item.guid;
+          },
+
           // Change the value of one attribute of many items to the same value.
           batchUpdateItems: function(cids,attribute,value){
             this.trigger("will_incremental_change");

@@ -100,6 +100,12 @@ test("update an item",function(){
   collection.updateItem(1,"color","silver");
   equal(collection.get([1])[0].color,"silver","updates attribute")
 });
+test("remove an item attribute",function(){
+  var collection = new PourOver.Collection([{name: "Erik", age: 26, color: "red"},{name:"Bart", age: 100, color: "dead"},{name: "Cindy", age: 10, color: "blue"}]);
+  collection.removeItemAttribute(1,"color");
+  equal(collection.get([1])[0].color,undefined,"removed attribute")
+  equal(collection.get([1])[0].age,100,"left other attributes")
+});
 
 module("Filters");
 test("create and query a filter", function(){
