@@ -259,14 +259,25 @@ test("Views can be sorted",function(){
 module("Benchmark")
 test("100000 items can be fast filtered",function(){
     fixture = [], i = 0;
-    while (i < 100000){ fixture.push({quantity: Math.random() * 3 >>> 0,total: Math.random() * 300 >>> 0, tip: Math.random() * 200 >>> 0, type: ["tab","visa","cash"][Math.random() * 3 >>> 0], color: ["red","orange","yellow","green","blue","indigo","violet"][Math.random() * 7 >>> 0] }); i++; }
+    while (i < 100000){ 
+      fixture.push({
+        quantity: Math.random() * 3 >>> 0,
+        total: Math.random() * 300 >>> 0, 
+        tip: Math.random() * 200 >>> 0, 
+        type: ["tab","visa","cash"][Math.random() * 3 >>> 0], 
+        color: ["red","orange","yellow","green","blue","indigo","violet"][Math.random() * 7 >>> 0],
+        percent: Math.random()
+      });
+      i++; 
+    }
     c = new PourOver.Collection(fixture)
     f = PourOver.makeExactFilter("quantity",[1,2]);
     ftwo = PourOver.makeExactFilter("type",["tab","cash","visa"]);
     fthree = PourOver.makeRangeFilter("total",[[0,100],[101,200],[201,300]]);
     ffour = PourOver.makeDVrangeFilter("color",["red","orange","yellow","green","blue","indigo","violet"]);
+    ffive = PourOver.makeContinuousRangeFilter("percent");
    
-   c.addFilters([f,ftwo,fthree,ffour]);
+   c.addFilters([f,ftwo,fthree,ffour,ffive]);
    var timea = Number(new Date());
    var output = c.getFilteredItems("type","tab");
    var timeb = Number(new Date());
@@ -278,12 +289,39 @@ test("100000 items can be fast filtered",function(){
    console.log(timeb-timea,output.length(),"Dvrange select");
    ok(timeb-timea < 45,"Dvrange select is fast enough")
    var timea = Number(new Date());
+   var output = c.getFilteredItems("percent",[.25, .75]);
+   var timeb = Number(new Date());
+   console.log(timeb-timea,output.length(),"ContinuousRange select");
+   ok(timeb-timea < 45,"Continuous range select is fast enough: took " + (timeb-timea))
+   var timea = Number(new Date());
    var output = c.getFilteredItems("total",[101,200]);
    var timeb = Number(new Date());
    console.log(timeb-timea,output.length(),"Range select");
    ok(timeb-timea < 10,"Range select is fast enough")
 });
 module("Non-stateful queries")
+test("Range crossfilter works",function() {
+  fixture = [{num: 5}, {num: 1}, {num: 9}, {num: 3}, {num: 1}, {num: 12}];
+  c = new PourOver.Collection(fixture)
+  f = PourOver.makeContinuousRangeFilter("num");
+  c.addFilters([f]);
+  query = c.getFilteredItems("num", [-100, 100])
+  equal(query.cids.length, 6, "All-inclusive range works.")
+  query = c.getFilteredItems("num", 1)
+  equal(query.cids.length, 2, "Equal range works.")
+  query = c.getFilteredItems("num", 2)
+  equal(query.cids.length, 0, "Empty equal range works.")
+  query = c.getFilteredItems("num", 12)
+  equal(query.cids.length, 1, "Top equal range works.")
+  query = c.getFilteredItems("num", [1, 3])
+  equal(query.cids.length, 2, "Small range works.")
+  query = c.getFilteredItems("num", [1, 3.00001])
+  equal(query.cids.length, 3, "Small range works.")
+  query = c.getFilteredItems("num", [13, 15])
+  equal(query.cids.length, 0, "Empty high range works.")
+  query = c.getFilteredItems("num", [-5, -4])
+  equal(query.cids.length, 0, "Empty low range works.")
+})
 test("Complex queries work",function(){
   data = [{guid:1,color:"red",sex:"male"},{guid:2,color:"yellow",sex:"thing"},{guid:3,color:"blue",sex:"female"},{guid:4,color:"blue",sex:"male"},{guid:5,color:"red",sex:"female"}];
   c = new PourOver.Collection(data);

@@ -131,6 +131,30 @@ var PourOver = (function(){
         }
         return set;
       },
+      bisect_by: function(f) {
+        // Thanks to crossfilter (https://github.com/square/crossfilter) for this implementation.
+        function bisectLeft(a, x, lo, hi) {
+          while (lo < hi) {
+            var mid = lo + hi >>> 1;
+            if (f(a[mid]) < x) lo = mid + 1;
+            else hi = mid;
+          }
+          return lo;
+        }
+
+        function bisectRight(a, x, lo, hi) {
+          while (lo < hi) {
+            var mid = lo + hi >>> 1;
+            if (x < f(a[mid])) hi = mid;
+            else lo = mid + 1;
+          }
+          return lo;
+        }
+
+        bisectRight.right = bisectRight;
+        bisectRight.left = bisectLeft;
+        return bisectRight;
+      },
       // # Pre-defined cache methods
       // Caching is really the raison d'etre of Pourover. Every filter has two cache methods: one for rebuilding the whole filter from scratch
       // and one for adding new items. As Pourover grows it will gain more pre-defined cache methods that correlate with common UI and data patterns.
@@ -1661,6 +1685,62 @@ var PourOver = (function(){
             newopts = _.extend({associated_attrs: [attr]},opts),
             filter = new PourOver.dvrangeFilter(name,values,newopts);
         return filter
+      }
+
+      // Filter for data with a continuous range or many possible values, such as dates, floats, etc.
+      // Query with a scalar to query by exact value, or query with a length-2 array to
+      // query a range (as in dvrangeFilter) such that the value is greater than or equal 
+      // to range[0] and less than range[1].
+      PourOver.continuousRangeFilter = PourOver.Filter.extend({
+        cacheResults: function(items){
+          this.values = _.map(items, function(i) { return {cid: i.cid, val: i[this.name]}; }, this);
+          this.values.sort(function(a,b) { return a.val-b.val });
+        },
+        addCacheResults: function(items){
+          this.values = this.values.concat(items);
+          this.values.sort(function(a,b) { return a.val-b.val });
+        },
+        getFn: function(query){
+          var li,hi;
+          var n = this.values.length;
+
+          var bisect = PourOver.bisect_by( function(a) { return a.val });
+          
+          if(_.isArray(query)){
+            // range filter
+            if(_.isUndefined(query[0]) || _.isUndefined(query[1])){
+              return new PourOver.MatchSet([],this.getCollection(),[[this,query]]);
+            }
+            li = bisect.left(this.values, query[0], 0, n);
+            hi = bisect.left(this.values, query[1], 0, n);
+          } else {
+            // exact filter
+            if(_.isUndefined(query)){
+              return new PourOver.MatchSet([],this.getCollection(),[[this,query]]);
+            }
+
+            li = bisect.left(this.values, query, 0, n);
+            hi = bisect.right(this.values, query, 0, n);
+          }
+
+          var cids = [];
+          var i=li;
+          while(i<hi) {
+            cids.push(this.values[i].cid);
+            ++i;
+          }
+          cids.sort(function(a,b) { return a-b });
+          return new PourOver.MatchSet(cids,this.getCollection(),[[this,query]]);
+        }
+      });
+
+      // The convenience constructor for continuous range filters.
+      PourOver.makeContinuousRangeFilter = function(name,opts){
+        if(typeof(opts) === "undefined"){opts = {}}
+        var attr = opts.attr || name,
+            newopts = _.extend({associated_attrs: [attr]},opts),
+            filter = new PourOver.continuousRangeFilter(name,newopts);
+        return filter;
       }
 
       // ## Preset sorts
