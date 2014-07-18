@@ -650,7 +650,7 @@ var PourOver = (function(){
               that.trigger("change:"+k,items);
             });
             this.trigger("incremental_change",_(updates).keys());
-            this.trigger("update");
+            this.trigger("update","batchUpdate");
             this.trigger("batchUpdateAttribute");
             return _(items).pluck("guid");
           },
@@ -677,7 +677,7 @@ var PourOver = (function(){
             this.regenerateFilterSets();
             this.trigger("incremental_change","*");
             this.trigger("change");
-            this.trigger("update");
+            this.trigger("update","batchLoad");
             this.trigger("batchLoadItems");
           }
       });
@@ -912,6 +912,7 @@ var PourOver = (function(){
           that.match_set.refresh();
           that.setNaturalSelection();
           that.resetPage();
+          that.trigger("collection-change");
         });
 
         // Whenever an item in the collection is changed, recache the MatchSet saved on the view.
@@ -919,6 +920,7 @@ var PourOver = (function(){
           that.match_set.refresh();
           that.setNaturalSelection(attrs);
           that.resetPage();
+          that.trigger("collection-incremental-change");
         });
 
         // Bubble all collection update events through.
@@ -963,8 +965,9 @@ var PourOver = (function(){
         },
 
         // Sets a sort on a view and fires all appropriate events.
-        setSort: function(sort_name,view_sort){
+        setSort: function(sort_name,view_sort,silent){
           if(typeof(view_sort) === "undefined"){view_sort = false;}
+          if(typeof(silent) === "undefined"){silent = false;}
           var that = this;
           if(this.current_sort.off){this.current_sort.off("resort");}
           if(sort_name && view_sort){
@@ -977,7 +980,9 @@ var PourOver = (function(){
             this.current_sort = false;
 
           }
-          this.trigger("sortChange");
+          if(! silent){
+            this.trigger("sortChange");
+          }
         },
 
         // Return the name of the current sort of the view.
@@ -1754,3 +1759,5 @@ var PourOver = (function(){
 
     return PourOver;
 })();
+
+
