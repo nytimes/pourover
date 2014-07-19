@@ -1,21 +1,20 @@
-(function (root, factory)
-{
-  if (typeof exports === 'object') {
-      // CommonJS module
-      module.exports = factory(require('underscore'));
-  } else if (typeof define === 'function' && define.amd) {
-      // AMD. Register as an anonymous module.
-      define(function (req)
-      {
-          return factory(req('_'));
-      });
-  } else {
-      root.PourOver = factory(root._);
-  }
-}(this, function (_)
-{
 
-  PourOver = {
+(function (root, factory) {
+  if (typeof define === 'function' && define.amd) {
+    // AMD. Register as an anonymous module.
+    define(['underscore'], factory);
+  } else if (typeof exports === 'object') {
+    // Node. Does not work with strict CommonJS, but
+    // only CommonJS-like environments that support module.exports,
+    // like Node.
+    module.exports = factory(require('underscore'));
+  } else {
+    // Browser globals (root is window)
+    root.PourOver = factory(root._);
+  }
+}(this, function (_) {
+
+  var PourOver = {
     // Utility functions. Skip down to "Collections" for the real meat of PourOver.
     //
     // # The basic sorted set operations
