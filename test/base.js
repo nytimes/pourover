@@ -69,7 +69,7 @@ test("permutation",function(){
 
 module("Basic collection operations");
 test("constructs collection", function(){
-  var collection = new PourOver.Collection([{name: "Erik", age: 26, color: "red"},{name:"Bart", age: 100, color: "dead"},{name: "Cindy", age: 10, color: "blue"}])       
+  var collection = new PourOver.Collection([{name: "Erik", age: 26, color: "red"},{name:"Bart", age: 100, color: "dead"},{name: "Cindy", age: 10, color: "blue"}])
   equal(collection.items.length,3,"Builds a three item collection");
 })
 test("get items from collection", function(){
@@ -112,8 +112,8 @@ test("create and query a filter", function(){
   var collection = new PourOver.Collection([{gender: "boy", name: "Erik", age: 26, color: "red"},{gender: "boy", name:"Bart", age: 100, color: "dead"},{name: "Cindy", age: 10, color: "blue", gender: "girl"},{gender: "girl", name:"Sandra", age: 70, color: "purple"}, {gender: "boy", name:"Cargo", age: 10, color: "gold"} ]),
       filter = PourOver.makeExactFilter("gender",["boy","girl"]);
   collection.addFilters([filter]);
-  equal(_(collection.filters).keys().length,1,"one filter added");
-  equal(_(collection.filters.gender.possibilities).keys().length,2,"all possibilities added to filter");
+  equal(_.keys(collection.filters).length,1,"one filter added");
+  equal(_.keys(collection.filters.gender.possibilities).length,2,"all possibilities added to filter");
   var boys = collection.getFilteredItems("gender","boy");
   equal(boys.cids.length,3,"correct number of items returned")
 })
@@ -183,8 +183,8 @@ test("Sorts can be created",function(){
       sort = new age_sort("age");
   collection.addFilters([filter]);
   collection.addSort(sort);
-  var items = _(collection.getSortedItems("age")).map(function(i){return i.cid});
-  deepEqual(items,[2,4,0,3,1],"Sorts items correctly")  
+  var items = _.pluck(collection.getSortedItems("age"),"cid");
+  deepEqual(items,[2,4,0,3,1],"Sorts items correctly")
 })
 
 module("Views")
@@ -208,19 +208,19 @@ test("Views can be paged",function(){
   var view = new PourOver.View("default",collection);
   view.setPageSize(2);
   var items = view.getCurrentItems();
-  deepEqual([0,1],_(items).pluck("cid"),"Page size is correct")
+  deepEqual([0,1],_.pluck(items,"cid"),"Page size is correct")
   view.page(1);
   var items = view.getCurrentItems();
-  deepEqual([2,3],_(items).pluck("cid"),"View can be paged forward")
+  deepEqual([2,3],_.pluck(items,"cid"),"View can be paged forward")
   view.page(-1);
   var items = view.getCurrentItems();
-  deepEqual([0,1],_(items).pluck("cid"),"View can be paged backward")
+  deepEqual([0,1],_.pluck(items,"cid"),"View can be paged backward")
   view.page(2);
   var items = view.getCurrentItems();
-  deepEqual([4],_(items).pluck("cid"),"View can be skipped forward")
+  deepEqual([4],_.pluck(items,"cid"),"View can be skipped forward")
   view.page(1);
   var items = view.getCurrentItems();
-  deepEqual([4],_(items).pluck("cid"),"View stops at end")
+  deepEqual([4],_.pluck(items,"cid"),"View stops at end")
 })
 test("Views can be paged to a specific page",function(){
   var collection = new PourOver.Collection([{gender: "boy", name: "Erik", age: 26, color: "red"},{gender: "boy", name:"Bart", age: 100, color: "dead"},{name: "Cindy", age: 10, color: "blue", gender: "girl"},{gender: "girl", name:"Sandra", age: 70, color: "purple"}, {gender: "boy", name:"Cargo", age: 10, color: "gold"} ]),
@@ -232,16 +232,16 @@ test("Views can be paged to a specific page",function(){
   var view = new PourOver.View("default",collection);
   view.setPageSize(2);
   var items = view.getCurrentItems();
-  deepEqual([0,1],_(items).pluck("cid"),"Page size is correct")
+  deepEqual([0,1],_.pluck(items,"cid"),"Page size is correct")
   view.setPage(0);
   var items = view.getCurrentItems();
-  deepEqual([0,1],_(items).pluck("cid"),"View can be paged to a specific page")
+  deepEqual([0,1],_.pluck(items,"cid"),"View can be paged to a specific page")
   view.setPage(1);
   var items = view.getCurrentItems();
-  deepEqual([2,3],_(items).pluck("cid"),"View can be paged to a specific page")
+  deepEqual([2,3],_.pluck(items,"cid"),"View can be paged to a specific page")
   view.setPage(2);
   var items = view.getCurrentItems();
-  deepEqual([4],_(items).pluck("cid"),"View can be paged to a specific page")
+  deepEqual([4],_.pluck(items,"cid"),"View can be paged to a specific page")
 })
 test("Views can be sorted",function(){
   var collection = new PourOver.Collection([{gender: "boy", name: "Erik", age: 26, color: "red"},{gender: "boy", name:"Bart", age: 100, color: "dead"},{name: "Cindy", age: 10, color: "blue", gender: "girl"},{gender: "girl", name:"Sandra", age: 70, color: "purple"}, {gender: "boy", name:"Cargo", age: 10, color: "gold"} ]),
@@ -251,24 +251,24 @@ test("Views can be sorted",function(){
   collection.addSort(age_sort);
   var view = new PourOver.View("default",collection);
   var items = view.getCurrentItems();
-  deepEqual([0,1,2,3,4],_(items).pluck("cid"),"View initially sorted")
+  deepEqual([0,1,2,3,4],_.pluck(items,"cid"),"View initially sorted")
   view.setSort("age");
   var items = view.getCurrentItems();
-  deepEqual([2,4,0,3,1],_(items).pluck("cid"),"View sort can be set")
+  deepEqual([2,4,0,3,1],_.pluck(items,"cid"),"View sort can be set")
 })
 module("Benchmark")
 test("100000 items can be fast filtered",function(){
     fixture = [], i = 0;
-    while (i < 100000){ 
+    while (i < 100000){
       fixture.push({
         quantity: Math.random() * 3 >>> 0,
-        total: Math.random() * 300 >>> 0, 
-        tip: Math.random() * 200 >>> 0, 
-        type: ["tab","visa","cash"][Math.random() * 3 >>> 0], 
+        total: Math.random() * 300 >>> 0,
+        tip: Math.random() * 200 >>> 0,
+        type: ["tab","visa","cash"][Math.random() * 3 >>> 0],
         color: ["red","orange","yellow","green","blue","indigo","violet"][Math.random() * 7 >>> 0],
         percent: Math.random()
       });
-      i++; 
+      i++;
     }
     c = new PourOver.Collection(fixture)
     f = PourOver.makeExactFilter("quantity",[1,2]);
@@ -276,7 +276,7 @@ test("100000 items can be fast filtered",function(){
     fthree = PourOver.makeRangeFilter("total",[[0,100],[101,200],[201,300]]);
     ffour = PourOver.makeDVrangeFilter("color",["red","orange","yellow","green","blue","indigo","violet"]);
     ffive = PourOver.makeContinuousRangeFilter("percent");
-   
+
    c.addFilters([f,ftwo,fthree,ffour,ffive]);
    var timea = Number(new Date());
    var output = c.getFilteredItems("type","tab");
@@ -363,7 +363,7 @@ test("Queries can be unioned",function(){
    ok(new_length > old_length, "Unioning adds elements to a filter")
    var items = c.get(c.filters.color.current_query.cids);
    ok(_.any(items,function(i){ return i.color == "blue" }), "Union adds the correct items to the query")
-   var change_item = _(c.items).find(function(i){return i.color == "indigo"})
+   var change_item = _.find(c.items,function(i){return i.color == "indigo"})
    c.updateItem(change_item.cid,"color","blue")
    var final_length = c.filters.color.current_query.cids.length;
    ok (final_length == new_length + 1, "Unioned queries are successfully refreshed")
@@ -384,7 +384,7 @@ test("Queries can be intersected",function(){
    ok(new_length < old_length, "Intersecting removes elements from a filter")
    var items = c.get(c.filters.color.current_query.cids);
    ok(_.all(items,function(i){ return i.color == "red" }), "Intersecting works properly")
-   var change_item = _(c.items).find(function(i){return i.color == "blue"})
+   var change_item = _.findWhere(c.items,{color:"blue"})
    c.updateItem(change_item.cid,"color","red")
    var final_length = c.filters.color.current_query.cids.length;
    ok (final_length == new_length + 1, "Intersected queries are successfully refreshed")
@@ -405,9 +405,8 @@ test("Queries can be subtracted",function(){
    ok(new_length < old_length, "Subtracting removes elements from a filter")
    var items = c.get(c.filters.color.current_query.cids);
    ok(! _.any(items,function(i){ return i.color == "orange" || i.color == "blue" || i.color == "indigo" || i.color == "violet" }), "Subtracting corrent differences the query")
-   var change_item = _(c.items).find(function(i){return i.color == "red"})
+   var change_item = _.findWhere(c.items,{color:"red"})
    c.updateItem(change_item.cid,"color","violet")
    var final_length = c.filters.color.current_query.cids.length;
    ok (final_length + 1 == new_length, "Subtracted queries are successfully refreshed")
 });
-
