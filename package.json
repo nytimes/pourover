@@ -15,5 +15,8 @@
   },
   "dependencies": {
     "underscore": "^1.6.0"
+  },
+  "devDependencies": {
+    "backbone": "^1.1.2"
   }
 }
