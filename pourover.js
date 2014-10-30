@@ -457,7 +457,7 @@ var PourOver = (function(){
             new_items = _(i).map(function(c){var n = PourOver.Item(c); n.cid = last_id++; return n;});
             this.items = this.items.concat(new_items);
             this.regenerateFilterSets(new_items);
-            this.trigger("change");
+            this.trigger("change",_(new_items).pluck("cid"));
           },
 
           // Remove items from the collection, triggering the appropriate events to keep all dependent sort and filter sets up-to-date.
@@ -495,7 +495,7 @@ var PourOver = (function(){
             }
             this.items = new_items;
             this.regenerateFilterSets();
-            this.trigger("change");
+            this.trigger("change",_(i).pluck("cid"));
           },
 
           // # Collection filter functions
@@ -692,6 +692,7 @@ var PourOver = (function(){
 
           batchLoadItems: function(data){
             this.trigger("will_incremental_change");
+            var new_cids = [];
 
             _(data).each(_.bind(function(d){
                 var item = this.getBy("guid",d.guid),
@@ -705,13 +706,14 @@ var PourOver = (function(){
                 } else {
                     item = PourOver.Item(d); 
                     item.cid = last_id++;
+                    new_cids.push(item.cid);
                     this.items = this.items.concat([item]);
                 }
             },this))
 
             this.regenerateFilterSets();
             this.trigger("incremental_change","*");
-            this.trigger("change");
+            this.trigger("change",new_cids);
             this.trigger("update","batchLoad");
             this.trigger("batchLoadItems");
           }
