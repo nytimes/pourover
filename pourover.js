@@ -690,8 +690,6 @@ var PourOver = (function(){
             return _(items).pluck("guid");
           },
 
-          // Note that if you pass a duplicate guid when batchLoadingItems,
-          // it will be added twice.
           batchLoadItems: function(data){
             this.trigger("will_incremental_change");
             var new_cids = [],
@@ -717,6 +715,11 @@ var PourOver = (function(){
                     item.cid = last_id++;
                     new_cids.push(item.cid);
                     this.items = this.items.concat([item]);
+
+                    // add this to the list of existing items so that
+                    // if data contains the same guid multiple times,
+                    // the second instance will be treated as an update.
+                    old_items[item.guid] = item;
                 }
             },this))
 
