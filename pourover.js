@@ -692,14 +692,21 @@ var PourOver = (function(){
 
           batchLoadItems: function(data){
             this.trigger("will_incremental_change");
-            var new_cids = [];
+            var new_cids = [],
+                guids = _.pluck(data, "guid"),
+                old_items = this.getBy("guid", guids),
+                old_item_dict = {};
+
+            _(old_items).each(function (item) { old_item_dict[item.guid] = item; });
 
             _(data).each(_.bind(function(d){
-                var item = this.getBy("guid",d.guid),
+                var item = old_item_dict[d.guid],
                     last_id = this.items.length > 0 ? _(this.items).last().cid + 1 : 0,
                     current_item;
-                if (item && item[0]){
-                    current_item = item[0];
+                if (item){
+                  current_item = item;
+
+                  // update the item's attrs
                   _(d).each(function(v,k){
                     current_item[k] = v;
                   });
@@ -717,6 +724,7 @@ var PourOver = (function(){
             this.trigger("update","batchLoad");
             this.trigger("batchLoadItems");
           }
+
       });
 
       // #Items
