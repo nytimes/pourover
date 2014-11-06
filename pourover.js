@@ -406,9 +406,10 @@ var PourOver = (function(){
 
           // Similar to get, except -- rather than getting items by cid -- you are getting them by [attr_name].
           // Here vals is an array of [attr_names]s.
-          getBy: function(attr_name,vals,sorted){
+          getBy: function(attr_name,vals,sorted,first){
             if(! _.isArray(vals)){ var vals = [vals] }
             if(typeof(sorted) == "undefined"){sorted = false;}
+            if(typeof(first) == "undefined"){first = false;}
             var low = 0, high = this.items.length,lc = 0, hc = vals.length, output = [],items = this.items,i;
             if(sorted == true){
               while (low < high && lc < hc){
@@ -441,6 +442,43 @@ var PourOver = (function(){
                   vals = _(vals).without(i[attr_name]);
                   low++;
                   lc++;
+                } else {
+                  low++;
+                }
+              }
+            }
+            return output;
+          },
+          getByFirst: function(attr_name,val,sorted){
+            if(typeof(sorted) == "undefined"){sorted = false;}
+            var low = 0, high = this.items.length, output = undefined,items = this.items,i;
+            if(sorted == true){
+              while (low < high){
+                if (val == (i=items[low])[attr_name]){
+                  output = i;
+                  break;
+                } else if (val < i[attr_name]){
+                  break;
+                } else{
+                  low++;
+                }
+              }
+            } else if (sorted == "reverse"){
+              while (low < high){
+                if (val == (i=items[low])[attr_name]){
+                  output = i;
+                  break;
+                } else if (val > i[attr_name]){
+                  break;
+                } else{
+                  low++;
+                }
+              }
+            } else {
+              while (low < high){
+                if (val == (i=items[low])[attr_name]){
+                  output = i;
+                  break;
                 } else {
                   low++;
                 }

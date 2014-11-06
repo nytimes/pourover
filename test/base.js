@@ -95,6 +95,11 @@ test("get an all items match",function(){
   deepEqual(all_match.stack,["all"],"correctly stacks an all result")
   equal(all_match.cids.length,3,"correctly retrieves all 3 items")
 })
+test("get first match",function(){
+  var collection = new PourOver.Collection([{name: "Erik", age: 26, color: "red"},{name:"Bart", age: 100, color: "dead"},{name: "Cindy", age: 10, color: "red"}]),
+      first_match = collection.getByFirst("color","red");
+  equal(first_match.name, "Erik","First match gets exactly one item, the first match")
+})
 test("update an item",function(){
   var collection = new PourOver.Collection([{name: "Erik", age: 26, color: "red"},{name:"Bart", age: 100, color: "dead"},{name: "Cindy", age: 10, color: "blue"}]);
   collection.updateItem(1,"color","silver");
