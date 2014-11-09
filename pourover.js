@@ -198,7 +198,8 @@ var PourOver = (function(){
           var that = this,
               attr = this.attr || this.name;
           _(items).each(function(i){
-            _(i[attr]).each(function(v){
+            var vs = _.isArray(i[attr]) ? i[attr] : [i[attr]];
+            _(vs).each(function(v){
               var p = that.possibilities[v];
               if(p){
                 p.matching_cids = PourOver.insert_sorted(p.matching_cids,i.cid);
@@ -749,7 +750,7 @@ var PourOver = (function(){
                     current_item[k] = v;
                   });
                 } else {
-                    item = PourOver.Item(d); 
+                    item = PourOver.Item(d);
                     item.cid = last_id++;
                     new_cids.push(item.cid);
                     this.items = this.items.concat([item]);
@@ -1746,7 +1747,7 @@ var PourOver = (function(){
 
       // Filter for data with a continuous range or many possible values, such as dates, floats, etc.
       // Query with a scalar to query by exact value, or query with a length-2 array to
-      // query a range (as in dvrangeFilter) such that the value is greater than or equal 
+      // query a range (as in dvrangeFilter) such that the value is greater than or equal
       // to range[0] and less than range[1].
       PourOver.continuousRangeFilter = PourOver.Filter.extend({
         cacheResults: function(items){
@@ -1762,7 +1763,7 @@ var PourOver = (function(){
           var n = this.values.length;
 
           var bisect = PourOver.bisect_by( function(a) { return a.val });
-          
+
           if(_.isArray(query)){
             // range filter
             if(_.isUndefined(query[0]) || _.isUndefined(query[1])){
