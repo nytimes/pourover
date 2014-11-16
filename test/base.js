@@ -95,10 +95,21 @@ test("get an all items match",function(){
   deepEqual(all_match.stack,["all"],"correctly stacks an all result")
   equal(all_match.cids.length,3,"correctly retrieves all 3 items")
 })
+test("get first match",function(){
+  var collection = new PourOver.Collection([{name: "Erik", age: 26, color: "red"},{name:"Bart", age: 100, color: "dead"},{name: "Cindy", age: 10, color: "red"}]),
+      first_match = collection.getByFirst("color","red");
+  equal(first_match.name, "Erik","First match gets exactly one item, the first match")
+})
 test("update an item",function(){
   var collection = new PourOver.Collection([{name: "Erik", age: 26, color: "red"},{name:"Bart", age: 100, color: "dead"},{name: "Cindy", age: 10, color: "blue"}]);
   collection.updateItem(1,"color","silver");
   equal(collection.get([1])[0].color,"silver","updates attribute")
+});
+test("remove an item attribute",function(){
+  var collection = new PourOver.Collection([{name: "Erik", age: 26, color: "red"},{name:"Bart", age: 100, color: "dead"},{name: "Cindy", age: 10, color: "blue"}]);
+  collection.removeItemAttribute(1,"color");
+  equal(collection.get([1])[0].color,undefined,"removed attribute")
+  equal(collection.get([1])[0].age,100,"left other attributes")
 });
 
 module("Filters");
@@ -216,6 +227,27 @@ test("Views can be paged",function(){
   var items = view.getCurrentItems();
   deepEqual([4],_(items).pluck("cid"),"View stops at end")
 })
+test("Views can be paged to a specific page",function(){
+  var collection = new PourOver.Collection([{gender: "boy", name: "Erik", age: 26, color: "red"},{gender: "boy", name:"Bart", age: 100, color: "dead"},{name: "Cindy", age: 10, color: "blue", gender: "girl"},{gender: "girl", name:"Sandra", age: 70, color: "purple"}, {gender: "boy", name:"Cargo", age: 10, color: "gold"} ]),
+      filter = PourOver.makeExactFilter("gender",["boy","girl"]),
+      age_sort = PourOver.Sort.extend({fn: function(a,b){return a.age - b.age}}),
+      sort = new age_sort("age");
+  collection.addFilters([filter]);
+  collection.addSort(sort);
+  var view = new PourOver.View("default",collection);
+  view.setPageSize(2);
+  var items = view.getCurrentItems();
+  deepEqual([0,1],_(items).pluck("cid"),"Page size is correct")
+  view.setPage(0);
+  var items = view.getCurrentItems();
+  deepEqual([0,1],_(items).pluck("cid"),"View can be paged to a specific page")
+  view.setPage(1);
+  var items = view.getCurrentItems();
+  deepEqual([2,3],_(items).pluck("cid"),"View can be paged to a specific page")
+  view.setPage(2);
+  var items = view.getCurrentItems();
+  deepEqual([4],_(items).pluck("cid"),"View can be paged to a specific page")
+})
 test("Views can be sorted",function(){
   var collection = new PourOver.Collection([{gender: "boy", name: "Erik", age: 26, color: "red"},{gender: "boy", name:"Bart", age: 100, color: "dead"},{name: "Cindy", age: 10, color: "blue", gender: "girl"},{gender: "girl", name:"Sandra", age: 70, color: "purple"}, {gender: "boy", name:"Cargo", age: 10, color: "gold"} ]),
       filter = PourOver.makeExactFilter("gender",["boy","girl"]),
@@ -232,14 +264,25 @@ test("Views can be sorted",function(){
 module("Benchmark")
 test("100000 items can be fast filtered",function(){
     fixture = [], i = 0;
-    while (i < 100000){ fixture.push({quantity: Math.random() * 3 >>> 0,total: Math.random() * 300 >>> 0, tip: Math.random() * 200 >>> 0, type: ["tab","visa","cash"][Math.random() * 3 >>> 0], color: ["red","orange","yellow","green","blue","indigo","violet"][Math.random() * 7 >>> 0] }); i++; }
+    while (i < 100000){ 
+      fixture.push({
+        quantity: Math.random() * 3 >>> 0,
+        total: Math.random() * 300 >>> 0, 
+        tip: Math.random() * 200 >>> 0, 
+        type: ["tab","visa","cash"][Math.random() * 3 >>> 0], 
+        color: ["red","orange","yellow","green","blue","indigo","violet"][Math.random() * 7 >>> 0],
+        percent: Math.random()
+      });
+      i++; 
+    }
     c = new PourOver.Collection(fixture)
     f = PourOver.makeExactFilter("quantity",[1,2]);
     ftwo = PourOver.makeExactFilter("type",["tab","cash","visa"]);
     fthree = PourOver.makeRangeFilter("total",[[0,100],[101,200],[201,300]]);
     ffour = PourOver.makeDVrangeFilter("color",["red","orange","yellow","green","blue","indigo","violet"]);
+    ffive = PourOver.makeContinuousRangeFilter("percent");
    
-   c.addFilters([f,ftwo,fthree,ffour]);
+   c.addFilters([f,ftwo,fthree,ffour,ffive]);
    var timea = Number(new Date());
    var output = c.getFilteredItems("type","tab");
    var timeb = Number(new Date());
@@ -251,12 +294,39 @@ test("100000 items can be fast filtered",function(){
    console.log(timeb-timea,output.length(),"Dvrange select");
    ok(timeb-timea < 45,"Dvrange select is fast enough")
    var timea = Number(new Date());
+   var output = c.getFilteredItems("percent",[.25, .75]);
+   var timeb = Number(new Date());
+   console.log(timeb-timea,output.length(),"ContinuousRange select");
+   ok(timeb-timea < 45,"Continuous range select is fast enough: took " + (timeb-timea))
+   var timea = Number(new Date());
    var output = c.getFilteredItems("total",[101,200]);
    var timeb = Number(new Date());
    console.log(timeb-timea,output.length(),"Range select");
    ok(timeb-timea < 10,"Range select is fast enough")
 });
 module("Non-stateful queries")
+test("Range crossfilter works",function() {
+  fixture = [{num: 5}, {num: 1}, {num: 9}, {num: 3}, {num: 1}, {num: 12}];
+  c = new PourOver.Collection(fixture)
+  f = PourOver.makeContinuousRangeFilter("num");
+  c.addFilters([f]);
+  query = c.getFilteredItems("num", [-100, 100])
+  equal(query.cids.length, 6, "All-inclusive range works.")
+  query = c.getFilteredItems("num", 1)
+  equal(query.cids.length, 2, "Equal range works.")
+  query = c.getFilteredItems("num", 2)
+  equal(query.cids.length, 0, "Empty equal range works.")
+  query = c.getFilteredItems("num", 12)
+  equal(query.cids.length, 1, "Top equal range works.")
+  query = c.getFilteredItems("num", [1, 3])
+  equal(query.cids.length, 2, "Small range works.")
+  query = c.getFilteredItems("num", [1, 3.00001])
+  equal(query.cids.length, 3, "Small range works.")
+  query = c.getFilteredItems("num", [13, 15])
+  equal(query.cids.length, 0, "Empty high range works.")
+  query = c.getFilteredItems("num", [-5, -4])
+  equal(query.cids.length, 0, "Empty low range works.")
+})
 test("Complex queries work",function(){
   data = [{guid:1,color:"red",sex:"male"},{guid:2,color:"yellow",sex:"thing"},{guid:3,color:"blue",sex:"female"},{guid:4,color:"blue",sex:"male"},{guid:5,color:"red",sex:"female"}];
   c = new PourOver.Collection(data);

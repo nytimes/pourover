@@ -103,7 +103,7 @@ var PourOver = (function(){
         if(typeof(sort) === "function"){
           sorted_set.sort(sort);
         } else {
-          sorted_set.sort(function(a,b){return sort.fn.call(sort,a,b)});
+          sorted_set.sort(function(a,b){return sort.fn.call(sort,a,b);});
         }
         _(sorted_set).each(function(m,i){perm[m.cid] = i;});
         return perm;
@@ -112,9 +112,9 @@ var PourOver = (function(){
       permute_from_array: function(collection,perm){
         var output = [];
         if(typeof(collection[0]) === "number"){
-          _(collection).each(function(i){ output[perm[i]] = i });
+          _(collection).each(function(i){ output[perm[i]] = i ;});
         } else {
-          _(collection).each(function(i){ output[perm[i.cid]] = i });
+          _(collection).each(function(i){ output[perm[i.cid]] = i ;});
         }
         return _(output).without(undefined);
       },
@@ -131,6 +131,30 @@ var PourOver = (function(){
         }
         return set;
       },
+      bisect_by: function(f) {
+        // Thanks to crossfilter (https://github.com/square/crossfilter) for this implementation.
+        function bisectLeft(a, x, lo, hi) {
+          while (lo < hi) {
+            var mid = lo + hi >>> 1;
+            if (f(a[mid]) < x) lo = mid + 1;
+            else hi = mid;
+          }
+          return lo;
+        }
+
+        function bisectRight(a, x, lo, hi) {
+          while (lo < hi) {
+            var mid = lo + hi >>> 1;
+            if (x < f(a[mid])) hi = mid;
+            else lo = mid + 1;
+          }
+          return lo;
+        }
+
+        bisectRight.right = bisectRight;
+        bisectRight.left = bisectLeft;
+        return bisectRight;
+      },
       // # Pre-defined cache methods
       // Caching is really the raison d'etre of Pourover. Every filter has two cache methods: one for rebuilding the whole filter from scratch
       // and one for adding new items. As Pourover grows it will gain more pre-defined cache methods that correlate with common UI and data patterns.
@@ -141,17 +165,17 @@ var PourOver = (function(){
         defaultCache: function(items){
           var that = this;
           _(that.possibilities).each(function(p){
-            var matching_items = _(items).filter(function(i){return that.fn(p,i)}),
-                matching_cids = _(matching_items).map(function(i){return i.cid});
+            var matching_items = _(items).filter(function(i){return that.fn(p,i);}),
+                matching_cids = _(matching_items).map(function(i){return i.cid;});
             p.matching_cids = matching_cids;
           });
         },
         defaultAddCache: function(items){
           var that = this;
           _(that.possibilities).each(function(p){
-            var matching_items = _(items).filter(function(i){return that.fn(p,i)}),
-                matching_cids = _(matching_items).map(function(i){return i.cid});
-            p.matching_cids = PourOver.union_sorted(p.matching_cids,matching_cids)
+            var matching_items = _(items).filter(function(i){return that.fn(p,i);}),
+                matching_cids = _(matching_items).map(function(i){return i.cid;});
+            p.matching_cids = PourOver.union_sorted(p.matching_cids,matching_cids);
           });
         },
         // ### Exact: the fastest caches.
@@ -163,7 +187,7 @@ var PourOver = (function(){
           _(items).each(function(i){
             var p = that.possibilities[i[attr]];
             if (p) {
-              p.matching_cids = PourOver.insert_sorted(p.matching_cids,i.cid)
+              p.matching_cids = PourOver.insert_sorted(p.matching_cids,i.cid);
             }
           });
         },
@@ -177,16 +201,16 @@ var PourOver = (function(){
             _(i[attr]).each(function(v){
               var p = that.possibilities[v];
               if(p){
-                p.matching_cids = PourOver.insert_sorted(p.matching_cids,i.cid)
+                p.matching_cids = PourOver.insert_sorted(p.matching_cids,i.cid);
               }
-            })
+            });
           });
         },
         inclusionAddCache: function(items){
           PourOver.cacheMethods.inclusionCache.call(this,items);
         }
       }
-    }
+    };
         // Copied from Backbone
         var array = [];
         var push = array.push;
@@ -357,13 +381,13 @@ var PourOver = (function(){
         if(typeof(items) == "undefined"){items = [];}
         this.items = [];
         this.filters = {};
-        this.sorts = {}
-        this.addItems(items)
+        this.sorts = {};
+        this.addItems(items);
         this.on("change",function(){
           _(this.filters).each(function(f){ if(f.current_query){f.current_query.refresh();} });
-        })
+        });
         this.initialize.apply(this, arguments);
-      }
+      };
 
       _.extend(PourOver.Collection.prototype,PourOver.Events,{
           initialize: function(){},
@@ -377,14 +401,15 @@ var PourOver = (function(){
           // This is not ususally an issue as you generally will not be calling `collection.get` with an array you
           // manually create. You will probably be using the output of some function that keeps it sorted for you.
           get: function(cids){
-            return PourOver.Collection.prototype.getBy.call(this,"cid",cids,true)
+            return PourOver.Collection.prototype.getBy.call(this,"cid",cids,true);
           },
 
           // Similar to get, except -- rather than getting items by cid -- you are getting them by [attr_name].
           // Here vals is an array of [attr_names]s.
-          getBy: function(attr_name,vals,sorted){
+          getBy: function(attr_name,vals,sorted,first){
             if(! _.isArray(vals)){ var vals = [vals] }
-            if(typeof(sorted) == "undefined"){sorted = false}
+            if(typeof(sorted) == "undefined"){sorted = false;}
+            if(typeof(first) == "undefined"){first = false;}
             var low = 0, high = this.items.length,lc = 0, hc = vals.length, output = [],items = this.items,i;
             if(sorted == true){
               while (low < high && lc < hc){
@@ -424,6 +449,43 @@ var PourOver = (function(){
             }
             return output;
           },
+          getByFirst: function(attr_name,val,sorted){
+            if(typeof(sorted) == "undefined"){sorted = false;}
+            var low = 0, high = this.items.length, output = undefined,items = this.items,i;
+            if(sorted == true){
+              while (low < high){
+                if (val == (i=items[low])[attr_name]){
+                  output = i;
+                  break;
+                } else if (val < i[attr_name]){
+                  break;
+                } else{
+                  low++;
+                }
+              }
+            } else if (sorted == "reverse"){
+              while (low < high){
+                if (val == (i=items[low])[attr_name]){
+                  output = i;
+                  break;
+                } else if (val > i[attr_name]){
+                  break;
+                } else{
+                  low++;
+                }
+              }
+            } else {
+              while (low < high){
+                if (val == (i=items[low])[attr_name]){
+                  output = i;
+                  break;
+                } else {
+                  low++;
+                }
+              }
+            }
+            return output;
+          },
 
           // Add items to the collection, triggering the appropriate events to keep all dependent sort and filter sets up-to-date.
           addItems: function(i){
@@ -433,7 +495,7 @@ var PourOver = (function(){
             new_items = _(i).map(function(c){var n = PourOver.Item(c); n.cid = last_id++; return n;});
             this.items = this.items.concat(new_items);
             this.regenerateFilterSets(new_items);
-            this.trigger("change");
+            this.trigger("change",_(new_items).pluck("cid"));
           },
 
           // Remove items from the collection, triggering the appropriate events to keep all dependent sort and filter sets up-to-date.
@@ -444,11 +506,11 @@ var PourOver = (function(){
             if(typeof(isSorted) === "undefined"){var isSorted = false}
             if(! _.isArray(i)){ var i = [i] }
             if(isSorted){
-              i = i.sort(function(a,b){return a.cid - b.cid });
+              i = i.sort(function(a,b){return a.cid - b.cid ;});
               var new_items = [],old_items = this.items,new_length = i.length,old_length = this.items.length,newi = 0, oldi = 0;
               while(oldi < old_length){
                 if(! newi < new_length){
-                  new_items = new_items.concat(old_items.slice(oldi))
+                  new_items = new_items.concat(old_items.slice(oldi));
                   break;
                 } else if(old_items[oldi].cid === i[newi].cid){
                   newi++;
@@ -471,7 +533,7 @@ var PourOver = (function(){
             }
             this.items = new_items;
             this.regenerateFilterSets();
-            this.trigger("change");
+            this.trigger("change",_(i).pluck("cid"));
           },
 
           // # Collection filter functions
@@ -488,7 +550,7 @@ var PourOver = (function(){
             _(new_filters).each(function(f){
               f.on("queryChange",function(){
                 that.trigger("queryChange");
-              })
+              });
               // All filters precache the result of their filtering. This is the source of pourover's speed optimizations.
               f.cacheResults(that.items);
               // If a user passes in an `associated_attrs` property on a filter, that filter will re-cache its result whenever
@@ -513,18 +575,18 @@ var PourOver = (function(){
             // If no new items are passed in, regenerate filters for all items in the collection
             if(typeof(new_items) == "undefined"){
               _(this.filters).each(function(f){
-                f.cacheResults(that.items)
+                f.cacheResults(that.items);
               });
             } else {
               _(this.filters).each(function(f){
-                f.addCacheResults(new_items)
+                f.addCacheResults(new_items);
               });
             }
           },
 
           // A shortcut for returning a match object containing all the items in a collection. More on matches below.
           getAllItems: function(){
-            var cids = _(this.items).map(function(i){return i.cid});
+            var cids = _(this.items).map(function(i){return i.cid;});
             return new PourOver.MatchSet(cids,this,["all"]);
           },
 
@@ -549,7 +611,7 @@ var PourOver = (function(){
           // The non-stateful way to query a filter. Simply returns the result of the query but does not store the query on the filter.
           getFilteredItems: function(filter_name,query){
             var filter = this.filters[filter_name],possibility;
-            if (_.isUndefined(filter) ) throw "The filter " + filter_name + " does not exist."
+            if (_.isUndefined(filter) ) throw "The filter " + filter_name + " does not exist.";
             return filter.getFn(query);
           },
 
@@ -578,7 +640,7 @@ var PourOver = (function(){
           // Add multiple sorts.
           addSorts: function(sorts){
             if(typeof(opts) === "undefined"){ opts = {};}
-            if(! _(sorts).isArray()){sorts = [sorts]}
+            if(! _(sorts).isArray()){sorts = [sorts];}
             var that = this;
             _(sorts).each(function(s){
               that.addSort(s);
@@ -602,6 +664,17 @@ var PourOver = (function(){
             this.trigger("will_incremental_change");
             var item = _(this.items).find(function(i){return i.cid === Number(cid);});
             item[attribute] = value;
+            this.trigger("change:"+attribute,[item]);
+            this.trigger("incremental_change",[attribute]);
+            this.trigger("update","updateItem");
+            return item.guid;
+          },
+
+          // Delete an attribute of one item in the collection.
+          removeItemAttribute: function(cid,attribute,value){
+            this.trigger("will_incremental_change");
+            var item = _(this.items).find(function(i){return i.cid === Number(cid);});
+            delete item[attribute];
             this.trigger("change:"+attribute,[item]);
             this.trigger("incremental_change",[attribute]);
             this.trigger("update","updateItem");
@@ -639,20 +712,60 @@ var PourOver = (function(){
           // is a hash of attributes -> new values.
           batchUpdateAttributes: function(cids,updates){
             this.trigger("will_incremental_change");
-            var items = this.get(cids,true)
+            var items = this.get(cids,true);
             var that = this;
             _(items).each(function(item){
               _(updates).each(function(v,k){
                 item[k] = v;
               });
-            })
+            });
             _(updates).each(function(v,k){
               that.trigger("change:"+k,items);
             });
             this.trigger("incremental_change",_(updates).keys());
-            this.trigger("update");
+            this.trigger("update","batchUpdate");
             this.trigger("batchUpdateAttribute");
             return _(items).pluck("guid");
+          },
+
+          batchLoadItems: function(data){
+            this.trigger("will_incremental_change");
+            var new_cids = [],
+                guids = _.pluck(data, "guid"),
+                old_items = this.getBy("guid", guids),
+                old_item_dict = {};
+
+            _(old_items).each(function (item) { old_item_dict[item.guid] = item; });
+
+            _(data).each(_.bind(function(d){
+                var item = old_item_dict[d.guid],
+                    last_id = this.items.length > 0 ? _(this.items).last().cid + 1 : 0,
+                    current_item;
+                if (item){
+                  current_item = item;
+
+                  // update the item's attrs
+                  _(d).each(function(v,k){
+                    current_item[k] = v;
+                  });
+                } else {
+                    item = PourOver.Item(d); 
+                    item.cid = last_id++;
+                    new_cids.push(item.cid);
+                    this.items = this.items.concat([item]);
+
+                    // add this to the list of existing items so that
+                    // if data contains the same guid multiple times,
+                    // the second instance will be treated as an update.
+                    old_items[item.guid] = item;
+                }
+            },this))
+
+            this.regenerateFilterSets();
+            this.trigger("incremental_change","*");
+            this.trigger("change",new_cids);
+            this.trigger("update","batchLoad");
+            this.trigger("batchLoadItems");
           }
       });
 
@@ -668,10 +781,10 @@ var PourOver = (function(){
       // values. It caches the results and can be queried either statefully or non-statefully, depending
       // on developer preference.
       PourOver.Filter = function(name,values,opts){
-        if(typeof(opts) === "undefined"){opts = {}}
+        if(typeof(opts) === "undefined"){opts = {};}
         this.name = name;
         this.possibilities = this.create_possibilities(values);
-        this.values = _(values).map(function(v){return v.value});
+        this.values = _(values).map(function(v){return v.value;});
         _.extend(this,opts);
         this.initialize.apply(this, arguments);
       }
@@ -682,14 +795,14 @@ var PourOver = (function(){
         initialize: function(){},
 
         // Given an array of possible values, initializes the object that will store the cached results
-        // of querying for that possibilitiy.
+        // of querying for that possibility.
         create_possibilities: function(vs){
           var o = {};
           _(vs).each(function(v){
             var name = v.name || String(v.value);
             o[name] = v;
             o[name].matching_cids = [];
-          })
+          });
           return o;
          },
 
@@ -698,20 +811,20 @@ var PourOver = (function(){
          // should cache all the items in the collection, whereas addCacheResults incrementally adds new items to already
          // cached, filtered results.
          cacheResults: function(items){
-           throw "No cache function has been defined for this filter '" + this.name + "'."
+           throw "No cache function has been defined for this filter '" + this.name + "'.";
          },
          addCacheResults: function(items){
-           throw "No add cache function has been defined for this filter '" + this.name + "'."
+           throw "No add cache function has been defined for this filter '" + this.name + "'.";
          },
 
          makeQueryMatchSet: function(cids,query){
-            return new PourOver.MatchSet(cids, this.getCollection(), [[this,query]]); 
+            return new PourOver.MatchSet(cids, this.getCollection(), [[this,query]]);
          },
 
          // Generally only used when removing items from a collection or when an item changes value. This will remove the item from
          // the cache so that it can either be recached with its new value or thrown away.
          removeFromCache: function(items){
-          var cids = _(items).map(function(i){return i.cid}).sort(function(a,b){return a-b;});
+          var cids = _(items).map(function(i){return i.cid;}).sort(function(a,b){return a-b;});
           _(this.possibilities).each(function(p){
             p.matching_cids = PourOver.subtract_sorted(p.matching_cids,cids);
           });
@@ -802,7 +915,7 @@ var PourOver = (function(){
            }
            var s = [],
                stack = this.current_query.stack,new_stack,
-               is_compound = function(c){return _.isString(c) && c.match(/^(or|and|not)$/)};
+               is_compound = function(c){return _.isString(c) && c.match(/^(or|and|not)$/);};
             new_stack = _(stack).reduce(function(m,i){
               if(i[1] === q.stack[0][1]){
                 return m;
@@ -811,7 +924,7 @@ var PourOver = (function(){
               } else {m.push(i); return m;}
             },s);
            if(new_stack[0] && (new_stack[0][0] == "and" || new_stack[0][0] == "or" || new_stack[0][0] == "not")){
-             new_stack[0] = new_stack [0][1][0]
+             new_stack[0] = new_stack [0][1][0];
            }
            this.current_query.stack = new_stack;
            this.current_query.refresh();
@@ -825,7 +938,12 @@ var PourOver = (function(){
          // the rest of the code.
          getCollection: function(){
            return this.collection;
-          }
+          },
+
+         getByPossibilityGroups: function(){
+           var collection = this.collection;
+           return _(this.possibilities).reduce(function(m,p,k){m[k] = collection.get(p.matching_cids); return m;},{});
+         }
       });
 
       // #Sorts
@@ -834,9 +952,9 @@ var PourOver = (function(){
       // but they can belong to views as well for optimization concerns.
       PourOver.Sort = function(name,opts){
         this.name = name;
-        _.extend(this,opts)
+        _.extend(this,opts);
         this.initialize.apply(this, arguments);
-      }
+      };
 
       _.extend(PourOver.Sort.prototype,PourOver.Events,{
         initialize: function(){},
@@ -846,7 +964,7 @@ var PourOver = (function(){
         view: false,
 
         // Use a sort to order an array of cids
-        sort: function(set){return PourOver.permute_from_array(set,this.permutation_array)},
+        sort: function(set){return PourOver.permute_from_array(set,this.permutation_array);},
 
         // Recache the results of sorting the collection.
         rebuild_sort: function(){
@@ -869,8 +987,8 @@ var PourOver = (function(){
         this.name = name;
         if(typeof(opts) === "undefined"){ opts = {};}
         this.collection = collection;
-        this.match_set = new PourOver.MatchSet(_(this.collection.items).map(function(i){return i.cid}),this.collection,["all"]);
-        if(opts.template){this.template = opts.template};
+        this.match_set = new PourOver.MatchSet(_(this.collection.items).map(function(i){return i.cid;}),this.collection,["all"]);
+        if(opts.template){this.template = opts.template;}
 
         // Whenever the collection gains or loses members, recache the MatchSet saved on the view.
         this.collection.on("will_change will_incremental_change",function(){
@@ -881,6 +999,7 @@ var PourOver = (function(){
           that.match_set.refresh();
           that.setNaturalSelection();
           that.resetPage();
+          that.trigger("collection-change");
         });
 
         // Whenever an item in the collection is changed, recache the MatchSet saved on the view.
@@ -888,6 +1007,7 @@ var PourOver = (function(){
           that.match_set.refresh();
           that.setNaturalSelection(attrs);
           that.resetPage();
+          that.trigger("collection-incremental-change");
         });
 
         // Bubble all collection update events through.
@@ -905,20 +1025,20 @@ var PourOver = (function(){
         // Bubble up sortChange events as updates
         this.on("sortChange",function(){
           this.trigger("update","sort");
-        })
+        });
 
         // Bubble up pageChange events as updates
         this.on("pageChange",function(){
           this.trigger("update","page");
-        })
+        });
+        this.view_sorts = [];
         _.extend(this,opts);
         this.initialize.apply(this, arguments);
-      }
+      };
 
       _.extend(PourOver.View.prototype,PourOver.Events,{
         initialize: function(){},
         current_page: 0,
-        view_sorts: [],
 
         // By default, return all items in the view.
         page_size: Infinity,
@@ -932,21 +1052,24 @@ var PourOver = (function(){
         },
 
         // Sets a sort on a view and fires all appropriate events.
-        setSort: function(sort_name,view_sort){
-          if(typeof(view_sort) === "undefined"){view_sort = false}
+        setSort: function(sort_name,view_sort,silent){
+          if(typeof(view_sort) === "undefined"){view_sort = false;}
+          if(typeof(silent) === "undefined"){silent = false;}
           var that = this;
           if(this.current_sort.off){this.current_sort.off("resort");}
           if(sort_name && view_sort){
             this.current_sort = this.view_sorts[sort_name];
-            this.current_sort.on("resort",function(){that.trigger("sortChange")});
+            this.current_sort.on("resort",function(){that.trigger("sortChange");});
           } else if(sort_name){
             this.current_sort = this.collection.sorts[sort_name];
-            this.current_sort.on("resort",function(){that.trigger("sortChange")});
+            this.current_sort.on("resort",function(){that.trigger("sortChange");});
           } else {
             this.current_sort = false;
 
           }
-          this.trigger("sortChange");
+          if(! silent){
+            this.trigger("sortChange");
+          }
         },
 
         // Return the name of the current sort of the view.
@@ -962,7 +1085,7 @@ var PourOver = (function(){
         // only change if the view receives a selectionChange.
         addViewSorts: function(sorts){
             if(typeof(opts) === "undefined"){ opts = {};}
-            if(! _(sorts).isArray()){sorts = [sorts]}
+            if(! _(sorts).isArray()){sorts = [sorts];}
             var that = this;
             _(sorts).each(function(sort){
               that.view_sorts[sort.name] = sort;
@@ -970,7 +1093,7 @@ var PourOver = (function(){
               sort.view = that;
               sort.rebuild_sort();
               that.on("selectionChange",function(attrs){
-                if(sort.associated_attrs == undefined){
+                if(sort.associated_attrs == undefined || attrs === "*"){
                   sort.rebuild_sort();
                 }
                 if(sort.associated_attrs && _.intersection(sort.associated_attrs,attrs).length > 0){
@@ -1018,7 +1141,7 @@ var PourOver = (function(){
         // IMPORTANT: This is the function you will call most often on views. This returns the cached, filtered items and
         // then sorts them and pages them as appropriate.
         getCurrentItems: function(page){
-          if(! this.match_set){return []}
+          if(! this.match_set){return [];}
           if(typeof(page) === "undefined"){
             var page = this.current_page;
           }
@@ -1033,9 +1156,9 @@ var PourOver = (function(){
             if(this.current_sort){
               var items = this.match_set.all_sorted_cids(this.current_sort);
               items = items.slice(this.page_size * page,this.page_size * (page + 1));
-              var ordered_cids = _(items).clone().sort(function(a,b){return a-b});
+              var ordered_cids = _(items).clone().sort(function(a,b){return a-b;});
               var unsorted_items = this.collection.get(ordered_cids);
-              items = _(items).map(function(i){return _(unsorted_items).find(function(o){return o.cid === i}) });
+              items = _(items).map(function(i){return _(unsorted_items).find(function(o){return o.cid === i;});});
             } else {
               var items = this.match_set.cids;
               items = items.slice(this.page_size * page,this.page_size * (page + 1));
@@ -1056,7 +1179,7 @@ var PourOver = (function(){
             if(this.last_head_cid){
                 if(this.current_sort){
                     this.current_sort.rebuild_sort();
-                } 
+                }
                 this.pageTo(this.last_head_cid,true);
             }
             this.last_head_cid = undefined;
@@ -1071,7 +1194,7 @@ var PourOver = (function(){
           this.trigger("pageChange");
         },
 
-        // Page to a specific cid. This IS NOT to page to a specific page.
+        // Page to a specific cid.
         pageTo: function(cid,silent){
           if(typeof(silent) == "undefined"){
             var silent = false;
@@ -1093,13 +1216,21 @@ var PourOver = (function(){
           }
         },
 
+        // Change the page of the view to a specific page.
+        setPage: function(page) {
+          if(page < 0) page = 0;
+          if(page > Math.ceil(this.match_set.length()/this.page_size - 1)) page = Math.ceil(this.match_set.length()/this.page_size - 1);
+          this.current_page = page;
+          this.trigger("pageChange");
+        },
+
         // Set the page size.
         setPageSize: function(size){
           this.page_size = size;
           this.trigger("pageChange");
         },
         render: function(){}
-      })
+      });
 
       // #MatchSets
       //
@@ -1107,10 +1238,10 @@ var PourOver = (function(){
       // They also keep a "stack" to remember how they were created (after chaining) so that they can refresh themselves.
       PourOver.MatchSet = function(cids,collection,stack){
         this.cids = cids;
-        this.collection = collection
+        this.collection = collection;
         this.stack = stack;
         this.initialize.apply(this, arguments);
-      }
+      };
       _.extend(PourOver.MatchSet.prototype,PourOver.Events,{
         initialize: function(){},
 
@@ -1127,12 +1258,12 @@ var PourOver = (function(){
 
          var step = s[0],
              operation = step[0],
-             is_compound = function(c){return _.isString(c) && c.match(/^(or|and|not)$/)};
+             is_compound = function(c){return _.isString(c) && c.match(/^(or|and|not)$/);};
          if(typeof(operation) === "object"){
            var match_set = operation.getFn(step[1]);
-           return this.refresh(_(s).rest(),match_set)
+           return this.refresh(_(s).rest(),match_set);
          } else if(operation === "all" || step === "all") {
-           var cids = _(this.collection.items).map(function(i){return i.cid});
+           var cids = _(this.collection.items).map(function(i){return i.cid;});
            var match_set = new PourOver.MatchSet(cids,this,["all"]);
            return this.refresh(_(s).rest(),match_set)
          } else if(is_compound(operation)) {
@@ -1221,7 +1352,7 @@ var PourOver = (function(){
     _.extend(PourOver.UI.Element.prototype,PourOver.Events,{
       initialize: function(){},
       getMatchSet: function(){
-        throw "No get match set function specifiec"
+        throw "No get match set function specified"
       },
       getFilterState: function(){
         throw "No get filter state specified";
@@ -1366,7 +1497,7 @@ var PourOver = (function(){
           });
         },
 
-        // Retreive a specific attr of a specific item from the buffer.
+        // Retrieve a specific attr of a specific item from the buffer.
         getBufferedValue: function(guid,attr){
           if(this.buffered_items.hasOwnProperty(guid)){
             return this.buffered_items[guid][attr] || false;
@@ -1613,6 +1744,62 @@ var PourOver = (function(){
         return filter
       }
 
+      // Filter for data with a continuous range or many possible values, such as dates, floats, etc.
+      // Query with a scalar to query by exact value, or query with a length-2 array to
+      // query a range (as in dvrangeFilter) such that the value is greater than or equal 
+      // to range[0] and less than range[1].
+      PourOver.continuousRangeFilter = PourOver.Filter.extend({
+        cacheResults: function(items){
+          this.values = _.map(items, function(i) { return {cid: i.cid, val: i[this.name]}; }, this);
+          this.values.sort(function(a,b) { return a.val-b.val });
+        },
+        addCacheResults: function(items){
+          this.values = this.values.concat(items);
+          this.values.sort(function(a,b) { return a.val-b.val });
+        },
+        getFn: function(query){
+          var li,hi;
+          var n = this.values.length;
+
+          var bisect = PourOver.bisect_by( function(a) { return a.val });
+          
+          if(_.isArray(query)){
+            // range filter
+            if(_.isUndefined(query[0]) || _.isUndefined(query[1])){
+              return new PourOver.MatchSet([],this.getCollection(),[[this,query]]);
+            }
+            li = bisect.left(this.values, query[0], 0, n);
+            hi = bisect.left(this.values, query[1], 0, n);
+          } else {
+            // exact filter
+            if(_.isUndefined(query)){
+              return new PourOver.MatchSet([],this.getCollection(),[[this,query]]);
+            }
+
+            li = bisect.left(this.values, query, 0, n);
+            hi = bisect.right(this.values, query, 0, n);
+          }
+
+          var cids = [];
+          var i=li;
+          while(i<hi) {
+            cids.push(this.values[i].cid);
+            ++i;
+          }
+          cids.sort(function(a,b) { return a-b });
+          return new PourOver.MatchSet(cids,this.getCollection(),[[this,query]]);
+        }
+      });
+
+      // The convenience constructor for continuous range filters.
+      PourOver.makeContinuousRangeFilter = function(name,opts){
+        if(typeof(opts) === "undefined"){opts = {}}
+        var attr = opts.attr || name,
+            newopts = _.extend({associated_attrs: [attr]},opts),
+            filter = new PourOver.continuousRangeFilter(name,newopts);
+        return filter;
+      }
+
       // ## Preset sorts
       //
       // Sorts items based on an explicit ordering of values. This would be useful for, say, a slideshow in which
@@ -1715,3 +1902,5 @@ var PourOver = (function(){
 
     return PourOver;
 })();
+
+
