@@ -1,6 +1,6 @@
 {
     "name": "pourover",
-    "main": "pourover.js",
+    "main": "dist/pourover.js",
     "version": "1.0.0",
     "homepage": "http://nytimes.github.io/pourover/",
     "authors": [
