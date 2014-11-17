@@ -8,7 +8,7 @@
       "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
     }
   ],
-  "main": "./pourover.js",
+  "main": "dist/pourover.js",
   "homepage": "http://nytimes.github.io/pourover",
   "repository": {
     "type": "git",
