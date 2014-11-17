@@ -9,12 +9,14 @@
     }
   ],
   "main": "./pourover.js",
-  "homepage": "http://nytimes.github.io/pourover",
   "repository": {
     "type": "git",
-    "url": "git://github.com/NYTimes/pourover.git"
+    "url": "git@github.com/NYTimes/pourover.git"
   },
   "dependencies": {
-    "underscore": "~1.6.0"
+    "underscore": "^1.6.0"
+  },
+  "devDependencies": {
+    "backbone": "^1.1.2"
   }
 }
