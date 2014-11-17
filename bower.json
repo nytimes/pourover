@@ -1,7 +1,7 @@
 {
   "name": "pourover",
   "description": "A library for simple, fast filtering and sorting of large collections in the browser",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "licenses": [
     {
       "type": "Apache License, Version 2.0",
@@ -16,5 +16,11 @@
   },
   "dependencies": {
     "underscore": "~1.6.0"
+  },
+  "devDependencies": {
+    "jquery": "~2.1.1",
+    "jquery-ui": "~1.11.2",
+    "backbone": "~1.1.2",
+    "qunit": "~1.15.0"
   }
 }
