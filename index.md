@@ -215,7 +215,7 @@ Other common attributes/methods to extend the default PourOver view with are:
 - current_page: The page to start the view on. By default, 0.
 - initialize: The function to call after the view has been created. This function will be passed all the arguments passed into `new View(arguments)` and the `this` context will be the new view. This is a noop by default.
 
-#Chp. 2 - The Event Cycle
+#### Chp. 2 - The Event Cycle
 	
 There are several basic types of events fired by PourOver objects:
 	
@@ -240,7 +240,7 @@ This means that a new filter will be created, the will rebuild itself whenever a
 
 This will create a sort that will rebuild itself whenever the eyes attribute is updated. You must specify this when creating a sort on collection with attributes that may change while in a sorted state.
 
-####Chp. 3 - PourOver UI
+#### Chp. 3 - PourOver UI
 
 PourOver comes bundled with a convenience interface for creating UIs that control the states of filters. Think of a color picker or a list of possible options. This is called PourOver.UI. The main purpose of PourOver.UI is to translate between a filter's MatchSet and an easier to work with representation of the filter's current state.
 
@@ -265,7 +265,7 @@ Even if you're not using one of these built-in classes, it's useful to organize 
 
 See the examples above.
 
-####Chp. 5 - FAQs
+#### Chp. 5 - FAQs
 
 ######## 1. What are the different filter types included with PourOver?
 
