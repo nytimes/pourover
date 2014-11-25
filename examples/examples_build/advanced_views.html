@@ -119,18 +119,20 @@ collection.addFilters([mythology_filter, gender_filter, hobbies_filter]);
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-4">&#182;</a>
               </div>
-              <p>To create a sort, we generally extend the Sort object with a <code>fn</code>, the comparator function used to order items.
+              <h4 id="creating-a-custom-sort">Creating a custom sort</h4>
+<p>To create a custom sort, we generally extend the Sort object with a <code>fn</code>, the comparator function used to order items.
 We also specify which attribute the sort operates over — what it sorts with respect to —  with the <code>attr</code> attribute.
-Then, we instantiate our new sort.</p>
+Then, we instantiate our new sort. This attr field has no special signifigance other than convention. You must still
+manually extract values in your sort function.</p>
 
             </div>
             
             <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> RevNameSort = PourOver.Sort.extend({
-    attr: <span class="hljs-string">"name"</span>,
     fn: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(a,b)</span>{</span>
-        <span class="hljs-keyword">if</span> (b &lt; a){
+        <span class="hljs-keyword">var</span> x = a.name, y = b.name;    
+        <span class="hljs-keyword">if</span> (y &lt; x){
           <span class="hljs-keyword">return</span> -<span class="hljs-number">1</span>;
-        } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (b &gt; a){
+        } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (y &gt; x){
           <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;
         } <span class="hljs-keyword">else</span> {
           <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
