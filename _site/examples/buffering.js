@@ -26,8 +26,8 @@ var MyBufferedCollection = PourOver.BufferedCollection.extend({
         var query = encodeURIComponent(guids.join(","));
         return "http://example.com/data?guids="+query;
     }
-})
-var collection = new MyBufferedCollection(monsters)
+});
+var collection = new MyBufferedCollection(monsters);
 
 // `BufferedViews` can only be defined on `BufferedCollections`.
 // Buffered views provide paging and rendering functions that buffer in the relevant items,
@@ -38,8 +38,8 @@ var MyBufferedView = PourOver.BufferedView.extend({
        var items = this.getCurrentItems();
        console.log(items);
     }
-})
-var my_buffered_view = new MyBufferedView("buffered_view",collection)
+});
+var my_buffered_view = new MyBufferedView("buffered_view",collection);
 
 // We call `bufferRender` instead of render, so that the collection buffers the data before
 // relinquishing control back to the vanilla `render`.
