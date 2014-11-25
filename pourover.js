@@ -406,10 +406,9 @@ var PourOver = (function(){
 
           // Similar to get, except -- rather than getting items by cid -- you are getting them by [attr_name].
           // Here vals is an array of [attr_names]s.
-          getBy: function(attr_name,vals,sorted,first){
+          getBy: function(attr_name,vals,sorted){
             if(! _.isArray(vals)){ var vals = [vals] }
             if(typeof(sorted) == "undefined"){sorted = false;}
-            if(typeof(first) == "undefined"){first = false;}
             var low = 0, high = this.items.length,lc = 0, hc = vals.length, output = [],items = this.items,i;
             if(sorted == true){
               while (low < high && lc < hc){
