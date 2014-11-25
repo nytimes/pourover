@@ -766,7 +766,7 @@ var PourOver = (function(){
                     // the second instance will be treated as an update.
                     old_items[item.guid] = item;
                 }
-            },this)
+            },this))
 
             this.regenerateFilterSets();
             this.trigger("incremental_change","*");
