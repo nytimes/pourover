@@ -33,13 +33,14 @@ var view = new PourOver.View("default_view", collection);
 
 // To create a sort, we generally extend the Sort object with a `fn`, the comparator function used to order items.
 // We also specify which attribute the sort operates over -- what it sorts with respect to --  with the `attr` attribute.
+// The 'attr' property has no special signifigance (currently), you must still reference the desired attr directly in the sorting function.
 // Then, we instantiate our new sort.
 var RevNameSort = PourOver.Sort.extend({
     attr: "name",
     fn: function(a,b){
-        if (b < a){
+        if (b.name < a.name){
           return -1;
-        } else if (b > a){
+        } else if (b.name > a.name){
           return 1;
         } else {
           return 0;
