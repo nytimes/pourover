@@ -7,6 +7,7 @@ Visit [the PourOver homepage on Github pages](http://nytimes.github.io/pourover)
 
 
 [Underscore.js](http://underscorejs.org/) is the only dependency.
+Optionally, you may use [Lo-dash](https://lodash.com/) instead of underscore.
 
 PourOver should work in any browser that underscore works in.
 It has been tested in: 
