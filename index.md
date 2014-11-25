@@ -12,6 +12,7 @@ If you just want to get started using PourOver, I would skip to "Preface - The B
 
 #### Prologue - Dependencies and Browser Compatibility
 [Underscore.js](http://underscorejs.org/) is the only dependency.
+Optionally, you may use [Lo-dash](https://lodash.com/) instead of Underscore.
 
 PourOver should work in any browser that underscore works in.
 It has been tested in: IE7+, Firefox 4+, Safari 5+, Opera 9+, Chrome 1+
