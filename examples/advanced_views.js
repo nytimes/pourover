@@ -34,7 +34,7 @@ var view = new PourOver.View("default_view", collection);
 // #### Creating a custom sort
 // To create a custom sort, we generally extend the Sort object with a `fn`, the comparator function used to order items.
 // We also specify which attribute the sort operates over -- what it sorts with respect to --  with the `attr` attribute.
-// Then, we instantiate our new sort.
+// Then, we instantiate our new sort. The `attr` attribute has no effect on how the items are sorted currently.
 var RevNameSort = PourOver.Sort.extend({
     fn: function(a,b){
         var x = a.name, y = b.name;    
