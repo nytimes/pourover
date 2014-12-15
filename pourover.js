@@ -1469,7 +1469,9 @@ var PourOver = (function(){
       // A PourOver buffered collection is one that stores some or all of its data as a promise. This is useful in conjunction with a
       // large data set in which you don't want to load all the data at page open.
       PourOver.BufferedCollection = PourOver.Collection.extend({
-        buffered_items: {},
+        initialize: function(){
+            this.buffered_items = {};
+        },
         stripFutures: function(item){
           return _.reduce(item,function(m,v,k){if(typeof(v) != "undefined"){m[k] = v} return m},{});
         },
