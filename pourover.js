@@ -631,7 +631,7 @@ var PourOver = (function(){
             this.sorts[sort.name] = sort;
             sort.collection = this;
             sort.rebuild_sort();
-            this.on("change",function(){ sort.rebuild_sort(); });
+            this.on("change",function(){ sort.rebuild_sort(true); });
             // Like filters, if you set `associated_attrs` on a sort, they will rebuild themselves whenever any item in the collection undergoes a change
             // on that attribute.
             // TODO: Consider cloning on add. Also, bring in line with addFilter (events or not!?)
@@ -702,7 +702,8 @@ var PourOver = (function(){
           },
 
           // Change the value of several attributes of a single item in the collection.
-          updateAttributes: function(cid,updates){
+          updateAttributes: function(cid,updates,silent){
+            if(typeof(silent) === "undefined"){var silent = false;}
             this.trigger("will_incremental_change");
             var item = _.find(this.items,function(i){return i.cid === Number(cid);});
             var that = this;
@@ -711,13 +712,16 @@ var PourOver = (function(){
               that.trigger("change:"+k,[item]);
             });
             this.trigger("incremental_change",_.keys(updates));
-            this.trigger("update","updateAttribute");
+            if(!silent) {
+              this.trigger("update","updateAttribute");
+            }
             return item.guid;
           },
 
           // Change the value of several attributes of several items in the collection. Here 'updates'
           // is a hash of attributes -> new values.
-          batchUpdateAttributes: function(cids,updates){
+          batchUpdateAttributes: function(cids,updates,silent){
+            if(typeof(silent) === "undefined"){var silent = false;}
             this.trigger("will_incremental_change");
             var items = this.get(cids,true);
             var that = this;
@@ -730,8 +734,10 @@ var PourOver = (function(){
               that.trigger("change:"+k,items);
             });
             this.trigger("incremental_change",_.keys(updates));
-            this.trigger("update","batchUpdate");
-            this.trigger("batchUpdateAttribute");
+            if (!silent) {
+              this.trigger("update","batchUpdate");
+              this.trigger("batchUpdateAttribute");
+            }
             return _.pluck(items,"guid");
           },
 
@@ -974,14 +980,15 @@ var PourOver = (function(){
         sort: function(set){return PourOver.permute_from_array(set,this.permutation_array);},
 
         // Recache the results of sorting the collection.
-        rebuild_sort: function(){
+        rebuild_sort: function(new_items){
+          if(typeof(new_items) === "undefined") {new_items = false;}
           if(this.view){
             var items = this.view.match_set.all();
           } else {
             var items = this.collection.items;
           }
           this.permutation_array = PourOver.build_permutation_array(items,this);
-          this.trigger("resort");
+          this.trigger("resort", new_items);
         }
       });
 
@@ -1066,10 +1073,18 @@ var PourOver = (function(){
           if(this.current_sort.off){this.current_sort.off("resort");}
           if(sort_name && view_sort){
             this.current_sort = this.view_sorts[sort_name];
-            this.current_sort.on("resort",function(){that.trigger("sortChange");});
+            this.current_sort.on("resort",_.bind(function(new_items){
+              if (!(this.silent_sort && new_items)) {
+                that.trigger("sortChange");
+              }
+            },this));
           } else if(sort_name){
             this.current_sort = this.collection.sorts[sort_name];
-            this.current_sort.on("resort",function(){that.trigger("sortChange");});
+            this.current_sort.on("resort",_.bind(function(new_items){
+              if (!(this.silent_sort && new_items)) {
+                that.trigger("sortChange");
+              }
+            },this));
           } else {
             this.current_sort = false;
 
