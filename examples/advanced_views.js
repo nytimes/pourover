@@ -48,7 +48,10 @@ var RevNameSort = PourOver.Sort.extend({
         }
     }
 });
-var rev_name_sort = new RevNameSort("rev_name");
+
+// We create a new sort and we associate it with attrs, so that when those attributes change -- if an item's name can change --
+// then the sort will rebuild itself.
+var rev_name_sort = new RevNameSort("rev_name", {associated_attrs: ["name"]});
 
 // Like we do with filters, we add the sort to the collection. This indexes the sort of the current items. Additionally, `addSorts` 
 // binds collection changes to a re-sorting operation.
