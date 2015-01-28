@@ -1130,6 +1130,9 @@ var PourOver = (function(){
         // if you want your view to do fancier things such as union some filters, difference others, and intersect the rest.
         selectionFn: function(){
           var collection = this.collection;
+          if(_.isEmpty(collection.filters)){
+            return collection.getAllItems();
+          }
           var output = _.reduce(collection.filters,function(m,i){
             var q = i.current_query;
             if(m && (!q || _.isEmpty(q.stack))){ return m;}
