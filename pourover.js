@@ -1928,3 +1928,7 @@ var PourOver = (function(){
 
     return PourOver;
 })();
+
+if (typeof module != 'undefined' && module.exports) {
+  module.exports = PourOver;
+}
