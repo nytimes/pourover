@@ -1,3 +1,7 @@
+if (typeof _ == 'undefined' && typeof require == 'function') {
+    var _ = require('underscore');
+}
+
 var PourOver = (function(){
     var ctor = function(){};
 
