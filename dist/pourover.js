@@ -10,6 +10,14 @@
 }(this, function(_) {
 
 var PourOver = (function(){
+    var ctor = function(){};
+
+    var create = _.create || function(prototype){
+      ctor.prototype = prototype;
+      var result = new ctor;
+      ctor.prototype = null;
+      return result;
+    };
 
     PourOver = {
       // Utility functions. Skip down to "Collections" for the real meat of PourOver.
@@ -110,24 +118,24 @@ var PourOver = (function(){
       // of the indicies. So if the first item went to index 2 after being sorted, put 2 in
       // the first spot of the permutation array.
       build_permutation_array: function(set,sort){
-        var sorted_set = _(set).clone(),perm=[];
+        var sorted_set = _.clone(set),perm=[];
         if(typeof(sort) === "function"){
           sorted_set.sort(sort);
         } else {
           sorted_set.sort(function(a,b){return sort.fn.call(sort,a,b);});
         }
-        _(sorted_set).each(function(m,i){perm[m.cid] = i;});
+        _.each(sorted_set,function(m,i){perm[m.cid] = i;});
         return perm;
       },
       // Use a permutation array to resort a subset of a collection.
       permute_from_array: function(collection,perm){
         var output = [];
         if(typeof(collection[0]) === "number"){
-          _(collection).each(function(i){ output[perm[i]] = i ;});
+          _.each(collection,function(i){ output[perm[i]] = i ;});
         } else {
-          _(collection).each(function(i){ output[perm[i.cid]] = i ;});
+          _.each(collection,function(i){ output[perm[i.cid]] = i ;});
         }
-        return _(output).without(undefined);
+        return _.without(output,undefined);
       },
       // Remove an element from a sorted set.
       remove_sorted: function(set,element){
@@ -175,17 +183,17 @@ var PourOver = (function(){
         // possibile, but simple.
         defaultCache: function(items){
           var that = this;
-          _(that.possibilities).each(function(p){
-            var matching_items = _(items).filter(function(i){return that.fn(p,i);}),
-                matching_cids = _(matching_items).map(function(i){return i.cid;});
+          _.each(that.possibilities,function(p){
+            var matching_items = _.filter(items,function(i){return that.fn(p,i);}),
+                matching_cids = _.pluck(matching_items,'cid');
             p.matching_cids = matching_cids;
           });
         },
         defaultAddCache: function(items){
           var that = this;
-          _(that.possibilities).each(function(p){
-            var matching_items = _(items).filter(function(i){return that.fn(p,i);}),
-                matching_cids = _(matching_items).map(function(i){return i.cid;});
+          _.each(that.possibilities,function(p){
+            var matching_items = _.filter(items,function(i){return that.fn(p,i);}),
+                matching_cids = _.pluck(matching_items,'cid');
             p.matching_cids = PourOver.union_sorted(p.matching_cids,matching_cids);
           });
         },
@@ -195,7 +203,7 @@ var PourOver = (function(){
         exactCache: function(items){
           var that = this,
               attr = this.attr || this.name;
-          _(items).each(function(i){
+          _.each(items,function(i){
             var p = that.possibilities[i[attr]];
             if (p) {
               p.matching_cids = PourOver.insert_sorted(p.matching_cids,i.cid);
@@ -208,8 +216,8 @@ var PourOver = (function(){
         inclusionCache: function(items){
           var that = this,
               attr = this.attr || this.name;
-          _(items).each(function(i){
-            _(i[attr]).each(function(v){
+          _.each(items,function(i){
+            _.each(i[attr],function(v){
               var p = that.possibilities[v];
               if(p){
                 p.matching_cids = PourOver.insert_sorted(p.matching_cids,i.cid);
@@ -365,7 +373,7 @@ var PourOver = (function(){
       // Inversion-of-control versions of `on` and `once`. Tell *this* object to
       // listen to an event in another object ... keeping track of what it's
       // listening to.
-      _.each(listenMethods, function(implementation, method) {
+      _.each(listenMethods,function(implementation, method) {
         Events[method] = function(obj, name, callback) {
           var listeningTo = this._listeningTo || (this._listeningTo = {});
           var id = obj._listenId || (obj._listenId = _.uniqueId('l'));
@@ -395,7 +403,7 @@ var PourOver = (function(){
         this.sorts = {};
         this.addItems(items);
         this.on("change",function(){
-          _(this.filters).each(function(f){ if(f.current_query){f.current_query.refresh();} });
+          _.each(this.filters,function(f){ if(f.current_query){f.current_query.refresh();} });
         });
         this.initialize.apply(this, arguments);
       };
@@ -417,10 +425,9 @@ var PourOver = (function(){
 
           // Similar to get, except -- rather than getting items by cid -- you are getting them by [attr_name].
           // Here vals is an array of [attr_names]s.
-          getBy: function(attr_name,vals,sorted,first){
+          getBy: function(attr_name,vals,sorted){
             if(! _.isArray(vals)){ var vals = [vals] }
             if(typeof(sorted) == "undefined"){sorted = false;}
-            if(typeof(first) == "undefined"){first = false;}
             var low = 0, high = this.items.length,lc = 0, hc = vals.length, output = [],items = this.items,i;
             if(sorted == true){
               while (low < high && lc < hc){
@@ -448,9 +455,9 @@ var PourOver = (function(){
               }
             } else {
               while (low < high && lc < hc){
-                if ( _(vals).include((i=items[low])[attr_name])){
+                if ( _.include(vals, (i=items[low])[attr_name])){
                   output.push(i);
-                  vals = _(vals).without(i[attr_name]);
+                  vals = _.without(vals, i[attr_name]);
                   low++;
                   lc++;
                 } else {
@@ -501,9 +508,9 @@ var PourOver = (function(){
           // Add items to the collection, triggering the appropriate events to keep all dependent sort and filter sets up-to-date.
           addItems: function(i){
             this.trigger("will_change");
-            if(! _.isArray(i)){ var i = [i] }
-            var last_id = this.items.length > 0 ? _(this.items).last().cid + 1 : 0,new_items;
-            new_items = _(i).map(function(c){var n = PourOver.Item(c); n.cid = last_id++; return n;});
+            if(! _.isArray(i)){ i = [i] }
+            var last_id = this.items.length > 0 ? _.last(this.items).cid + 1 : 0,new_items;
+            new_items = _.map(i,function(c){var n = PourOver.Item(c); n.cid = last_id++; return n;});
             this.items = this.items.concat(new_items);
             this.regenerateFilterSets(new_items);
             this.trigger("change",_(new_items).pluck("cid"));
@@ -532,9 +539,9 @@ var PourOver = (function(){
                 }
               }
             } else {
-              var new_items = [], old_items = this.items,old_length = this.items.length, oldi = 0,delete_cids = _(i).pluck("cid");
+              var new_items = [], old_items = this.items,old_length = this.items.length, oldi = 0,delete_cids = _.pluck(i,"cid");
               while(oldi < old_length && delete_cids.length > 0){
-                if(_(delete_cids).include(old_items[oldi].cid)){
+                if(_.include(delete_cids, old_items[oldi].cid)){
 
                 } else {
                   new_items.push(old_items[oldi]);
@@ -553,12 +560,12 @@ var PourOver = (function(){
           // one up view as well.
           addFilters: function(f){
             var that = this,new_filters;
-            if(! _.isArray(f)){ var f = [f] }
-            new_filters = _(f).reduce(function(m,i){ m[i.name] = _.clone(i); m[i.name].collection = that; return m; },{});
-            this.filters = _(this.filters).extend(new_filters);
+            if(! _.isArray(f)){ f = [f] }
+            new_filters = _.reduce(f,function(m,i){ m[i.name] = create(i); m[i.name].collection = that; return m; },{});
+            this.filters = _.extend(this.filters,new_filters);
             // Bubble all query change events up from the individual filters to the collection. This allows a developers to
             // specify events that should be triggered whenever any filter's query is changed.
-            _(new_filters).each(function(f){
+            _.each(new_filters,function(f){
               f.on("queryChange",function(){
                 that.trigger("queryChange");
               });
@@ -568,7 +575,7 @@ var PourOver = (function(){
               // any object in the collection has an attribute changed. Setting `associated_attrs` is essential for admins or
               // other uses in which filterable values can change.
               if(f.associated_attrs){
-                _(f.associated_attrs).each(function(a){
+                _.each(f.associated_attrs,function(a){
                   that.on("change:"+a,function(objs){
                     f.removeFromCache(objs);
                     f.addCacheResults(objs);
@@ -585,11 +592,11 @@ var PourOver = (function(){
             var that = this;
             // If no new items are passed in, regenerate filters for all items in the collection
             if(typeof(new_items) == "undefined"){
-              _(this.filters).each(function(f){
+              _.each(this.filters,function(f){
                 f.cacheResults(that.items);
               });
             } else {
-              _(this.filters).each(function(f){
+              _.each(this.filters,function(f){
                 f.addCacheResults(new_items);
               });
             }
@@ -597,7 +604,7 @@ var PourOver = (function(){
 
           // A shortcut for returning a match object containing all the items in a collection. More on matches below.
           getAllItems: function(){
-            var cids = _(this.items).map(function(i){return i.cid;});
+            var cids = _.pluck(this.items,"cid");
             return new PourOver.MatchSet(cids,this,["all"]);
           },
 
@@ -635,12 +642,12 @@ var PourOver = (function(){
             this.sorts[sort.name] = sort;
             sort.collection = this;
             sort.rebuild_sort();
-            this.on("change",function(){ sort.rebuild_sort(); });
+            this.on("change",function(){ sort.rebuild_sort(true); });
             // Like filters, if you set `associated_attrs` on a sort, they will rebuild themselves whenever any item in the collection undergoes a change
             // on that attribute.
             // TODO: Consider cloning on add. Also, bring in line with addFilter (events or not!?)
             if(sort.associated_attrs){
-              _(sort.associated_attrs).each(function(a){
+              _.each(sort.associated_attrs,function(a){
                 that.on("change:"+a,function(objs){
                   sort.rebuild_sort();
                 });
@@ -651,9 +658,9 @@ var PourOver = (function(){
           // Add multiple sorts.
           addSorts: function(sorts){
             if(typeof(opts) === "undefined"){ opts = {};}
-            if(! _(sorts).isArray()){sorts = [sorts];}
+            if(! _.isArray(sorts)){sorts = [sorts];}
             var that = this;
-            _(sorts).each(function(s){
+            _.each(sorts,function(s){
               that.addSort(s);
             });
           },
@@ -666,14 +673,14 @@ var PourOver = (function(){
 
           // A silly shortcut, pass in a cid and an attribute, retrieve its value. Useful for template helpers.
           getItemValue: function(cid,attribute){
-            var item = _(this.items).find(function(i){return i.cid === Number(cid);});
+            var item = _.find(this.items,function(i){return i.cid === Number(cid);});
             return item[attribute];
           },
 
           // Update the value of one attribute of one item in the collection.
           updateItem: function(cid,attribute,value){
             this.trigger("will_incremental_change");
-            var item = _(this.items).find(function(i){return i.cid === Number(cid);});
+            var item = _.find(this.items,function(i){return i.cid === Number(cid);});
             item[attribute] = value;
             this.trigger("change:"+attribute,[item]);
             this.trigger("incremental_change",[attribute]);
@@ -684,7 +691,7 @@ var PourOver = (function(){
           // Delete an attribute of one item in the collection.
           removeItemAttribute: function(cid,attribute,value){
             this.trigger("will_incremental_change");
-            var item = _(this.items).find(function(i){return i.cid === Number(cid);});
+            var item = _.find(this.items,function(i){return i.cid === Number(cid);});
             delete item[attribute];
             this.trigger("change:"+attribute,[item]);
             this.trigger("incremental_change",[attribute]);
@@ -696,47 +703,53 @@ var PourOver = (function(){
           batchUpdateItems: function(cids,attribute,value){
             this.trigger("will_incremental_change");
             var items = this.get(cids,true);
-            _(items).each(function(i){
+            _.each(items,function(i){
               i[attribute] = value;
             });
             this.trigger("change:"+attribute,items);
             this.trigger("incremental_change",[attribute]);
             this.trigger("update","batchUpdate");
-            return _(items).pluck("guid");
+            return _.pluck(items,"guid");
           },
 
           // Change the value of several attributes of a single item in the collection.
-          updateAttributes: function(cid,updates){
+          updateAttributes: function(cid,updates,silent){
+            if(typeof(silent) === "undefined"){var silent = false;}
             this.trigger("will_incremental_change");
-            var item = _(this.items).find(function(i){return i.cid === Number(cid);});
+            var item = _.find(this.items,function(i){return i.cid === Number(cid);});
             var that = this;
-            _(updates).each(function(v,k){
+            _.each(updates,function(v,k){
               item[k] = v;
               that.trigger("change:"+k,[item]);
             });
-            this.trigger("incremental_change",_(updates).keys());
-            this.trigger("update","updateAttribute");
+            this.trigger("incremental_change",_.keys(updates));
+            if(!silent) {
+              this.trigger("update","updateAttribute");
+            }
             return item.guid;
           },
 
           // Change the value of several attributes of several items in the collection. Here 'updates'
           // is a hash of attributes -> new values.
-          batchUpdateAttributes: function(cids,updates){
+          batchUpdateAttributes: function(cids,updates,silent){
+            if(typeof(silent) === "undefined"){var silent = false;}
             this.trigger("will_incremental_change");
             var items = this.get(cids,true);
             var that = this;
-            _(items).each(function(item){
-              _(updates).each(function(v,k){
+            _.each(items,function(item){
+              _.each(updates,function(v,k){
                 item[k] = v;
               });
             });
-            _(updates).each(function(v,k){
+            _.each(updates,function(v,k){
               that.trigger("change:"+k,items);
             });
-            this.trigger("incremental_change",_(updates).keys());
-            this.trigger("update","batchUpdate");
-            this.trigger("batchUpdateAttribute");
-            return _(items).pluck("guid");
+            this.trigger("incremental_change",_.keys(updates));
+            if (!silent) {
+              this.trigger("update","batchUpdate");
+              this.trigger("batchUpdateAttribute");
+            }
+            return _.pluck(items,"guid");
           },
 
           batchLoadItems: function(data){
@@ -748,7 +761,7 @@ var PourOver = (function(){
 
             _(old_items).each(function (item) { old_item_dict[item.guid] = item; });
 
-            _(data).each(_.bind(function(d){
+            _.each(data,_.bind(function(d){
                 var item = old_item_dict[d.guid],
                     last_id = this.items.length > 0 ? _(this.items).last().cid + 1 : 0,
                     current_item;
@@ -756,7 +769,7 @@ var PourOver = (function(){
                   current_item = item;
 
                   // update the item's attrs
-                  _(d).each(function(v,k){
+                  _.each(d, function(v,k){
                     current_item[k] = v;
                   });
                 } else {
@@ -795,7 +808,7 @@ var PourOver = (function(){
         if(typeof(opts) === "undefined"){opts = {};}
         this.name = name;
         this.possibilities = this.create_possibilities(values);
-        this.values = _(values).map(function(v){return v.value;});
+        this.values = _.pluck(values,"value");
         _.extend(this,opts);
         this.initialize.apply(this, arguments);
       }
@@ -809,7 +822,7 @@ var PourOver = (function(){
         // of querying for that possibility.
         create_possibilities: function(vs){
           var o = {};
-          _(vs).each(function(v){
+          _.each(vs,function(v){
             var name = v.name || String(v.value);
             o[name] = v;
             o[name].matching_cids = [];
@@ -835,8 +848,8 @@ var PourOver = (function(){
          // Generally only used when removing items from a collection or when an item changes value. This will remove the item from
          // the cache so that it can either be recached with its new value or thrown away.
          removeFromCache: function(items){
-          var cids = _(items).map(function(i){return i.cid;}).sort(function(a,b){return a-b;});
-          _(this.possibilities).each(function(p){
+          var cids = _.pluck(items,"cid").sort(function(a,b){return a-b;});
+          _.each(this.possibilities,function(p){
             p.matching_cids = PourOver.subtract_sorted(p.matching_cids,cids);
           });
          },
@@ -927,7 +940,7 @@ var PourOver = (function(){
            var s = [],
                stack = this.current_query.stack,new_stack,
                is_compound = function(c){return _.isString(c) && c.match(/^(or|and|not)$/);};
-            new_stack = _(stack).reduce(function(m,i){
+            new_stack = _.reduce(stack,function(m,i){
               if(i[1] === q.stack[0][1]){
                 return m;
               } else if(is_compound(i[0]) && i[1][0][1] === q.stack[0][1]){
@@ -953,7 +966,7 @@ var PourOver = (function(){
 
          getByPossibilityGroups: function(){
            var collection = this.collection;
-           return _(this.possibilities).reduce(function(m,p,k){m[k] = collection.get(p.matching_cids); return m;},{});
+           return _.reduce(this.possibilities,function(m,p,k){m[k] = collection.get(p.matching_cids); return m;},{});
          }
       });
 
@@ -978,14 +991,15 @@ var PourOver = (function(){
         sort: function(set){return PourOver.permute_from_array(set,this.permutation_array);},
 
         // Recache the results of sorting the collection.
-        rebuild_sort: function(){
+        rebuild_sort: function(new_items){
+          if(typeof(new_items) === "undefined") {new_items = false;}
           if(this.view){
             var items = this.view.match_set.all();
           } else {
             var items = this.collection.items;
           }
           this.permutation_array = PourOver.build_permutation_array(items,this);
-          this.trigger("resort");
+          this.trigger("resort", new_items);
         }
       });
 
@@ -998,7 +1012,7 @@ var PourOver = (function(){
         this.name = name;
         if(typeof(opts) === "undefined"){ opts = {};}
         this.collection = collection;
-        this.match_set = new PourOver.MatchSet(_(this.collection.items).map(function(i){return i.cid;}),this.collection,["all"]);
+        this.match_set = new PourOver.MatchSet(_.pluck(this.collection.items,"cid"),this.collection,["all"]);
         if(opts.template){this.template = opts.template;}
 
         // Whenever the collection gains or loses members, recache the MatchSet saved on the view.
@@ -1070,10 +1084,18 @@ var PourOver = (function(){
           if(this.current_sort.off){this.current_sort.off("resort");}
           if(sort_name && view_sort){
             this.current_sort = this.view_sorts[sort_name];
-            this.current_sort.on("resort",function(){that.trigger("sortChange");});
+            this.current_sort.on("resort",_.bind(function(new_items){
+              if (!(this.silent_sort && new_items)) {
+                that.trigger("sortChange");
+              }
+            },this));
           } else if(sort_name){
             this.current_sort = this.collection.sorts[sort_name];
-            this.current_sort.on("resort",function(){that.trigger("sortChange");});
+            this.current_sort.on("resort",_.bind(function(new_items){
+              if (!(this.silent_sort && new_items)) {
+                that.trigger("sortChange");
+              }
+            },this));
           } else {
             this.current_sort = false;
 
@@ -1096,9 +1118,9 @@ var PourOver = (function(){
         // only change if the view receives a selectionChange.
         addViewSorts: function(sorts){
             if(typeof(opts) === "undefined"){ opts = {};}
-            if(! _(sorts).isArray()){sorts = [sorts];}
+            if(! _.isArray(sorts)){sorts = [sorts];}
             var that = this;
-            _(sorts).each(function(sort){
+            _.each(sorts,function(sort){
               that.view_sorts[sort.name] = sort;
               sort.collection = that.collection;
               sort.view = that;
@@ -1119,7 +1141,10 @@ var PourOver = (function(){
         // if you want your view to do fancier things such as union some filters, difference others, and intersect the rest.
         selectionFn: function(){
           var collection = this.collection;
-          var output = _(collection.filters).reduce(function(m,i){
+          if(_.isEmpty(collection.filters)){
+            return collection.getAllItems();
+          }
+          var output = _.reduce(collection.filters,function(m,i){
             var q = i.current_query;
             if(m && (!q || _.isEmpty(q.stack))){ return m;}
             if(!m && (!q || _.isEmpty(q.stack))){return collection.getAllItems();}
@@ -1167,9 +1192,9 @@ var PourOver = (function(){
             if(this.current_sort){
               var items = this.match_set.all_sorted_cids(this.current_sort);
               items = items.slice(this.page_size * page,this.page_size * (page + 1));
-              var ordered_cids = _(items).clone().sort(function(a,b){return a-b;});
+              var ordered_cids = _.clone(items).sort(function(a,b){return a-b;});
               var unsorted_items = this.collection.get(ordered_cids);
-              items = _(items).map(function(i){return _(unsorted_items).find(function(o){return o.cid === i;});});
+              items = _.map(items,function(i){return _.findWhere(unsorted_items,{cid:i});});
             } else {
               var items = this.match_set.cids;
               items = items.slice(this.page_size * page,this.page_size * (page + 1));
@@ -1211,11 +1236,11 @@ var PourOver = (function(){
             var silent = false;
           }
           if(this.current_sort){
-            var index = _(this.match_set.all_sorted_cids(this.current_sort)).indexOf(cid),
+            var index = _.indexOf(this.match_set.all_sorted_cids(this.current_sort),cid),
                 len = this.match_set.cids.length,
                 page = Math.floor(index/this.page_size);
           } else {
-            var index = _(this.match_set.cids).indexOf(cid),
+            var index = _.indexOf(this.match_set.cids,cid),
                 len = this.match_set.cids.length,
                 page = Math.floor(index/this.page_size);
           }
@@ -1271,18 +1296,18 @@ var PourOver = (function(){
              operation = step[0],
              is_compound = function(c){return _.isString(c) && c.match(/^(or|and|not)$/);};
          if(typeof(operation) === "object"){
-           var match_set = operation.getFn(step[1]);
-           return this.refresh(_(s).rest(),match_set);
+           match_set = operation.getFn(step[1]);
+           return this.refresh(_.rest(s),match_set);
          } else if(operation === "all" || step === "all") {
-           var cids = _(this.collection.items).map(function(i){return i.cid;});
-           var match_set = new PourOver.MatchSet(cids,this,["all"]);
-           return this.refresh(_(s).rest(),match_set)
+           var cids = _.pluck(this.collection.items,"cid");
+           match_set = new PourOver.MatchSet(cids,this,["all"]);
+           return this.refresh(_.rest(s),match_set)
          } else if(is_compound(operation)) {
              var m = match_set[operation](this.refresh(step[1]));
          } else {
              var m = this.refresh(step[1]);
          }
-         return this.refresh(_(s).rest(),m);
+         return this.refresh(_.rest(s),m);
         },
 
         // Intersect this MatchSet with another MatchSet.
@@ -1380,32 +1405,32 @@ var PourOver = (function(){
       // an array of possibility names that have been selected.
       getSimpleSelectState: function(match_set,s,output){
           if(typeof(match_set) === "undefined" || !match_set || !match_set.stack){return false}
-          if(typeof(s) === "undefined"){var s = match_set.stack}
-          if(typeof(output) === "undefined"){var output = []}
+          if(typeof(s) === "undefined"){s = match_set.stack}
+          if(typeof(output) === "undefined"){output = []}
           if(s.length < 1){
             return output;
           } else if (typeof(s[0][0]) === "object"){
             output.push(s[0][1]);
-            return this.getSimpleSelectState(match_set,_(s).rest(),output);
+            return this.getSimpleSelectState(match_set,_.rest(s),output);
           } else if (s[0][0] === "or"){
             output = output.concat(this.getSimpleSelectState(match_set,s[0][1]));
-            return this.getSimpleSelectState(match_set,_(s).rest(),output);
+            return this.getSimpleSelectState(match_set,_.rest(s),output);
           } else {
             throw "This does not appear to be a valid, simple selectElement stack."
           }
       },
       getIntersectedSelectState: function(match_set,s,output){
           if(typeof(match_set) === "undefined" || !match_set || !match_set.stack){return false}
-          if(typeof(s) === "undefined"){var s = match_set.stack}
-          if(typeof(output) === "undefined"){var output = []}
+          if(typeof(s) === "undefined"){s = match_set.stack}
+          if(typeof(output) === "undefined"){output = []}
           if(s.length < 1){
             return output;
           } else if (typeof(s[0][0]) === "object"){
             output.push(s[0][1]);
-            return this.getIntersectedSelectState(match_set,_(s).rest(),output);
+            return this.getIntersectedSelectState(match_set,_.rest(s),output);
           } else if (s[0][0] === "and"){
             output = output.concat(this.getIntersectedSelectState(match_set,s[0][1]));
-            return this.getIntersectedSelectState(match_set,_(s).rest(),output);
+            return this.getIntersectedSelectState(match_set,_.rest(s),output);
           } else {
             throw "This does not appear to be a valid, simple selectElement stack."
           }
@@ -1473,35 +1498,37 @@ var PourOver = (function(){
       // A PourOver buffered collection is one that stores some or all of its data as a promise. This is useful in conjunction with a
       // large data set in which you don't want to load all the data at page open.
       PourOver.BufferedCollection = PourOver.Collection.extend({
-        buffered_items: {},
+        initialize: function(){
+            this.buffered_items = {};
+        },
         stripFutures: function(item){
-          return _(item).reduce(function(m,v,k){if(typeof(v) != "undefined"){m[k] = v} return m},{});
+          return _.reduce(item,function(m,v,k){if(typeof(v) != "undefined"){m[k] = v} return m},{});
         },
 
         // Overrides the base get function with one that buffers in whole values from the server
         get: function(cids,raw){
-          if(typeof(raw) === "undefined"){var raw = false}
+          if(typeof(raw) === "undefined"){raw = false}
           var items = PourOver.Collection.prototype.get.call(this,cids),
               that = this;
           if(raw){return items;}
-          return _(items).map(function(i){
+          return _.map(items,function(i){
             var guid = i.guid, new_item;
             if(that.buffered_items.hasOwnProperty(guid)){
-              return _(that.buffered_items[guid]).extend(that.stripFutures(i));
+              return _.extend(that.buffered_items[guid],that.stripFutures(i));
             } else {
               return i;
             }
           });
         },
         getBy: function(attr_name,vals,sorted,raw){
-          if(typeof(raw) === "undefined"){var raw = false}
+          if(typeof(raw) === "undefined"){raw = false}
           var items = PourOver.Collection.prototype.getBy.call(this,attr_name,vals,sorted),
               that = this;
           if(raw){return items;}
-          return _(items).map(function(i){
+          return _.map(items,function(i){
             var guid = i.guid, new_item;
             if(that.buffered_items.hasOwnProperty(guid)){
-              return _(that.buffered_items[guid]).extend(that.stripFutures(i));
+              return _.extend(that.buffered_items[guid],that.stripFutures(i));
             } else {
               return i;
             }
@@ -1540,9 +1567,10 @@ var PourOver = (function(){
         // push the new values into the buffer. The deferred object is returned from this method so you can chain additional callbacks
         // onto the resolution such as a render action.
         bufferGuids: function(guids){
-          var that = this,
-              guids = _(guids).select(function(g){ return g &&  ! that.buffered_items.hasOwnProperty(g);}),
-              buffurl = this.getBufferUrl(guids),
+          var that = this;
+          guids = _.select(guids,function(g){ return g &&  ! that.buffered_items.hasOwnProperty(g);});
+
+          var buffurl = this.getBufferUrl(guids),
               url = buffurl[0],
               jsonpCallback = buffurl[1];
           if(guids.length > 0){
@@ -1552,8 +1580,8 @@ var PourOver = (function(){
               cache: true
             }).always(function(d){
               if(_.isArray(d)){
-                items = _(d).map(_.bind(that.preprocessItem,that));
-                _(items).each(function(i){
+                items = _.map(d,that.preprocessItem,that);
+                _.each(items,function(i){
                   that.buffered_items[i[0]] = i[1];
                 });
               }
@@ -1575,8 +1603,8 @@ var PourOver = (function(){
               high_bound = current_page + this.buffer_pages,
               range = _.range(low_bound,high_bound + 1),
               that = this;
-          range = _(range).map(function(page){
-            return _(that.getCurrentItems(page)).pluck("guid");
+          range = _.map(range,function(page){
+            return _.pluck(that.getCurrentItems(page),"guid");
           });
           var guids = _.flatten(range);
           buffer_deferred = this.collection.bufferGuids(guids);
@@ -1587,11 +1615,11 @@ var PourOver = (function(){
           })
         },
         bufferRender: function(){
-          var guids = _(this.getCurrentItems()).pluck('guid'),
+          var guids = _.pluck(this.getCurrentItems(),'guid'),
               buffer_deferred = this.collection.bufferGuids(guids);
-          buffer_deferred.done(_(function(){
+          buffer_deferred.done(_.bind(function(){
             this.render()
-          }).bind(this));
+          },this));
         },
         page: function(dir){
           PourOver.View.prototype.page.call(this,dir);
@@ -1599,7 +1627,7 @@ var PourOver = (function(){
         },
         pageTo: function(cid,silent){
           if(typeof(silent) === "undefined"){
-            var silent = false;
+            silent = false;
           }
           PourOver.View.prototype.pageTo.call(this,cid,silent);
           this.bufferAroundCurrentPage();
@@ -1615,7 +1643,7 @@ var PourOver = (function(){
         cacheResults: function(){return false},
         addCacheResults: function(){return false},
         getFn: function(query){
-          if(_(query).isArray()){
+          if(_.isArray(query)){
             query = query.sort(function(a,b){return a - b})
             return new PourOver.MatchSet(query,this.getCollection(),[[this,query]]);
           } else if (typeof(query) === "number") {
@@ -1625,7 +1653,7 @@ var PourOver = (function(){
           }
         },
         addItems: function(cids){
-          if(! _(cids).isArray()){cids = [cids]}
+          if(! _.isArray(cids)){cids = [cids]}
           cids = cids.sort(function(a,b){return a - b});
           if(this.current_query){
             var current_query = this.current_query.cids,
@@ -1636,7 +1664,7 @@ var PourOver = (function(){
           this.query(new_query);
         },
         removeItems: function(cids){
-          if(! _(cids).isArray()){cids = [cids]}
+          if(! _.isArray(cids)){cids = [cids]}
           cids = cids.sort(function(a,b){return a - b});
           var current_query = this.current_query.cids,
               new_query = PourOver.subtract_sorted(current_query,cids);
@@ -1657,8 +1685,8 @@ var PourOver = (function(){
         addCacheResults: PourOver.cacheMethods.exactAddCache,
         getFn: function(query){
           var that = this;
-          if(_(query).isArray()){
-            var match_set = _(query).reduce(function(m,i){
+          if(_.isArray(query)){
+            var match_set = _.reduce(query,function(m,i){
               if(!m){
                 return that.getFn(i);
               } else {
@@ -1677,11 +1705,10 @@ var PourOver = (function(){
       // The convenience constructor for exact filters.
       PourOver.makeExactFilter = function(name,values,opts){
         if(typeof(opts) === "undefined"){opts = {}}
-        var values = _(values).map(function(i){return {value:i}}),
-            attr = opts.attr || name,
-            opts = _.extend({associated_attrs: [attr]},opts),
-            filter = new PourOver.exactFilter(name,values,opts);
-        return filter;
+        var attr = opts.attr || name;
+        values = _.map(values,function(i){return {value:i}});
+        opts = _.extend({associated_attrs: [attr]},opts);
+        return new PourOver.exactFilter(name,values,opts);
       }
 
       PourOver.inclusionFilter = PourOver.exactFilter.extend({
@@ -1691,11 +1718,10 @@ var PourOver = (function(){
 
       PourOver.makeInclusionFilter = function(name,values,opts){
         if(typeof(opts) === "undefined"){opts = {}}
-        var values = _(values).map(function(i){return {value:i}}),
-            attr = opts.attr || name,
-            opts = _.extend({associated_attrs: [attr]},opts),
-            filter = new PourOver.inclusionFilter(name,values,opts);
-        return filter;
+        var attr = opts.attr || name;
+        values = _.map(values,function(i){return {value:i}});
+        opts = _.extend({associated_attrs: [attr]},opts);
+        return new PourOver.inclusionFilter(name,values,opts);
       };
 
       // A range filter is for dividing items into buckets of ranges based on a specific attribute. A good example is, say, each item as 0-1000 "friends", then you can
@@ -1717,7 +1743,7 @@ var PourOver = (function(){
       // The convenience constructor for range filters.
       PourOver.makeRangeFilter = function(name,ranges,opts){
         if(typeof(opts) === "undefined"){opts = {}}
-        var values = _(ranges).map(function(r){return {low: r[0], high: r[1], value: r.join("-")}}),
+        var values = _.map(ranges,function(r){return {low: r[0], high: r[1], value: r.join("-")}}),
             attr = opts.attr || name,
             newopts = _.extend({associated_attrs: [attr]},opts),
             filter = new PourOver.rangeFilter(name,values,newopts);
@@ -1736,11 +1762,11 @@ var PourOver = (function(){
             return new PourOver.MatchSet([],this.getCollection(),[[this,query]]);
           }
           var li,hi,that,possibilities,cids;
-          li = _(this.values).indexOf(query[0]);
-          hi = _(this.values).indexOf(query[1]);
+          li = _.indexOf(this.values,query[0]);
+          hi = _.indexOf(this.values,query[1]);
           that = this;
-          possibilities = _(this.values.slice(li,hi+1)).map(function(p){return that.possibilities[p]});
-          cids = _(possibilities).reduce(function(m,i){ return PourOver.union_sorted(m,i.matching_cids) },[]);
+          possibilities = _.map(this.values.slice(li,hi+1),function(p){return that.possibilities[p]});
+          cids = _.reduce(possibilities,function(m,i){ return PourOver.union_sorted(m,i.matching_cids) },[]);
           return new PourOver.MatchSet(cids,this.getCollection(),[[this,query]]);
         }
       });
@@ -1748,7 +1774,7 @@ var PourOver = (function(){
       // The convenience constructor for dv range filters.
       PourOver.makeDVrangeFilter = function(name,v,opts){
         if(typeof(opts) === "undefined"){opts = {}}
-        var values = _(v).map(function(i){return {value:i}}),
+        var values = _.map(v,function(i){return {value:i}}),
             attr = opts.attr || name,
             newopts = _.extend({associated_attrs: [attr]},opts),
             filter = new PourOver.dvrangeFilter(name,values,newopts);
@@ -1761,7 +1787,7 @@ var PourOver = (function(){
       // to range[0] and less than range[1].
       PourOver.continuousRangeFilter = PourOver.Filter.extend({
         cacheResults: function(items){
-          this.values = _.map(items, function(i) { return {cid: i.cid, val: i[this.name]}; }, this);
+          this.values = _.map(items,function(i) { return {cid: i.cid, val: i[this.name]}; }, this);
           this.values.sort(function(a,b) { return a.val-b.val });
         },
         addCacheResults: function(items){
@@ -1818,22 +1844,22 @@ var PourOver = (function(){
       // the items in the sort.
       PourOver.explicitSort = PourOver.Sort.extend({
         fn: function(a,b){
-          var a_index = _(this.order).indexOf(a[this.attr]),
-              b_index = _(this.order).indexOf(b[this.attr]);
+          var a_index = _.indexOf(this.order,a[this.attr]),
+              b_index = _.indexOf(this.order,b[this.attr]);
           if(a_index === -1) {a_index = 1/0}
           if(b_index === -1) {b_index = 1/0}
           return a_index - b_index;
         },
         reset: function(items){
-          this.order = _(items).pluck(this.attr);
+          this.order = _.pluck(items,this.attr);
           this.rebuild_sort();
         },
 
         // Insert an item into the sort.
         insert: function(items,index){
-          if(typeof(index) === "undefined"){var index = this.order.length}
-          if(! _(items).isArray()){items = [items]}
-          var new_order = _(items).pluck(this.attr),
+          if(typeof(index) === "undefined"){index = this.order.length}
+          if(! _.isArray(items)){items = [items]}
+          var new_order = _.pluck(items,this.attr),
               args = [index,0].concat(new_order);
           this.order.splice.apply(this.order,args);
           this.rebuild_sort();
@@ -1841,26 +1867,26 @@ var PourOver = (function(){
 
         // Remove an item from the sort.
         remove: function(items){
-          if(! _(items).isArray()){items = [items]}
-          var attrs = _(items).pluck(this.attr);
-          this.order = _(this.order).difference(attrs);
+          if(! _.isArray(items)){items = [items]}
+          var attrs = _.pluck(items,this.attr);
+          this.order = _.difference(this.order,attrs);
           this.rebuild_sort();
         },
 
         // Move an item from one place to another in the sort.
         move: function(items,index){
-          if(! _(items).isArray()){items = [items]}
-          var attrs = _(items).pluck(this.attr);
-          this.order = _(this.order).map(function(o){ return _(attrs).include(o) ? null : o });
+          if(! _.isArray(items)){items = [items]}
+          var attrs = _.pluck(items,this.attr);
+          this.order = _.map(this.order,function(o){ return _.include(attrs,o) ? null : o });
           this.insert(items,index);
-          this.order = _(this.order).compact();
+          this.order = _.compact(this.order);
         }
       });
 
       // The convenience constructor for an explicit sort.
       PourOver.makeExplicitSort = function(name,collection,attr,order,opts){
         var sort = new PourOver.explicitSort(name,opts);
-        sort.attr = attr;
+        sort.associated_attrs = [attr];
         sort.order = order;
         return sort;
       }
@@ -1873,7 +1899,7 @@ var PourOver = (function(){
 
       PourOver.makeReverseCidSort = function(name,collection){
         var sort = new PourOver.reverseCidSort(name);
-        sort.attr = "cid";
+        sort.associated_attrs = ["cid"];
         return sort;
       }
 
@@ -1913,8 +1939,6 @@ var PourOver = (function(){
 
     return PourOver;
 })();
-
-
 
 return PourOver;
 
