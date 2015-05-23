@@ -1,5 +1,4 @@
 var should = require('chai').should();
-var process = require('process');
 var _ = require('underscore');
 var PourOver = require('../');
 
