@@ -35,7 +35,7 @@ describe('Basic Operations', function() {
       this.expected = [1];
       this.output.should.deep.equal(this.expected);
     });
-  })
+  });
 
   describe('Intersect Sorts', function() {
     it('should run a Standard Intersect 1', function() {
@@ -49,7 +49,7 @@ describe('Basic Operations', function() {
       this.output.should.deep.equal(this.expected);
     });
     it('should run a Tiny Intersect 1', function() {
-      this.output = PourOver.intersect_sorted([1], [1])
+      this.output = PourOver.intersect_sorted([1], [1]);
       this.expected = [1];
       this.output.should.deep.equal(this.expected);
     });
@@ -68,7 +68,7 @@ describe('Basic Operations', function() {
       this.expected = [];
       this.output.should.deep.equal(this.expected);
     });
-  })
+  });
 
   describe('Subtract Sorts', function() {
     it('should run a Standard Subtract 1', function() {
@@ -82,7 +82,7 @@ describe('Basic Operations', function() {
       this.output.should.deep.equal(this.expected);
     });
     it('should run a Tiny Subtract 1', function() {
-      this.output = PourOver.subtract_sorted([1], [1])
+      this.output = PourOver.subtract_sorted([1], [1]);
       this.expected = [];
       this.output.should.deep.equal(this.expected);
     });
@@ -101,7 +101,7 @@ describe('Basic Operations', function() {
       this.expected = [];
       this.output.should.deep.equal(this.expected);
     });
-  })
+  });
 
   describe('Insert Sorts', function() {
     it('should run a Standard Insert', function() {
@@ -110,7 +110,7 @@ describe('Basic Operations', function() {
       this.output.should.deep.equal(this.expected);
     });
     it('should run a Beginning Insert', function() {
-      this.output = PourOver.insert_sorted([1,3,5], 0)
+      this.output = PourOver.insert_sorted([1,3,5], 0);
       this.expected = [0,1,3,5];
       this.output.should.deep.equal(this.expected);
     });
@@ -124,7 +124,7 @@ describe('Basic Operations', function() {
       this.expected = [1];
       this.output.should.deep.equal(this.expected);
     });
-  })
+  });
 
   describe('Remove Sorts', function() {
     it('should run a Standard Remove', function() {
@@ -133,7 +133,7 @@ describe('Basic Operations', function() {
       this.output.should.deep.equal(this.expected);
     });
     it('should run a Beginning Remove', function() {
-      this.output = PourOver.remove_sorted([1,3,8,9], 1)
+      this.output = PourOver.remove_sorted([1,3,8,9], 1);
       this.expected = [3,8,9];
       this.output.should.deep.equal(this.expected);
     });
@@ -147,23 +147,23 @@ describe('Basic Operations', function() {
       this.expected = [];
       this.output.should.deep.equal(this.expected);
     });
-  })
+  });
 
   describe('Permutation', function() {
     it('should run a Permute Subset', function() {
-      this.permutation = PourOver.build_permutation_array([{cid: 1, name: "Erik"},{cid: 2, name: "Brad"}, {cid: 3, name: "Chris"}],function(a,b){return (a.name < b.name) ? -1 : (a.name > b.name) ? 1 : 0});
+      this.permutation = PourOver.build_permutation_array([{cid: 1, name: "Erik"},{cid: 2, name: "Brad"}, {cid: 3, name: "Chris"}],function(a,b){return (a.name < b.name) ? -1 : (a.name > b.name) ? 1 : 0;});
       this.output = PourOver.permute_from_array([1,2], this.permutation);
       this.expected = [2,1];
       this.output.should.deep.equal(this.expected);
     });
     it('should run a Permute Whole set', function() {
-      this.permutation = PourOver.build_permutation_array([{cid: 1, name: "Erik"},{cid: 2, name: "Brad"}, {cid: 3, name: "Chris"}],function(a,b){return (a.name < b.name) ? -1 : (a.name > b.name) ? 1 : 0});
+      this.permutation = PourOver.build_permutation_array([{cid: 1, name: "Erik"},{cid: 2, name: "Brad"}, {cid: 3, name: "Chris"}],function(a,b){return (a.name < b.name) ? -1 : (a.name > b.name) ? 1 : 0;});
       this.output = PourOver.permute_from_array([1,2,3], this.permutation);
       this.expected = [2,3,1];
       this.output.should.deep.equal(this.expected);
     });
-  })
-})
+  });
+});
 
 describe('Basic Collection Operations', function() {
   describe('Constructs Collection', function() {
@@ -173,11 +173,11 @@ describe('Basic Collection Operations', function() {
       this.expected = 3;
       this.output.should.equal(this.expected);
     });
-  })
+  });
 
   describe('Get items from Collection', function() {
     it('should get one item', function() {
-      this.collection = new PourOver.Collection([{name: "Erik", age: 26, color: "red"},{name:"Bart", age: 100, color: "dead"},{name: "Cindy", age: 10, color: "blue"}])
+      this.collection = new PourOver.Collection([{name: "Erik", age: 26, color: "red"},{name:"Bart", age: 100, color: "dead"},{name: "Cindy", age: 10, color: "blue"}]);
       this.output = this.collection.get([1])[0].name;
       this.expected = "Bart";
       this.output.should.equal(this.expected);
@@ -188,7 +188,7 @@ describe('Basic Collection Operations', function() {
       this.expected = "Cindy";
       this.output.should.equal(this.expected);
     });
-  })
+  });
 
   describe('Add items to Collection', function() {
     it('should add one item', function() {
@@ -205,7 +205,7 @@ describe('Basic Collection Operations', function() {
       this.expected = "Charles";
       this.output.should.equal(this.expected);
     });
-  })
+  });
 
   describe('Get all matched items', function() {
     it('should correctly stack all results', function() {
@@ -220,7 +220,7 @@ describe('Basic Collection Operations', function() {
       this.expected = 3;
       this.output.should.equal(this.expected);
     });
-  })
+  });
 
   describe('Get first match', function() {
     it('should get exactly one item, this first match', function() {
@@ -229,7 +229,7 @@ describe('Basic Collection Operations', function() {
       this.expected = "Erik";
       this.output.should.equal(this.expected);
     });
-  })
+  });
 
   describe('Update an item', function() {
     it('should update an attribute', function() {
@@ -239,7 +239,7 @@ describe('Basic Collection Operations', function() {
       this.expected = "silver";
       this.output.should.equal(this.expected);
     });
-  })
+  });
 
   describe('Remove an item attribute', function() {
     it('should remove an attribute', function() {
@@ -255,8 +255,8 @@ describe('Basic Collection Operations', function() {
       this.expected = 100;
       this.output.should.equal(this.expected);
     });
-  })
-})
+  });
+});
 
 describe('Filters', function() {
   describe('Create and query a filter', function() {
@@ -281,7 +281,7 @@ describe('Filters', function() {
       this.expected = 3;
       this.output.should.equal(this.expected);
     });
-  })
+  });
 
   describe('Add items to collection and update filter', function() {
     it('should return correct number of items before addition', function() {
@@ -299,7 +299,7 @@ describe('Filters', function() {
       this.expected = 4;
       this.output.should.equal(this.expected);
     });
-  })
+  });
 
   describe('Query filter remembers last query', function() {
     it('should be okay without a starting query', function() {
@@ -343,7 +343,7 @@ describe('Filters', function() {
       this.collection.filters.gender.clearQuery();
       false.should.equal(this.collection.filters.gender.current_query);
     });
-  })
+  });
 
   describe('Can be booleaned together', function() {
     it('should be self-unioned correctly', function() {
@@ -428,27 +428,27 @@ describe('Filters', function() {
       this.expected = 2;
       this.output.should.equal(this.expected);
     });
-  })
-})
+  });
+});
 
 describe('Sorts', function() {
   describe('Can be created', function() {
     it('should sort items correctly', function() {
-      age_sort = PourOver.Sort.extend({fn: function(a,b){return a.age - b.age}});
-      this.collection = new PourOver.Collection([{gender: "boy", name: "Erik", age: 26, color: "red"},{gender: "boy", name:"Bart", age: 100, color: "dead"},{name: "Cindy", age: 10, color: "blue", gender: "girl"},{gender: "girl", name:"Sandra", age: 70, color: "purple"}, {gender: "boy", name:"Cargo", age: 10, color: "gold"} ])
+      age_sort = PourOver.Sort.extend({fn: function(a,b){return a.age - b.age;}});
+      this.collection = new PourOver.Collection([{gender: "boy", name: "Erik", age: 26, color: "red"},{gender: "boy", name:"Bart", age: 100, color: "dead"},{name: "Cindy", age: 10, color: "blue", gender: "girl"},{gender: "girl", name:"Sandra", age: 70, color: "purple"}, {gender: "boy", name:"Cargo", age: 10, color: "gold"} ]);
       this.collection.addFilters([PourOver.makeExactFilter("gender", ["boy","girl"])]);
-      this.collection.addSort(new age_sort("age"))
+      this.collection.addSort(new age_sort("age"));
       this.output = _.pluck(this.collection.getSortedItems("age"), "cid");
       this.expected = [2,4,0,3,1];
       this.output.should.deep.equal(this.expected);
-    })
-  })
-})
+    });
+  });
+});
 
 describe('Views', function() {
   describe('Can be created', function() {
     it('should construct successfully with all items', function() {
-      age_sort = PourOver.Sort.extend({fn: function(a,b){return a.age - b.age}}),
+      age_sort = PourOver.Sort.extend({fn: function(a,b){return a.age - b.age;}});
       this.collection = new PourOver.Collection([{gender: "boy", name: "Erik", age: 26, color: "red"},{gender: "boy", name:"Bart", age: 100, color: "dead"},{name: "Cindy", age: 10, color: "blue", gender: "girl"},{gender: "girl", name:"Sandra", age: 70, color: "purple"}, {gender: "boy", name:"Cargo", age: 10, color: "gold"} ]);
       this.collection.addFilters([PourOver.makeExactFilter("gender", ["boy","girl"])]);
       this.collection.addSort(new age_sort("age"));
@@ -456,10 +456,10 @@ describe('Views', function() {
       this.expected = this.collection.items;
       this.output.should.deep.equal(this.expected);
     });
-  })
+  });
   describe('Can be paged', function() {
     it('should have the correct page size', function() {
-      age_sort = PourOver.Sort.extend({fn: function(a,b){return a.age - b.age}}),
+      age_sort = PourOver.Sort.extend({fn: function(a,b){return a.age - b.age;}});
       this.collection = new PourOver.Collection([{gender: "boy", name: "Erik", age: 26, color: "red"},{gender: "boy", name:"Bart", age: 100, color: "dead"},{name: "Cindy", age: 10, color: "blue", gender: "girl"},{gender: "girl", name:"Sandra", age: 70, color: "purple"}, {gender: "boy", name:"Cargo", age: 10, color: "gold"} ]);
       this.collection.addFilters([PourOver.makeExactFilter("gender", ["boy","girl"])]);
       this.collection.addSort(new age_sort("age"));
@@ -470,7 +470,7 @@ describe('Views', function() {
       this.output.should.deep.equal(this.expected);
     });
     it('should be able to be paged forward', function() {
-      age_sort = PourOver.Sort.extend({fn: function(a,b){return a.age - b.age}}),
+      age_sort = PourOver.Sort.extend({fn: function(a,b){return a.age - b.age;}});
       this.collection = new PourOver.Collection([{gender: "boy", name: "Erik", age: 26, color: "red"},{gender: "boy", name:"Bart", age: 100, color: "dead"},{name: "Cindy", age: 10, color: "blue", gender: "girl"},{gender: "girl", name:"Sandra", age: 70, color: "purple"}, {gender: "boy", name:"Cargo", age: 10, color: "gold"} ]);
       this.collection.addFilters([PourOver.makeExactFilter("gender", ["boy","girl"])]);
       this.collection.addSort(new age_sort("age"));
@@ -482,7 +482,7 @@ describe('Views', function() {
       this.output.should.deep.equal(this.expected);
     });
     it('should be able to be paged backward', function() {
-      age_sort = PourOver.Sort.extend({fn: function(a,b){return a.age - b.age}}),
+      age_sort = PourOver.Sort.extend({fn: function(a,b){return a.age - b.age;}});
       this.collection = new PourOver.Collection([{gender: "boy", name: "Erik", age: 26, color: "red"},{gender: "boy", name:"Bart", age: 100, color: "dead"},{name: "Cindy", age: 10, color: "blue", gender: "girl"},{gender: "girl", name:"Sandra", age: 70, color: "purple"}, {gender: "boy", name:"Cargo", age: 10, color: "gold"} ]);
       this.collection.addFilters([PourOver.makeExactFilter("gender", ["boy","girl"])]);
       this.collection.addSort(new age_sort("age"));
@@ -495,7 +495,7 @@ describe('Views', function() {
       this.output.should.deep.equal(this.expected);
     });
     it('should be able to be skipped forward', function() {
-      age_sort = PourOver.Sort.extend({fn: function(a,b){return a.age - b.age}}),
+      age_sort = PourOver.Sort.extend({fn: function(a,b){return a.age - b.age;}});
       this.collection = new PourOver.Collection([{gender: "boy", name: "Erik", age: 26, color: "red"},{gender: "boy", name:"Bart", age: 100, color: "dead"},{name: "Cindy", age: 10, color: "blue", gender: "girl"},{gender: "girl", name:"Sandra", age: 70, color: "purple"}, {gender: "boy", name:"Cargo", age: 10, color: "gold"} ]);
       this.collection.addFilters([PourOver.makeExactFilter("gender", ["boy","girl"])]);
       this.collection.addSort(new age_sort("age"));
@@ -509,7 +509,7 @@ describe('Views', function() {
       this.output.should.deep.equal(this.expected);
     });
     it('should stop at end', function() {
-      age_sort = PourOver.Sort.extend({fn: function(a,b){return a.age - b.age}}),
+      age_sort = PourOver.Sort.extend({fn: function(a,b){return a.age - b.age;}});
       this.collection = new PourOver.Collection([{gender: "boy", name: "Erik", age: 26, color: "red"},{gender: "boy", name:"Bart", age: 100, color: "dead"},{name: "Cindy", age: 10, color: "blue", gender: "girl"},{gender: "girl", name:"Sandra", age: 70, color: "purple"}, {gender: "boy", name:"Cargo", age: 10, color: "gold"} ]);
       this.collection.addFilters([PourOver.makeExactFilter("gender", ["boy","girl"])]);
       this.collection.addSort(new age_sort("age"));
@@ -523,11 +523,11 @@ describe('Views', function() {
       this.expected = [4];
       this.output.should.deep.equal(this.expected);
     });
-  })
+  });
 
   describe('Can be paged to a specific page', function() {
     it('should have the correct page size', function() {
-      age_sort = PourOver.Sort.extend({fn: function(a,b){return a.age - b.age}}),
+      age_sort = PourOver.Sort.extend({fn: function(a,b){return a.age - b.age;}});
       this.collection = new PourOver.Collection([{gender: "boy", name: "Erik", age: 26, color: "red"},{gender: "boy", name:"Bart", age: 100, color: "dead"},{name: "Cindy", age: 10, color: "blue", gender: "girl"},{gender: "girl", name:"Sandra", age: 70, color: "purple"}, {gender: "boy", name:"Cargo", age: 10, color: "gold"} ]);
       this.collection.addFilters([PourOver.makeExactFilter("gender", ["boy","girl"])]);
       this.collection.addSort(new age_sort("age"));
@@ -538,7 +538,7 @@ describe('Views', function() {
       this.output.should.deep.equal(this.expected);
     });
     it('should be able to be paged to a specific page: 0', function() {
-      age_sort = PourOver.Sort.extend({fn: function(a,b){return a.age - b.age}}),
+      age_sort = PourOver.Sort.extend({fn: function(a,b){return a.age - b.age;}});
       this.collection = new PourOver.Collection([{gender: "boy", name: "Erik", age: 26, color: "red"},{gender: "boy", name:"Bart", age: 100, color: "dead"},{name: "Cindy", age: 10, color: "blue", gender: "girl"},{gender: "girl", name:"Sandra", age: 70, color: "purple"}, {gender: "boy", name:"Cargo", age: 10, color: "gold"} ]);
       this.collection.addFilters([PourOver.makeExactFilter("gender", ["boy","girl"])]);
       this.collection.addSort(new age_sort("age"));
@@ -550,7 +550,7 @@ describe('Views', function() {
       this.output.should.deep.equal(this.expected);
     });
     it('should be able to be paged to a specific page: 1', function() {
-      age_sort = PourOver.Sort.extend({fn: function(a,b){return a.age - b.age}}),
+      age_sort = PourOver.Sort.extend({fn: function(a,b){return a.age - b.age;}});
       this.collection = new PourOver.Collection([{gender: "boy", name: "Erik", age: 26, color: "red"},{gender: "boy", name:"Bart", age: 100, color: "dead"},{name: "Cindy", age: 10, color: "blue", gender: "girl"},{gender: "girl", name:"Sandra", age: 70, color: "purple"}, {gender: "boy", name:"Cargo", age: 10, color: "gold"} ]);
       this.collection.addFilters([PourOver.makeExactFilter("gender", ["boy","girl"])]);
       this.collection.addSort(new age_sort("age"));
@@ -563,7 +563,7 @@ describe('Views', function() {
       this.output.should.deep.equal(this.expected);
     });
     it('should be able to be paged to a specific page: 2', function() {
-      age_sort = PourOver.Sort.extend({fn: function(a,b){return a.age - b.age}}),
+      age_sort = PourOver.Sort.extend({fn: function(a,b){return a.age - b.age;}});
       this.collection = new PourOver.Collection([{gender: "boy", name: "Erik", age: 26, color: "red"},{gender: "boy", name:"Bart", age: 100, color: "dead"},{name: "Cindy", age: 10, color: "blue", gender: "girl"},{gender: "girl", name:"Sandra", age: 70, color: "purple"}, {gender: "boy", name:"Cargo", age: 10, color: "gold"} ]);
       this.collection.addFilters([PourOver.makeExactFilter("gender", ["boy","girl"])]);
       this.collection.addSort(new age_sort("age"));
@@ -576,11 +576,11 @@ describe('Views', function() {
       this.expected = [4];
       this.output.should.deep.equal(this.expected);
     });
-  })
+  });
 
   describe('Can be sorted', function() {
     it('should be initially sorted', function() {
-      age_sort = PourOver.Sort.extend({fn: function(a,b){return a.age - b.age}}),
+      age_sort = PourOver.Sort.extend({fn: function(a,b){return a.age - b.age;}});
       this.collection = new PourOver.Collection([{gender: "boy", name: "Erik", age: 26, color: "red"},{gender: "boy", name:"Bart", age: 100, color: "dead"},{name: "Cindy", age: 10, color: "blue", gender: "girl"},{gender: "girl", name:"Sandra", age: 70, color: "purple"}, {gender: "boy", name:"Cargo", age: 10, color: "gold"} ]);
       this.collection.addFilters([PourOver.makeExactFilter("gender", ["boy","girl"])]);
       this.collection.addSort(new age_sort("age"));
@@ -590,7 +590,7 @@ describe('Views', function() {
       this.output.should.deep.equal(this.expected);
     });
     it('should be able to be set', function() {
-      age_sort = PourOver.Sort.extend({fn: function(a,b){return a.age - b.age}}),
+      age_sort = PourOver.Sort.extend({fn: function(a,b){return a.age - b.age;}});
       this.collection = new PourOver.Collection([{gender: "boy", name: "Erik", age: 26, color: "red"},{gender: "boy", name:"Bart", age: 100, color: "dead"},{name: "Cindy", age: 10, color: "blue", gender: "girl"},{gender: "girl", name:"Sandra", age: 70, color: "purple"}, {gender: "boy", name:"Cargo", age: 10, color: "gold"} ]);
       this.collection.addFilters([PourOver.makeExactFilter("gender", ["boy","girl"])]);
       this.collection.addSort(new age_sort("age"));
@@ -600,14 +600,14 @@ describe('Views', function() {
       this.expected = [2,4,0,3,1];
       this.output.should.deep.equal(this.expected);
     });
-  })
-})
+  });
+});
 
 describe('Non-stateful queries', function() {
   describe('Range crossfilters', function() {
     it('should have an all-inclusive range', function() {
       this.fixture = [{num: 5}, {num: 1}, {num: 9}, {num: 3}, {num: 1}, {num: 12}];
-      this.c = new PourOver.Collection(this.fixture)
+      this.c = new PourOver.Collection(this.fixture);
       this.f = PourOver.makeContinuousRangeFilter("num");
       this.c.addFilters([this.f]);
       this.query = this.c.getFilteredItems("num", [-100, 100]);
@@ -617,7 +617,7 @@ describe('Non-stateful queries', function() {
     });
     it('should have an equal range', function() {
       this.fixture = [{num: 5}, {num: 1}, {num: 9}, {num: 3}, {num: 1}, {num: 12}];
-      this.c = new PourOver.Collection(this.fixture)
+      this.c = new PourOver.Collection(this.fixture);
       this.f = PourOver.makeContinuousRangeFilter("num");
       this.c.addFilters([this.f]);
       this.query = this.c.getFilteredItems("num", [-100, 100]);
@@ -628,7 +628,7 @@ describe('Non-stateful queries', function() {
     });
     it('should have an empty equal range', function() {
       this.fixture = [{num: 5}, {num: 1}, {num: 9}, {num: 3}, {num: 1}, {num: 12}];
-      this.c = new PourOver.Collection(this.fixture)
+      this.c = new PourOver.Collection(this.fixture);
       this.f = PourOver.makeContinuousRangeFilter("num");
       this.c.addFilters([this.f]);
       this.query = this.c.getFilteredItems("num", [-100, 100]);
@@ -640,7 +640,7 @@ describe('Non-stateful queries', function() {
     });
     it('should have top equal range', function() {
       this.fixture = [{num: 5}, {num: 1}, {num: 9}, {num: 3}, {num: 1}, {num: 12}];
-      this.c = new PourOver.Collection(this.fixture)
+      this.c = new PourOver.Collection(this.fixture);
       this.f = PourOver.makeContinuousRangeFilter("num");
       this.c.addFilters([this.f]);
       this.query = this.c.getFilteredItems("num", [-100, 100]);
@@ -653,7 +653,7 @@ describe('Non-stateful queries', function() {
     });
     it('should have small range', function() {
       this.fixture = [{num: 5}, {num: 1}, {num: 9}, {num: 3}, {num: 1}, {num: 12}];
-      this.c = new PourOver.Collection(this.fixture)
+      this.c = new PourOver.Collection(this.fixture);
       this.f = PourOver.makeContinuousRangeFilter("num");
       this.c.addFilters([this.f]);
       this.query = this.c.getFilteredItems("num", [-100, 100]);
@@ -667,7 +667,7 @@ describe('Non-stateful queries', function() {
     });
     it('should have small range with decimals', function() {
       this.fixture = [{num: 5}, {num: 1}, {num: 9}, {num: 3}, {num: 1}, {num: 12}];
-      this.c = new PourOver.Collection(this.fixture)
+      this.c = new PourOver.Collection(this.fixture);
       this.f = PourOver.makeContinuousRangeFilter("num");
       this.c.addFilters([this.f]);
       this.query = this.c.getFilteredItems("num", [-100, 100]);
@@ -682,7 +682,7 @@ describe('Non-stateful queries', function() {
     });
     it('should have empty high range', function() {
       this.fixture = [{num: 5}, {num: 1}, {num: 9}, {num: 3}, {num: 1}, {num: 12}];
-      this.c = new PourOver.Collection(this.fixture)
+      this.c = new PourOver.Collection(this.fixture);
       this.f = PourOver.makeContinuousRangeFilter("num");
       this.c.addFilters([this.f]);
       this.query = this.c.getFilteredItems("num", [-100, 100]);
@@ -698,7 +698,7 @@ describe('Non-stateful queries', function() {
     });
     it('should have empty low range', function() {
       this.fixture = [{num: 5}, {num: 1}, {num: 9}, {num: 3}, {num: 1}, {num: 12}];
-      this.c = new PourOver.Collection(this.fixture)
+      this.c = new PourOver.Collection(this.fixture);
       this.f = PourOver.makeContinuousRangeFilter("num");
       this.c.addFilters([this.f]);
       this.query = this.c.getFilteredItems("num", [-100, 100]);
@@ -713,7 +713,7 @@ describe('Non-stateful queries', function() {
       this.expected = 0;
       this.output.should.equal(this.expected);
     });
-  })
+  });
 
   describe('Complex queries', function() {
     it('should have initial simple query', function() {
@@ -789,106 +789,112 @@ describe('Non-stateful queries', function() {
       this.expected = [2,3];
       this.output.should.deep.equal(this.expected);
     });
-  })
-})
+  });
+});
 
 describe('Stateful queries', function() {
   describe('Queries can be unioned', function() {
     it('should add elements to a filter', function() {
-      this.fixture = [], this.i = 0;
+      this.fixture = [];
+      this.i = 0;
       while (this.i < 100000){ this.fixture.push({quantity: Math.random() * 3 >>> 0,total: Math.random() * 300 >>> 0, tip: Math.random() * 200 >>> 0, type: ["tab","visa","cash"][Math.random() * 3 >>> 0], color: ["red","orange","yellow","green","blue","indigo","violet"][Math.random() * 7 >>> 0] }); this.i++; }
-      this.c = new PourOver.Collection(this.fixture)
+      this.c = new PourOver.Collection(this.fixture);
       this.f = PourOver.makeExactFilter("quantity",[1,2]);
       this.ftwo = PourOver.makeExactFilter("type",["tab","cash","visa"]);
       this.fthree = PourOver.makeRangeFilter("total",[[0,100],[101,200],[201,300]]);
       this.ffour = PourOver.makeDVrangeFilter("color",["red","orange","yellow","green","blue","indigo","violet"]);
       this.c.addFilters([this.f,this.ftwo,this.fthree,this.ffour]);
-      this.c.filters.color.query(["red","green"])
+      this.c.filters.color.query(["red","green"]);
       this.old_length = this.c.filters.color.current_query.cids.length;
-      this.c.filters.color.unionQuery(["blue","blue"])
+      this.c.filters.color.unionQuery(["blue","blue"]);
       this.new_length = this.c.filters.color.current_query.cids.length;
       this.old_length.should.be.below(this.new_length);
     });
     it('should add the correct items to the query', function() {
-      this.fixture = [], this.i = 0;
+      this.fixture = [];
+      this.i = 0;
       while (this.i < 100000){ this.fixture.push({quantity: Math.random() * 3 >>> 0,total: Math.random() * 300 >>> 0, tip: Math.random() * 200 >>> 0, type: ["tab","visa","cash"][Math.random() * 3 >>> 0], color: ["red","orange","yellow","green","blue","indigo","violet"][Math.random() * 7 >>> 0] }); this.i++; }
-      this.c = new PourOver.Collection(this.fixture)
+      this.c = new PourOver.Collection(this.fixture);
       this.f = PourOver.makeExactFilter("quantity",[1,2]);
       this.ftwo = PourOver.makeExactFilter("type",["tab","cash","visa"]);
       this.fthree = PourOver.makeRangeFilter("total",[[0,100],[101,200],[201,300]]);
       this.ffour = PourOver.makeDVrangeFilter("color",["red","orange","yellow","green","blue","indigo","violet"]);
       this.c.addFilters([this.f,this.ftwo,this.fthree,this.ffour]);
-      this.c.filters.color.query(["red","green"])
+      this.c.filters.color.query(["red","green"]);
       this.old_length = this.c.filters.color.current_query.cids.length;
-      this.c.filters.color.unionQuery(["blue","blue"])
+      this.c.filters.color.unionQuery(["blue","blue"]);
       this.new_length = this.c.filters.color.current_query.cids.length;
       this.items = this.c.get(this.c.filters.color.current_query.cids);
-      this.output = _.any(this.items, function(i){ return i.color == "blue" });
+      this.output = _.any(this.items, function(i){ return i.color == "blue"; });
       this.output.should.equal(true);
     });
     it('should refresh unioned queries', function() {
-      this.fixture = [], this.i = 0;
+      this.fixture = [];
+      this.i = 0;
       while (this.i < 100000){ this.fixture.push({quantity: Math.random() * 3 >>> 0,total: Math.random() * 300 >>> 0, tip: Math.random() * 200 >>> 0, type: ["tab","visa","cash"][Math.random() * 3 >>> 0], color: ["red","orange","yellow","green","blue","indigo","violet"][Math.random() * 7 >>> 0] }); this.i++; }
-      this.c = new PourOver.Collection(this.fixture)
+      this.c = new PourOver.Collection(this.fixture);
       this.f = PourOver.makeExactFilter("quantity",[1,2]);
       this.ftwo = PourOver.makeExactFilter("type",["tab","cash","visa"]);
       this.fthree = PourOver.makeRangeFilter("total",[[0,100],[101,200],[201,300]]);
       this.ffour = PourOver.makeDVrangeFilter("color",["red","orange","yellow","green","blue","indigo","violet"]);
       this.c.addFilters([this.f,this.ftwo,this.fthree,this.ffour]);
-      this.c.filters.color.query(["red","green"])
+      this.c.filters.color.query(["red","green"]);
       this.old_length = this.c.filters.color.current_query.cids.length;
-      this.c.filters.color.unionQuery(["blue","blue"])
+      this.c.filters.color.unionQuery(["blue","blue"]);
       this.new_length = this.c.filters.color.current_query.cids.length;
       this.items = this.c.get(this.c.filters.color.current_query.cids);
-      this.change_item = _.find(this.c.items, function(i){return i.color == "indigo"})
-      this.c.updateItem(this.change_item.cid,"color","blue")
+      this.change_item = _.find(this.c.items, function(i){return i.color == "indigo";});
+      this.c.updateItem(this.change_item.cid,"color","blue");
       this.final_length = this.c.filters.color.current_query.cids.length;
       this.final_length.should.equal(this.new_length + 1);
     });
-  })
+  });
   describe('Queries can be intersected', function() {
     it('should remove intersecting elements from a filter', function() {
-      this.fixture = [], this.i = 0;
+      this.fixture = [];
+      this.i = 0;
       while (this.i < 100000){ this.fixture.push({quantity: Math.random() * 3 >>> 0,total: Math.random() * 300 >>> 0, tip: Math.random() * 200 >>> 0, type: ["tab","visa","cash"][Math.random() * 3 >>> 0], color: ["red","orange","yellow","green","blue","indigo","violet"][Math.random() * 7 >>> 0] }); this.i++; }
-      this.c = new PourOver.Collection(this.fixture)
+      this.c = new PourOver.Collection(this.fixture);
       this.f = PourOver.makeExactFilter("quantity",[1,2]);
       this.ftwo = PourOver.makeExactFilter("type",["tab","cash","visa"]);
       this.fthree = PourOver.makeRangeFilter("total",[[0,100],[101,200],[201,300]]);
       this.ffour = PourOver.makeDVrangeFilter("color",["red","orange","yellow","green","blue","indigo","violet"]);
       this.c.addFilters([this.f,this.ftwo,this.fthree,this.ffour]);
-      this.c.filters.color.query(["red","green"])
+      this.c.filters.color.query(["red","green"]);
       this.old_length = this.c.filters.color.current_query.cids.length;
       this.c.filters.color.intersectQuery(["red","red"]);
       this.new_length = this.c.filters.color.current_query.cids.length;
       this.old_length.should.be.above(this.new_length);
     });
     it('should proerly intersect', function() {
-      this.fixture = [], this.i = 0;
+      this.fixture = [];
+      this.i = 0;
       while (this.i < 100000){ this.fixture.push({quantity: Math.random() * 3 >>> 0,total: Math.random() * 300 >>> 0, tip: Math.random() * 200 >>> 0, type: ["tab","visa","cash"][Math.random() * 3 >>> 0], color: ["red","orange","yellow","green","blue","indigo","violet"][Math.random() * 7 >>> 0] }); this.i++; }
-      this.c = new PourOver.Collection(this.fixture)
+      this.c = new PourOver.Collection(this.fixture);
       this.f = PourOver.makeExactFilter("quantity",[1,2]);
       this.ftwo = PourOver.makeExactFilter("type",["tab","cash","visa"]);
       this.fthree = PourOver.makeRangeFilter("total",[[0,100],[101,200],[201,300]]);
       this.ffour = PourOver.makeDVrangeFilter("color",["red","orange","yellow","green","blue","indigo","violet"]);
       this.c.addFilters([this.f,this.ftwo,this.fthree,this.ffour]);
-      this.c.filters.color.query(["red","green"])
+      this.c.filters.color.query(["red","green"]);
       this.old_length = this.c.filters.color.current_query.cids.length;
       this.c.filters.color.intersectQuery(["red","red"]);
       this.new_length = this.c.filters.color.current_query.cids.length;
       this.items = this.c.get(this.c.filters.color.current_query.cids);
-      this.output = _.any(this.items, function(i){ return i.color == "red" });
+      this.output = _.any(this.items, function(i){ return i.color == "red"; });
       this.output.should.equal(true);
     });
     it('should refresh successfuly', function() {
-      this.fixture = [], this.i = 0;
+      this.fixture = [];
+      this.i = 0;
       while (this.i < 100000){ this.fixture.push({quantity: Math.random() * 3 >>> 0,total: Math.random() * 300 >>> 0, tip: Math.random() * 200 >>> 0, type: ["tab","visa","cash"][Math.random() * 3 >>> 0], color: ["red","orange","yellow","green","blue","indigo","violet"][Math.random() * 7 >>> 0] }); this.i++; }
-      this.c = new PourOver.Collection(this.fixture)
+      this.c = new PourOver.Collection(this.fixture);
       this.f = PourOver.makeExactFilter("quantity",[1,2]);
       this.ftwo = PourOver.makeExactFilter("type",["tab","cash","visa"]);
       this.fthree = PourOver.makeRangeFilter("total",[[0,100],[101,200],[201,300]]);
       this.ffour = PourOver.makeDVrangeFilter("color",["red","orange","yellow","green","blue","indigo","violet"]);
       this.c.addFilters([this.f,this.ftwo,this.fthree,this.ffour]);
-      this.c.filters.color.query(["red","green"])
+      this.c.filters.color.query(["red","green"]);
       this.old_length = this.c.filters.color.current_query.cids.length;
       this.c.filters.color.intersectQuery(["red","red"]);
       this.new_length = this.c.filters.color.current_query.cids.length;
@@ -898,67 +904,71 @@ describe('Stateful queries', function() {
       this.final_length = this.c.filters.color.current_query.cids.length;
       this.final_length.should.equal(this.new_length + 1);
     });
-  })
+  });
   describe('Queries can be subtracted', function() {
     it('should remove elements from a filter', function() {
-      this.fixture = [], this.i = 0;
+      this.fixture = [];
+      this.i = 0;
       while (this.i < 100000){ this.fixture.push({quantity: Math.random() * 3 >>> 0,total: Math.random() * 300 >>> 0, tip: Math.random() * 200 >>> 0, type: ["tab","visa","cash"][Math.random() * 3 >>> 0], color: ["red","orange","yellow","green","blue","indigo","violet"][Math.random() * 7 >>> 0] }); this.i++; }
-      this.c = new PourOver.Collection(this.fixture)
+      this.c = new PourOver.Collection(this.fixture);
       this.f = PourOver.makeExactFilter("quantity",[1,2]);
       this.ftwo = PourOver.makeExactFilter("type",["tab","cash","visa"]);
       this.fthree = PourOver.makeRangeFilter("total",[[0,100],[101,200],[201,300]]);
       this.ffour = PourOver.makeDVrangeFilter("color",["red","orange","yellow","green","blue","indigo","violet"]);
       this.c.addFilters([this.f,this.ftwo,this.fthree,this.ffour]);
-      this.c.filters.color.query(["red","green"])
+      this.c.filters.color.query(["red","green"]);
       this.old_length = this.c.filters.color.current_query.cids.length;
-      this.c.filters.color.subtractQuery(["orange","orange"])
+      this.c.filters.color.subtractQuery(["orange","orange"]);
       this.new_length = this.c.filters.color.current_query.cids.length;
       this.old_length.should.be.above(this.new_length);
-    })
+    });
     it('should difference the current query', function() {
-      this.fixture = [], this.i = 0;
+      this.fixture = [];
+      this.i = 0;
       while (this.i < 100000){ this.fixture.push({quantity: Math.random() * 3 >>> 0,total: Math.random() * 300 >>> 0, tip: Math.random() * 200 >>> 0, type: ["tab","visa","cash"][Math.random() * 3 >>> 0], color: ["red","orange","yellow","green","blue","indigo","violet"][Math.random() * 7 >>> 0] }); this.i++; }
-      this.c = new PourOver.Collection(this.fixture)
+      this.c = new PourOver.Collection(this.fixture);
       this.f = PourOver.makeExactFilter("quantity",[1,2]);
       this.ftwo = PourOver.makeExactFilter("type",["tab","cash","visa"]);
       this.fthree = PourOver.makeRangeFilter("total",[[0,100],[101,200],[201,300]]);
       this.ffour = PourOver.makeDVrangeFilter("color",["red","orange","yellow","green","blue","indigo","violet"]);
       this.c.addFilters([this.f,this.ftwo,this.fthree,this.ffour]);
-      this.c.filters.color.query(["red","green"])
+      this.c.filters.color.query(["red","green"]);
       this.old_length = this.c.filters.color.current_query.cids.length;
-      this.c.filters.color.subtractQuery(["orange","orange"])
+      this.c.filters.color.subtractQuery(["orange","orange"]);
       this.new_length = this.c.filters.color.current_query.cids.length;
       this.items = this.c.get(this.c.filters.color.current_query.cids);
-      this.output = _.any(this.items,function(i){ return i.color == "orange" || i.color == "blue" || i.color == "indigo" || i.color == "violet" });
+      this.output = _.any(this.items,function(i){ return i.color == "orange" || i.color == "blue" || i.color == "indigo" || i.color == "violet"; });
       this.output.should.equal(false);
-    })
+    });
     it('should successfully refresh', function() {
-      this.fixture = [], this.i = 0;
+      this.fixture = [];
+      this.i = 0;
       while (this.i < 100000){ this.fixture.push({quantity: Math.random() * 3 >>> 0,total: Math.random() * 300 >>> 0, tip: Math.random() * 200 >>> 0, type: ["tab","visa","cash"][Math.random() * 3 >>> 0], color: ["red","orange","yellow","green","blue","indigo","violet"][Math.random() * 7 >>> 0] }); this.i++; }
-      this.c = new PourOver.Collection(this.fixture)
+      this.c = new PourOver.Collection(this.fixture);
       this.f = PourOver.makeExactFilter("quantity",[1,2]);
       this.ftwo = PourOver.makeExactFilter("type",["tab","cash","visa"]);
       this.fthree = PourOver.makeRangeFilter("total",[[0,100],[101,200],[201,300]]);
       this.ffour = PourOver.makeDVrangeFilter("color",["red","orange","yellow","green","blue","indigo","violet"]);
       this.c.addFilters([this.f,this.ftwo,this.fthree,this.ffour]);
-      this.c.filters.color.query(["red","green"])
+      this.c.filters.color.query(["red","green"]);
       this.old_length = this.c.filters.color.current_query.cids.length;
-      this.c.filters.color.subtractQuery(["orange","orange"])
+      this.c.filters.color.subtractQuery(["orange","orange"]);
       this.new_length = this.c.filters.color.current_query.cids.length;
       this.items = this.c.get(this.c.filters.color.current_query.cids);
       this.change_item = _.findWhere(this.c.items,{color:"red"});
       this.c.updateItem(this.change_item.cid,"color","violet");
       this.final_length = this.c.filters.color.current_query.cids.length;
       this.new_length.should.equal(this.final_length + 1);
-    })
-  })
+    });
+  });
 
   describe('Benchmarks', function() {
     describe('Simple select', function() {
       it('should be faster than 10s', function() {
-        this.fixture = [], this.i = 0;
+        this.fixture = [];
+        this.i = 0;
         while (this.i < 100000){ this.fixture.push({quantity: Math.random() * 3 >>> 0,total: Math.random() * 300 >>> 0,tip: Math.random() * 200 >>> 0,type: ["tab","visa","cash"][Math.random() * 3 >>> 0],color: ["red","orange","yellow","green","blue","indigo","violet"][Math.random() * 7 >>> 0],percent: Math.random()});this.i++; }
-        this.c = new PourOver.Collection(this.fixture)
+        this.c = new PourOver.Collection(this.fixture);
         this.f = PourOver.makeExactFilter("quantity",[1,2]);
         this.ftwo = PourOver.makeExactFilter("type",["tab","cash","visa"]);
         this.fthree = PourOver.makeRangeFilter("total",[[0,100],[101,200],[201,300]]);
@@ -971,13 +981,14 @@ describe('Stateful queries', function() {
         this.timeB[0].should.be.below(10);
         console.log('\ttime: ' + this.timeB[0] + '.' + this.timeB[1]);
       });
-    })
+    });
 
     describe('Dvrange select', function() {
       it('should be faster than 45s', function() {
-        this.fixture = [], this.i = 0;
+        this.fixture = [];
+        this.i = 0;
         while (this.i < 100000){ this.fixture.push({quantity: Math.random() * 3 >>> 0,total: Math.random() * 300 >>> 0,tip: Math.random() * 200 >>> 0,type: ["tab","visa","cash"][Math.random() * 3 >>> 0],color: ["red","orange","yellow","green","blue","indigo","violet"][Math.random() * 7 >>> 0],percent: Math.random()});this.i++; }
-        this.c = new PourOver.Collection(this.fixture)
+        this.c = new PourOver.Collection(this.fixture);
         this.f = PourOver.makeExactFilter("quantity",[1,2]);
         this.ftwo = PourOver.makeExactFilter("type",["tab","cash","visa"]);
         this.fthree = PourOver.makeRangeFilter("total",[[0,100],[101,200],[201,300]]);
@@ -990,13 +1001,14 @@ describe('Stateful queries', function() {
         this.timeB[0].should.be.below(45);
         console.log('\ttime: ' + this.timeB[0] + '.' + this.timeB[1]);
       });
-    })
+    });
 
     describe('Continous Range', function() {
       it('should be faster than 45s', function() {
-        this.fixture = [], this.i = 0;
+        this.fixture = [];
+        this.i = 0;
         while (this.i < 100000){ this.fixture.push({quantity: Math.random() * 3 >>> 0,total: Math.random() * 300 >>> 0,tip: Math.random() * 200 >>> 0,type: ["tab","visa","cash"][Math.random() * 3 >>> 0],color: ["red","orange","yellow","green","blue","indigo","violet"][Math.random() * 7 >>> 0],percent: Math.random()});this.i++; }
-        this.c = new PourOver.Collection(this.fixture)
+        this.c = new PourOver.Collection(this.fixture);
         this.f = PourOver.makeExactFilter("quantity",[1,2]);
         this.ftwo = PourOver.makeExactFilter("type",["tab","cash","visa"]);
         this.fthree = PourOver.makeRangeFilter("total",[[0,100],[101,200],[201,300]]);
@@ -1004,18 +1016,19 @@ describe('Stateful queries', function() {
         this.ffive = PourOver.makeContinuousRangeFilter("percent");
         this.c.addFilters([this.f,this.ftwo,this.fthree,this.ffour,this.ffive]);
         this.timeA = process.hrtime();
-        this.output = this.c.getFilteredItems("percent", [.25, .75]);
+        this.output = this.c.getFilteredItems("percent", [0.25, 0.75]);
         this.timeB = process.hrtime(this.timeA);
         this.timeB[0].should.be.below(45);
         console.log('\ttime: ' + this.timeB[0] + '.' + this.timeB[1]);
       });
-    })
+    });
 
     describe('Range select', function() {
       it('should be faster than 10s', function() {
-        this.fixture = [], this.i = 0;
+        this.fixture = [];
+        this.i = 0;
         while (this.i < 100000){ this.fixture.push({quantity: Math.random() * 3 >>> 0,total: Math.random() * 300 >>> 0,tip: Math.random() * 200 >>> 0,type: ["tab","visa","cash"][Math.random() * 3 >>> 0],color: ["red","orange","yellow","green","blue","indigo","violet"][Math.random() * 7 >>> 0],percent: Math.random()});this.i++; }
-        this.c = new PourOver.Collection(this.fixture)
+        this.c = new PourOver.Collection(this.fixture);
         this.f = PourOver.makeExactFilter("quantity",[1,2]);
         this.ftwo = PourOver.makeExactFilter("type",["tab","cash","visa"]);
         this.fthree = PourOver.makeRangeFilter("total",[[0,100],[101,200],[201,300]]);
@@ -1027,6 +1040,6 @@ describe('Stateful queries', function() {
         this.timeB = process.hrtime(this.timeA);
         console.log('\ttime: ' + this.timeB[0] + '.' + this.timeB[1]);
       });
-    })
-  })
-})
+    });
+  });
+});
