@@ -24,15 +24,18 @@ PourOver is built around the ideal of simple queries that can be arbitrarily com
 
 Visit [the PourOver homepage on Github pages](http://nytimes.github.io/pourover) for more info.
 
-[Underscore.js](http://underscorejs.org/) is the only dependency. Optionally, you may use [Lo-dash](https://lodash.com/) instead of underscore.
-
 ## Usage
 Install through preferred package manager:
 - npm: `npm install pourover`
 - bower: `bower install pourover`
 - component: `component install hhsnopek/pourover`
 
-Then require `pourover` into your project script and you're all set!
+### Dependencies
+[Underscore.js](http://underscorejs.org/) is the only dependency. Optionally, you may use [Lo-dash](https://lodash.com/) instead of underscore.
+
+Then require `pourover` and `underscore`/`lodash` into your project script and you're all set!
+
+
 
 ## Browser Support
 PourOver should work in any browser that underscore works in. It has been tested in:
