@@ -46,4 +46,4 @@ PourOver should work in any browser that underscore works in. It has been tested
 - Chrome 1+
 
 ## Notice
-This repo contains upstream changes that weren't verified by [NYTimes](//github.com/NYTimes) developers. I attempted contact the original developers of PourOver for changes to be looked at or add myself or others as maintainers, but was unable to receive a response. There is an issue present in [NYTimes/pourover]() that contains an open issue regarding this.
+This repo contains upstream changes that weren't verified by [NYTimes](//github.com/NYTimes) developers. I attempted contact the original developers of PourOver for changes to be looked at or add myself or others as maintainers, but was unable to receive a response. There is an issue present in [NYTimes/pourover](//github.com/NYTimes/pourover/issues/56) that contains an open issue regarding this.
