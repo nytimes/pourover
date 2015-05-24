@@ -1,8 +1,8 @@
 {
   "name": "pourover",
-  "repository": "NYTimes/pourover",
+  "repository": "hhsnopek/pourover",
   "description": "A library for simple, fast filtering and sorting of large collections in the browser.",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "dependencies": {
     "jashkenas/underscore": "1.6.0"
   },
