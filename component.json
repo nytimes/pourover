@@ -1,0 +1,12 @@
+{
+  "name": "pourover",
+  "repository": "hhsnopek/pourover",
+  "description": "A library for simple, fast filtering and sorting of large collections in the browser.",
+  "version": "1.1.1",
+  "dependencies": {
+    "jashkenas/underscore": "1.6.0"
+  },
+  "main": "dist/pourover.js",
+  "scripts": ["pourover.js"],
+  "license": "Apache License, Version 2.0"
+}

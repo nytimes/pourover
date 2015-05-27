@@ -1,0 +1,10 @@
+language: node_js
+node_js:
+  - 'node'
+notifications:
+  webhooks:
+    urls:
+      - https://webhooks.gitter.im/e/a19b257ea9a0a4f201f5
+    on_success: change
+    on_failure: always
+    on_start: false

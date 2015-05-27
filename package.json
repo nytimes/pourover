@@ -1,0 +1,44 @@
+{
+  "name": "pourover",
+  "description": "A library for simple, fast filtering and sorting of large collections in the browser",
+  "version": "1.1.1",
+  "main": "dist/pourover.js",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com/hhsnopek/pourover.git"
+  },
+  "dependencies": {
+    "underscore": "^1.6.0"
+  },
+  "scripts": {
+    "build": "gulp",
+    "test": "mocha"
+  },
+  "devDependencies": {
+    "chai": "^2.3.0",
+    "mocha": "^2.2.5",
+    "del": "~0.1.3",
+    "gulp": "^3.8.11",
+    "gulp-rename": "^1.2.2",
+    "gulp-uglify": "^1.0.2",
+    "gulp-wrap-umd": "~0.2.1"
+  },
+  "bugs": {
+    "url": "https://github.com/hhsnopek/pourover/issues"
+  },
+  "homepage": "https://github.com/hhsnopek/pourover",
+  "directories": {
+    "doc": "docs",
+    "example": "examples",
+    "test": "test"
+  },
+  "keywords": [
+    "pourover",
+    "sorting",
+    "filtering",
+    "data",
+    "collections"
+  ],
+  "author": "Henry Snopek <hhsnopek@gmail.com> (http://hhsnopek.com/)",
+  "license": "asl"
+}
