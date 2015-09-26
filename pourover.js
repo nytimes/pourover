@@ -194,7 +194,7 @@ var PourOver = (function(){
               attr = this.attr || this.name;
           _.each(items,function(i){
             var p = that.possibilities[i[attr]];
-            if (p) {
+            if (p && !_.contains(p.matching_cids, i.cid)) {
               p.matching_cids = PourOver.insert_sorted(p.matching_cids,i.cid);
             }
           });
