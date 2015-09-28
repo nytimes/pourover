@@ -16,28 +16,30 @@
           <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
           <a class="small" href="javascript:void(0);">+</a>
           <div id="jump_wrapper">
-          <div id="jump_page">
-            
+          <div id="jump_page_wrapper">
+            <div id="jump_page">
               
-              <a class="source" href="advanced_filters.html">
-                advanced_filters.js
-              </a>
-            
+                
+                <a class="source" href="advanced_filters.html">
+                  advanced_filters.js
+                </a>
               
-              <a class="source" href="advanced_views.html">
-                advanced_views.js
-              </a>
-            
+                
+                <a class="source" href="advanced_views.html">
+                  advanced_views.js
+                </a>
               
-              <a class="source" href="basic_pourover_ing.html">
-                basic_pourover_ing.js
-              </a>
-            
+                
+                <a class="source" href="basic_pourover_ing.html">
+                  basic_pourover_ing.js
+                </a>
               
-              <a class="source" href="buffering.html">
-                buffering.js
-              </a>
-            
+                
+                <a class="source" href="buffering.html">
+                  buffering.js
+                </a>
+              
+            </div>
           </div>
         </li>
       </ul>
@@ -259,24 +261,24 @@ only needs to be different for optimization purposes.</li>
             </div>
             
             <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> CaseInsensitiveFilter = PourOver.Filter.extend({
-    cacheResults: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(items)</span>{</span>
+    cacheResults: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">items</span>)</span>{
       <span class="hljs-keyword">var</span> possibilities = <span class="hljs-keyword">this</span>.possibilities,
           attribute = <span class="hljs-keyword">this</span>.attr; 
-      _(items).each(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(i)</span>{</span>
+      _(items).each(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">i</span>)</span>{
         <span class="hljs-keyword">var</span> value = i[attribute].toLowerCase();
-        _(possibilities).each(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(p)</span>{</span>
+        _(possibilities).each(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">p</span>)</span>{
             <span class="hljs-keyword">if</span> (p.value.toLowerCase() === value) {
               p.matching_cids = PourOver.insert_sorted(p.matching_cids,i.cid)
             }
         })
       });
     },
-    addCacheResults: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(new_items)</span>{</span>
+    addCacheResults: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">new_items</span>)</span>{
         <span class="hljs-keyword">this</span>.cacheResults.call(<span class="hljs-keyword">this</span>,new_items); 
     },
-    getFn: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(query)</span>{</span>
+    getFn: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">query</span>)</span>{
         <span class="hljs-keyword">var</span> query_lc = query.toLowerCase(),
-            matching_possibility = _(<span class="hljs-keyword">this</span>.possibilities).find(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(p)</span>{</span>
+            matching_possibility = _(<span class="hljs-keyword">this</span>.possibilities).find(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">p</span>)</span>{
                 <span class="hljs-keyword">var</span> value_lc = p.value.toLowerCase();
                 <span class="hljs-keyword">return</span> value_lc === query_lc;
             });</pre></div></div>
@@ -313,8 +315,8 @@ constructor expects.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> makeCaseInsensitiveFilter = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(name,values,attr)</span>{</span>
-    <span class="hljs-keyword">var</span> values = _(values).map(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(i)</span>{</span><span class="hljs-keyword">return</span> {value:i}}),
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> makeCaseInsensitiveFilter = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">name,values,attr</span>)</span>{
+    <span class="hljs-keyword">var</span> values = _(values).map(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">i</span>)</span>{<span class="hljs-keyword">return</span> {value:i}}),
         opts = {associated_attrs: [attr], attr: attr},
         filter = <span class="hljs-keyword">new</span> CaseInsensitiveFilter(name,values,opts);
     <span class="hljs-keyword">return</span> filter;

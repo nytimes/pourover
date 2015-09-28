@@ -2,7 +2,7 @@
 
 <html>
 <head>
-  <title>Basic PourOver example</title>
+  <title>basic_pourover_ing.js</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
   <link rel="stylesheet" media="all" href="docco.css" />
@@ -16,33 +16,41 @@
           <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
           <a class="small" href="javascript:void(0);">+</a>
           <div id="jump_wrapper">
-          <div id="jump_page">
-            
+          <div id="jump_page_wrapper">
+            <div id="jump_page">
               
-              <a class="source" href="advanced_filters.html">
-                advanced_filters.js
-              </a>
-            
+                
+                <a class="source" href="advanced_filters.html">
+                  advanced_filters.js
+                </a>
               
-              <a class="source" href="advanced_views.html">
-                advanced_views.js
-              </a>
-            
+                
+                <a class="source" href="advanced_views.html">
+                  advanced_views.js
+                </a>
               
-              <a class="source" href="basic_pourover_ing.html">
-                basic_pourover_ing.js
-              </a>
-            
+                
+                <a class="source" href="basic_pourover_ing.html">
+                  basic_pourover_ing.js
+                </a>
               
-              <a class="source" href="buffering.html">
-                buffering.js
-              </a>
-            
+                
+                <a class="source" href="buffering.html">
+                  buffering.js
+                </a>
+              
+            </div>
           </div>
         </li>
       </ul>
     
     <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>basic_pourover_ing.js</h1>
+              </div>
+          </li>
         
         
         
@@ -52,8 +60,8 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-1">&#182;</a>
               </div>
-              <h1 id="basic-pourover-example">Basic PourOver example</h1>
-<p>This will cover the creation of a collection and the basic use of filters, views, and sorts</p>
+              <p>#Basic PourOver example
+This will cover the creation of a collection and the basic use of filters, views, and sorts</p>
 
             </div>
             
@@ -66,7 +74,7 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-2">&#182;</a>
               </div>
-              <h3 id="data">Data</h3>
+              <p>###Data</p>
 
             </div>
             
@@ -100,7 +108,7 @@ arrays of hashes like the following, each item a hash of attributes.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-4">&#182;</a>
               </div>
-              <h3 id="collection-creation">Collection creation</h3>
+              <p>###Collection creation</p>
 
             </div>
             
@@ -128,7 +136,7 @@ arrays of hashes like the following, each item a hash of attributes.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
-              <h3 id="filter-creation">Filter creation</h3>
+              <p>###Filter creation</p>
 
             </div>
             
@@ -141,13 +149,13 @@ arrays of hashes like the following, each item a hash of attributes.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-7">&#182;</a>
               </div>
-              <p>To do anything interesting with collections, we — almost always — need to add some filters. 
+              <p>To do anything interesting with collections, we – almost always – need to add some filters. 
 The most common filter is the exactFilter, a filter that describes an attribute that is satisfied by exactly
 one choice of several possibilities. For example, in the above example, the “mythology” attribute has two possibilities:
 “greek” or “norse”. Every item has the value “greek” or “norse” for its mythology.
 <em>NOTE: <code>exactFilter</code>s’ names must be identical to the item attribute that they index</em></p>
 <p>For the most common filter types, such as “exactFilter”, PourOver ships with convenience constructors.
-<em>NOTE: Constructors for preset filters and sorts — like the ones below — are not initialized with “new”.
+<em>NOTE: Constructors for preset filters and sorts – like the ones below – are not initialized with “new”.
 They are simply passed a name and the set of possibilities.</em></p>
 
             </div>
@@ -189,7 +197,7 @@ However, rather than items have a single choice, <code>inclusionFilter</code>s d
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-9">&#182;</a>
               </div>
-              <h3 id="adding-filters">Adding filters</h3>
+              <p>###Adding filters</p>
 
             </div>
             
@@ -202,7 +210,7 @@ However, rather than items have a single choice, <code>inclusionFilter</code>s d
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-10">&#182;</a>
               </div>
-              <p>After constructing our filters, we have to add them to the collection. This will causes the filters to index
+              <p>After constructing our filters, we have to add them to the collection. This causes the filters to index
 the collection, pre-computing which collection elements satisfy each possibility’s predicate. For exact filters, the
 predicate is equality; a collection item satisfies a possibility if it’s value is equal to the value of the possibility.</p>
 <p>Adding a filter to a collection will also tell the filter to smartly reconstruct itself when items are added to, removed from, or
@@ -221,7 +229,7 @@ updated in the collection.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-11">&#182;</a>
               </div>
-              <h3 id="non-stateful-pure-querying-of-filters">Non-stateful (pure) querying of filters</h3>
+              <p>###Non-stateful (pure) querying of filters</p>
 
             </div>
             
@@ -266,7 +274,7 @@ you add filters to a collection, the filter gets cloned first. Querying the orig
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-14">&#182;</a>
               </div>
-              <p>Querying filters returns a <code>MatchSet</code>, an objects that wraps a result and can be combined — AND, OR, NOT — with other <code>MatchSets</code>.
+              <p>Querying filters returns a <code>MatchSet</code>, an objects that wraps a result and can be combined – AND, OR, NOT – with other <code>MatchSets</code>.
 The boolean combinations will also return <code>MatchSet</code>s and can, in turn, be further combined.</p>
 
             </div>
@@ -282,7 +290,7 @@ The boolean combinations will also return <code>MatchSet</code>s and can, in tur
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-15">&#182;</a>
               </div>
-              <p>To get the value of a MatchSet, simply access its <code>cids</code> — read “collection ids” — property. These cids can be passed to a collection’s <code>get</code>
+              <p>To get the value of a MatchSet, simply access its <code>cids</code> – read “collection ids” – property. These cids can be passed to a collection’s <code>get</code>
 function to transform the cids into the actual objects they represent.
 The value of my_monsters will be:</p>
 <pre><code>[{<span class="hljs-string">"name"</span>:<span class="hljs-string">"hydra"</span>,<span class="hljs-string">"mythology"</span>:<span class="hljs-string">"greek"</span>,<span class="hljs-string">"eyes"</span>:<span class="hljs-number">18</span>,<span class="hljs-string">"sex"</span>:<span class="hljs-string">"m"</span>,<span class="hljs-string">"hobbies"</span>:[<span class="hljs-string">"coiling"</span>,<span class="hljs-string">"terrorizing"</span>,<span class="hljs-string">"growing"</span>],<span class="hljs-string">"cid"</span>:<span class="hljs-number">1</span>},
@@ -301,7 +309,7 @@ The value of my_monsters will be:</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-16">&#182;</a>
               </div>
-              <h3 id="stateful-querying">Stateful querying</h3>
+              <p>###Stateful querying</p>
 
             </div>
             
@@ -324,7 +332,7 @@ This will store the result of the query  on the <code>current_query</code> attri
             
             <div class="content"><div class='highlight'><pre>collection.filters.mythology.query(<span class="hljs-string">"greek"</span>);
 collection.filters.hobbies.query(<span class="hljs-string">"terrorizing"</span>);
-<span class="hljs-keyword">var</span> getCurrentMonsters = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span>{</span>
+<span class="hljs-keyword">var</span> getCurrentMonsters = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
     <span class="hljs-keyword">var</span> myth_set = collection.filters.mythology.current_query,
         hobby_set = collection.filters.hobbies.current_query,
         output_set = myth_set.and(hobby_set);
@@ -536,7 +544,7 @@ This gets fired whenever something happens that would require a re-render (queri
             </div>
             
             <div class="content"><div class='highlight'><pre>
-paged_view_1.on(<span class="hljs-string">"update"</span>,<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span>{</span>
+paged_view_1.on(<span class="hljs-string">"update"</span>,<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
    paged_view_1.render(); 
 })</pre></div></div>
             
