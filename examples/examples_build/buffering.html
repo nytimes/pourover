@@ -107,8 +107,8 @@ for the specified guids</li>
         <span class="hljs-keyword">var</span> query = <span class="hljs-built_in">encodeURIComponent</span>(guids.join(<span class="hljs-string">","</span>));
         <span class="hljs-keyword">return</span> <span class="hljs-string">"http://example.com/data?guids="</span>+query;
     }
-});
-<span class="hljs-keyword">var</span> collection = <span class="hljs-keyword">new</span> MyBufferedCollection(monsters);</pre></div></div>
+})
+<span class="hljs-keyword">var</span> collection = <span class="hljs-keyword">new</span> MyBufferedCollection(monsters)</pre></div></div>
             
         </li>
         
@@ -131,8 +131,8 @@ and then delegate back to the default <code>render</code> function of the view</
        <span class="hljs-keyword">var</span> items = <span class="hljs-keyword">this</span>.getCurrentItems();
        console.log(items);
     }
-});
-<span class="hljs-keyword">var</span> my_buffered_view = <span class="hljs-keyword">new</span> MyBufferedView(<span class="hljs-string">"buffered_view"</span>,collection);</pre></div></div>
+})
+<span class="hljs-keyword">var</span> my_buffered_view = <span class="hljs-keyword">new</span> MyBufferedView(<span class="hljs-string">"buffered_view"</span>,collection)</pre></div></div>
             
         </li>
         
