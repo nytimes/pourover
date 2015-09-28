@@ -393,6 +393,7 @@ var PourOver = (function(){
         this.addItems(items);
         this.on("change",function(){
           _.each(this.filters,function(f){ if(f.current_query){f.current_query.refresh();} });
+          _.each(this.sorts, function(s){ s.rebuild_sort(true); });
         });
         this.initialize.apply(this, arguments);
       };
@@ -631,7 +632,6 @@ var PourOver = (function(){
             this.sorts[sort.name] = sort;
             sort.collection = this;
             sort.rebuild_sort();
-            this.on("change",function(){ sort.rebuild_sort(true); });
             // Like filters, if you set `associated_attrs` on a sort, they will rebuild themselves whenever any item in the collection undergoes a change
             // on that attribute.
             // TODO: Consider cloning on add. Also, bring in line with addFilter (events or not!?)
