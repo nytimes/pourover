@@ -46,7 +46,7 @@ var hobbies_filter = PourOver.makeInclusionFilter("hobbies",["riddles",
 
 // ###Adding filters
 
-// After constructing our filters, we have to add them to the collection. This will causes the filters to index
+// After constructing our filters, we have to add them to the collection. This causes the filters to index
 // the collection, pre-computing which collection elements satisfy each possibility's predicate. For exact filters, the
 // predicate is equality; a collection item satisfies a possibility if it's value is equal to the value of the possibility.
 //
