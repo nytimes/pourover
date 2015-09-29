@@ -154,12 +154,12 @@ collection = new PourOver.Collection(data);
 
 <p>Removing of items is also supported. However, it is not a fast operation and should be avoided if possible. It is generally preferable to have a “visible” filter and hide items thusly rather than removing them.</p>
 
-<pre><code>collection.removeItems(1);
+<pre><code>collection.removeItems({cid: 1});
 </code></pre>
 
 <p><code>removeItem</code> either takes a single cid or an array of cids. It is much faster if these cids are sorted. If they are already sorted call <code>removeItems</code> with a second parameter “true”</p>
 
-<pre><code>collection.removeItems([1,2],true);
+<pre><code>collection.removeItems([{cid: 1},{cid: 2}],true);
 </code></pre>
 
 <p><strong>Adding filters</strong>
