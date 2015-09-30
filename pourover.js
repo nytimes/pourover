@@ -1,3 +1,7 @@
+if (typeof _ == 'undefined' && typeof require == 'function') {
+    var _ = require('underscore');
+}
+
 var PourOver = (function(){
     var ctor = function(){};
 
@@ -1928,3 +1932,7 @@ var PourOver = (function(){
 
     return PourOver;
 })();
+
+if (typeof module != 'undefined' && module.exports) {
+  module.exports = PourOver;
+}
