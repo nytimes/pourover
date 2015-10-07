@@ -191,6 +191,29 @@ test("Sorts can be created",function(){
   var items = _.pluck(collection.getSortedItems("age"),"cid");
   deepEqual(items,[2,4,0,3,1],"Sorts items correctly")
 })
+test("Sorts can be chained", function() {
+  var collection = new PourOver.Collection([ {gender: "boy", name: "Merick", age: 70, color: "red"},{gender: "boy", name:"Howl", age: 70, color: "dead"},{name: "Boo", age: 70, color: "blue", gender: "girl"},{gender: "girl", name:"Stoic", age: 70, color: "purple"}, {gender: "boy", name:"Cargo", age: 10, color: "gold"},{gender: "boy", name: "Erik", age: 26, color: "red"},{gender: "boy", name:"Bart", age: 100, color: "dead"},{name: "Cindy", age: 10, color: "blue", gender: "girl"},{gender: "girl", name:"Sandra", age: 70, color: "purple"}, {gender: "boy", name:"Cargo", age: 10, color: "gold"},{gender: "boy", name: "Erik", age: 26, color: "red"},{gender: "boy", name:"Bart", age: 100, color: "dead"},{name: "Cindy", age: 10, color: "blue", gender: "girl"},{gender: "girl", name:"Sandra", age: 70, color: "purple"}, {gender: "boy", name:"Cargo", age: 10, color: "gold"},{gender: "boy", name: "Erik", age: 26, color: "red"},{gender: "boy", name:"Bart", age: 100, color: "dead"},{name: "Cindy", age: 10, color: "blue", gender: "girl"},{gender: "girl", name:"Sandra", age: 70, color: "purple"}, {gender: "boy", name:"Cargo", age: 10, color: "gold"},{gender: "girl", name:"Sandra", age: 70, color: "purple"}, {gender: "boy", name:"Cargo", age: 10, color: "gold"},{gender: "boy", name: "Erik", age: 26, color: "red"},{gender: "boy", name:"Bart", age: 100, color: "dead"},{name: "Cindy", age: 10, color: "blue", gender: "girl"},{gender: "girl", name:"Sandra", age: 70, color: "purple"}, {gender: "boy", name:"Cargo", age: 10, color: "gold"},{gender: "boy", name: "Erik", age: 26, color: "red"},{gender: "boy", name:"Bart", age: 100, color: "dead"},{name: "Cindy", age: 10, color: "blue", gender: "girl"},{gender: "girl", name:"Sandra", age: 70, color: "purple"}, {gender: "boy", name:"Cargo", age: 10, color: "gold"},{gender: "boy", name: "Erik", age: 26, color: "red"},{gender: "boy", name:"Bart", age: 100, color: "dead"},{name: "Cindy", age: 10, color: "blue", gender: "girl"},{gender: "girl", name:"Sandra", age: 70, color: "purple"}, {gender: "boy", name:"Cargo", age: 10, color: "gold"},{gender: "boy", name: "Erik", age: 70, color: "red"},{gender: "boy", name:"Bart", age: 100, color: "dead"},{name: "Cindy", age: 10, color: "blue", gender: "girl"},{gender: "girl", name:"Sandra", age: 70, color: "purple"}, {gender: "boy", name:"Cargo", age: 70, color: "gold"},{gender: "girl", name:"Sandra", age: 70, color: "purple"}, {gender: "boy", name:"Cargo", age: 70, color: "gold"} ]),
+      filter = PourOver.makeExactFilter("gender",["boy","girl"]),
+      age_sort = new (PourOver.Sort.extend({fn: function(a,b){return a.age - b.age}}))("age"),
+      name_sort = new (PourOver.Sort.extend({fn: function(a,b){if (a.name < b.name) {return -1;} else if (a.name > b.name) {return 1;} else {return 0;}}}))("name");
+  collection.addFilters([filter]);
+  collection.addSorts([name_sort, age_sort]);
+  var girls = collection.filters.gender.getFn("boy").all();
+  var sorted = collection.sorts.age.sort(collection.sorts.name.sort(girls));
+  notDeepEqual(_(sorted).map(function(i){return i.cid}), _(girls).map(function(i){return i.cid}), "Sort changed the order");
+  var prev_obj;
+  _(sorted).each(function(obj) {
+      if (prev_obj) {
+          if (prev_obj.age === obj.age) {
+//              console.log('equal?', prev_obj, obj);
+              equal(prev_obj.name <= obj.name, true, prev_obj.name + " should be before " + obj.name);
+          } else {
+              equal(prev_obj.age <= obj.age, true, prev_obj.age + " should be before " + obj.age);
+          }
+      }
+      prev_obj = obj;
+  });
+})
 
 module("Views")
 test("Views can be created",function(){
