@@ -90,7 +90,8 @@ var PourOver = (function(){
         }
         while(i < length){
           if(element < set[i]){
-            return set.slice(0,i).concat([element]).concat(set.slice(i,length));
+            set.splice(i, 0, element);
+            return set;
           } else {
             i++;
           }
